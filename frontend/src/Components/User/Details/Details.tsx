@@ -4,6 +4,7 @@ import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
+import Spacer from '../../Common/Spacer'
 
 type Props = {}
 
@@ -66,6 +67,7 @@ const Details = (props: Props) => {
 
 
             </div>
+            <Spacer vertical={50} />
             <NavigationButton destination='/' />
         </>
     )

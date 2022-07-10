@@ -13,7 +13,6 @@ const Drinks = (props: Props) => {
             <div className={style.drinksOutterContainer}>
                 <AddDrink />
                 <div className={style.drinksContainer}>
-
                     <Drink />
                     <Drink />
                     <Drink />
@@ -23,7 +22,6 @@ const Drinks = (props: Props) => {
                     <Drink />
                     <Drink />
                     <Drink />
-
                 </div>
 
             </div>

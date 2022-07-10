@@ -39,6 +39,48 @@ def get_event_infos(event_URL):
         return util.build_response("Event not found", code=404)
 
 
+@app.route('/api/users', methods=["GET"])
+def get_event_infos():
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/favorites', methods=["GET"])
+def get_event_infos(member_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/history', methods=["GET"])
+def get_event_infos(member_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/favorites/add/<int:drink_id>', methods=["GET"])
+def get_event_infos(member_id, drink_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/favorites/remove/<int:drink_id>', methods=["GET"])
+def get_event_infos(member_id, drink_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/drinks', methods=["GET"])
+def get_event_infos():
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/drinks/buy', methods=["GET"])
+def get_event_infos():
+    """
+    Input:
+    {
+        drink:<drink_id>,
+        member:<member_id>
+    }
+    """
+    return util.build_response("Not Implemented yet", code=404)
+
+
 @app.route('/api/login/check', methods=["GET"])
 @authenticated
 def loginCheck():
