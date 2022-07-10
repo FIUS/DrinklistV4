@@ -347,6 +347,7 @@ export const darkTheme2 = createTheme({
 const normalPrimary = '#c4daff'
 const normalBackground = '#fbfbfb'
 const normalText = '#000000'
+const success = '#88d32d'
 
 export const normalTheme = createTheme({
     palette: {
@@ -359,6 +360,9 @@ export const normalTheme = createTheme({
         text: {
             primary: normalText
         },
+        success: {
+            main: success
+        }
     },
     components: {
         MuiButton: {

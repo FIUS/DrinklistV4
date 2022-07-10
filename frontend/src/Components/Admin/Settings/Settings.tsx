@@ -1,10 +1,14 @@
 import React from 'react'
+import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 
 type Props = {}
 
 const Settings = (props: Props) => {
     return (
-        <div>Settings</div>
+        <>
+
+            <NavigationButton destination='/admin' />
+        </>
     )
 }
 

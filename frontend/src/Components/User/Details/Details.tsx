@@ -1,15 +1,13 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
-import { useNavigate } from 'react-router-dom';
+import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 
 type Props = {}
 
 const Details = (props: Props) => {
-    const navigate = useNavigate();
-
     return (
         <>
             <div className={style.details}>
@@ -68,15 +66,7 @@ const Details = (props: Props) => {
 
 
             </div>
-
-            <Paper className={style.footer}>
-                <Button
-                    className={style.footerButton}
-                    variant='contained'
-                    onClick={() => navigate("/")}>
-                    Zurück
-                </Button>
-            </Paper>
+            <NavigationButton destination='/' />
         </>
     )
 }

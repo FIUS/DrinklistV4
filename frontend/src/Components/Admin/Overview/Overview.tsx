@@ -5,34 +5,45 @@ import PersonIcon from '@mui/icons-material/Person';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { Settings } from '@mui/icons-material';
 import style from './overview.module.scss'
+import { useNavigate } from 'react-router-dom';
 
 type Props = {}
 
 const Overview = (props: Props) => {
+    const navigate = useNavigate();
+
     return (
         <div className={style.overview}>
             <Button
                 size="large"
                 className={style.button}
-                variant='contained'>
+                variant='contained'
+                onClick={() => navigate("drinks")}
+            >
                 Getränke <SportsBarIcon />
             </Button>
             <Button
                 size="large"
                 className={style.button}
-                variant='contained'>
+                variant='contained'
+                onClick={() => navigate("members")}
+            >
                 Mitglieder <PersonIcon />
             </Button>
             <Button
                 size="large"
                 className={style.button}
-                variant='contained'>
+                variant='contained'
+                onClick={() => navigate("transactions")}
+            >
                 Transaktionen <ReceiptLongIcon />
             </Button>
             <Button
                 size="large"
                 className={style.button}
-                variant='contained'>
+                variant='contained'
+                onClick={() => navigate("settings")}
+            >
                 Einstellungen <Settings />
             </Button>
         </div>
