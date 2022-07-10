@@ -30,38 +30,31 @@ def authenticated(fn):
     return wrapper
 
 
-@app.route('/api/event/infos/<string:event_URL>', methods=["GET"])
-def get_event_infos(event_URL):
-    event_infos = db.get_event_infos(event_URL)
-    if event_infos is not None:
-        return util.build_response(event_infos)
-    else:
-        return util.build_response("Event not found", code=404)
-
-
 @app.route('/api/users', methods=["GET"])
 def get_users():
-    return util.build_response("Not Implemented yet", code=404)
+    return util.build_response(db.get_users())
 
 
 @app.route('/api/users/<int:member_id>/favorites', methods=["GET"])
 def get_user_favorites(member_id):
-    return util.build_response("Not Implemented yet", code=404)
+    return util.build_response(db.get_user_favorites(member_id))
 
 
 @app.route('/api/users/<int:member_id>/history', methods=["GET"])
 def get_user_history(member_id):
-    return util.build_response("Not Implemented yet", code=404)
+    return util.build_response(db.get_user_history(member_id))
 
 
 @app.route('/api/users/<int:member_id>/favorites/add/<int:drink_id>', methods=["POST"])
 def add_user_favorite(member_id, drink_id):
-    return util.build_response("Not Implemented yet", code=404)
+    db.add_user_favorite(member_id, drink_id)
+    return util.build_response("Added favorite")
 
 
 @app.route('/api/users/<int:member_id>/favorites/remove/<int:drink_id>', methods=["POST"])
 def remove_user_favorite(member_id, drink_id):
-    return util.build_response("Not Implemented yet", code=404)
+    db.remove_user_favorite(member_id, drink_id)
+    return util.build_response("Removed favorite")
 
 
 @app.route('/api/users/<int:member_id>/password', methods=["POST"])
@@ -72,12 +65,14 @@ def change_user_password(member_id):
         password:<new password>
     }
     """
-    return util.build_response("Not Implemented yet", code=404)
+    db.change_user_password(member_id, request.json["password"])
+    return util.build_response("Password changed")
 
 
 @app.route('/api/users/<int:member_id>/visibility/toggle', methods=["POST"])
 def toggle_user_visibility(member_id):
-    return util.build_response("Not Implemented yet", code=404)
+    db.change_user_visibility(member_id)
+    return util.build_response("Changed visibility")
 
 
 @app.route('/api/users/<int:member_id>/delete', methods=["GET"])
@@ -95,12 +90,14 @@ def add_user():
         password:<password>
     }
     """
-    return util.build_response("Not Implemented yet", code=404)
+    db.add_user(request.json["name"],
+                request.json["money"], request.json["password"])
+    return util.build_response("User added")
 
 
 @app.route('/api/drinks', methods=["GET"])
 def get_drinks():
-    return util.build_response("Not Implemented yet", code=404)
+    return util.build_response(db.get_drinks())
 
 
 @app.route('/api/drinks/<int:drink_id>/price', methods=["POST"])
@@ -111,7 +108,8 @@ def set_drink_price(drink_id):
         price:<price>
     }
     """
-    return util.build_response("Not Implemented yet", code=404)
+    db.change_drink_price(drink_id, request.json["price"])
+    return util.build_response("Price changed")
 
 
 @app.route('/api/drinks/<int:drink_id>/stock', methods=["POST"])
@@ -122,12 +120,14 @@ def set_drink_stock(drink_id):
         stock:<new stock>
     }
     """
-    return util.build_response("Not Implemented yet", code=404)
+    db.change_drink_stock(drink_id, request.json["stock"])
+    return util.build_response("Stock changed")
 
 
 @app.route('/api/drinks/<int:drink_id>/delete', methods=["POST"])
 def delete_drink(drink_id):
-    return util.build_response("Not Implemented yet", code=404)
+    db.delete_drink(drink_id)
+    return util.build_response("Drink deleted")
 
 
 @app.route('/api/drinks/add', methods=["POST"])
@@ -140,7 +140,9 @@ def add_drink():
         stock:<stock>
     }
     """
-    return util.build_response("Not Implemented yet", code=404)
+    db.add_drink(request.json["name"],
+                 request.json["price"], request.json["stock"])
+    return util.build_response("Drink added")
 
 
 @app.route('/api/drinks/buy', methods=["POST"])
@@ -148,21 +150,26 @@ def buy_drink():
     """
     Input:
     {
-        drink:<drink_id>,
-        member:<member_id>
+        drinkID:<drink_id>,
+        memberID:<member_id>
     }
     """
-    return util.build_response("Not Implemented yet", code=404)
+    status = db.buy_drink(request.json["memberID"], request.json["drinkID"])
+    if status == None:
+        return util.build_response("Drink bought")
+    else:
+        return util.build_response(status, code=400)
 
 
 @app.route('/api/transactions', methods=["GET"])
 def get_transactions():
-    return util.build_response("Not Implemented yet", code=404)
+    return util.build_response(db.get_transactions(), code=404)
 
 
-@app.route('/api/transactions/<int:drink_id>/undo', methods=["GET"])
-def undo_transaction():
-    return util.build_response("Not Implemented yet", code=404)
+@app.route('/api/transactions/<int:transaction_id>/undo', methods=["GET"])
+def undo_transaction(transaction_id):
+    db.delete_transaction(transaction_id)
+    return util.build_response("Transaction undone")
 
 
 @app.route('/api/login/check', methods=["GET"])

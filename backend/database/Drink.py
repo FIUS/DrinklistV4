@@ -7,4 +7,12 @@ class Drink(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     name = sql.Column(sql.String(100), nullable=False, unique=True)
     stock = sql.Column(sql.Integer, default=0, nullable=True)
-    price = sql.Column(sql.Integer, default=0, nullable=True)
+    price = sql.Column(sql.Float, default=0, nullable=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "stock": self.stock,
+            "price": self.price
+        }
