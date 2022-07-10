@@ -344,7 +344,7 @@ export const darkTheme2 = createTheme({
     },
 });
 
-const normalPrimary = '#bbc34f'
+const normalPrimary = '#c4daff'
 const normalBackground = '#fbfbfb'
 const normalText = '#000000'
 

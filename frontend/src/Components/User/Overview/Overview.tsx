@@ -2,7 +2,6 @@ import { TextField, Typography } from '@mui/material'
 import React from 'react'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
-
 type Props = {}
 
 const Overview = (props: Props) => {

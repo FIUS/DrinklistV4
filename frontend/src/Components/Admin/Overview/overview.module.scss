@@ -1,0 +1,12 @@
+@import "../../Common/variables.module.scss";
+
+.overview{
+    padding: $padding;
+    display: flex;
+    gap: $flex-gap;
+}
+
+.button{
+    width: 250px;
+    height: 100px;
+}

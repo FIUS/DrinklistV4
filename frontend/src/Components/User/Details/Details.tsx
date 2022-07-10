@@ -25,7 +25,12 @@ const Details = (props: Props) => {
                     <Typography variant='h4'>Ich nehme...</Typography>
                     <TextField placeholder='Suche...' />
                     <div className={style.buyDrinkContainerInner}>
-                        {Array(33).fill(<DrinkButton />)}
+                        <Typography variant='h6' style={{ width: "100%" }}>Bier</Typography>
+                        {Array(6).fill(<DrinkButton />)}
+                        <Typography variant='h6' style={{ width: "100%" }}>Paulaner</Typography>
+                        {Array(7).fill(<DrinkButton />)}
+                        <Typography variant='h6' style={{ width: "100%" }}>Softdrinks</Typography>
+                        {Array(9).fill(<DrinkButton />)}
                     </div>
                 </div>
 
