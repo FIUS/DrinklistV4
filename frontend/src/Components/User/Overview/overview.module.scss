@@ -1,0 +1,27 @@
+@import "../../Common/variables.module.scss";
+
+.outterContainer{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $flex-gap;
+}
+
+.headline{
+    padding-top: $padding;
+}
+
+.input{
+    width: 70%;
+    min-width: 350px !important;
+}
+
+.buttonArea{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $flex-gap;
+    padding: $padding;
+}

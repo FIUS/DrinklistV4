@@ -1,0 +1,71 @@
+@import "../../Common/variables.module.scss";
+
+.balanceContainer{
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+}
+
+.balanceTop{
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+}
+
+.drinkButtonContainer{
+    display: flex;
+    gap: $flex-gap;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.balanceBoxContainer{
+    display: flex;
+    flex-direction: column;
+    gap: $flex-gap;
+}
+
+.buyDrinkContainer{
+    display: flex;
+    flex-direction: column;
+    gap: $flex-gap;
+}
+
+.buyDrinkContainerInner{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+    column-gap: calc(2*$flex-gap);
+    max-width: 750px;
+}
+
+.details{
+    display: flex;
+    gap: calc(3*$flex-gap);
+    padding: $padding;
+    flex-wrap: wrap;
+}
+
+.historyContainer{
+    display: flex;
+    flex-direction: column;
+    gap: $flex-gap;
+}
+
+.footer{
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: calc($padding/2);
+}
+
+.footerButton{
+    width: 100%;
+}

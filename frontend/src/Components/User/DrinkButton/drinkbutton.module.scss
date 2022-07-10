@@ -1,0 +1,7 @@
+@import "../../Common/variables.module.scss";
+
+.container{
+    display: flex;
+    align-items: center;
+    gap: $flex-gap;
+}

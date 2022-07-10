@@ -9,6 +9,8 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import { CssBaseline } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
+import TopBar from './Components/Common/TopBar/TopBar';
+import Routing from './Components/Routing/Routing';
 
 function App() {
   const [themeCookie, setthemeCookie] = useState(0)
@@ -24,7 +26,8 @@ function App() {
         <div className="App">
           <CssBaseline />
           <Provider store={store}>
-            {/*  INSERT MAIN TAG HERE  */}
+            <TopBar />
+            <Routing />
           </Provider>
         </div>
       </Router>
