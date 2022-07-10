@@ -40,37 +40,111 @@ def get_event_infos(event_URL):
 
 
 @app.route('/api/users', methods=["GET"])
-def get_event_infos():
+def get_users():
     return util.build_response("Not Implemented yet", code=404)
 
 
 @app.route('/api/users/<int:member_id>/favorites', methods=["GET"])
-def get_event_infos(member_id):
+def get_user_favorites(member_id):
     return util.build_response("Not Implemented yet", code=404)
 
 
 @app.route('/api/users/<int:member_id>/history', methods=["GET"])
+def get_user_history(member_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/favorites/add/<int:drink_id>', methods=["POST"])
+def add_user_favorite(member_id, drink_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/favorites/remove/<int:drink_id>', methods=["POST"])
+def remove_user_favorite(member_id, drink_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/password', methods=["POST"])
+def change_user_password(member_id):
+    """
+    Input:
+    {
+        password:<new password>
+    }
+    """
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/visibility/toggle', methods=["POST"])
+def toggle_user_visibility(member_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/users/<int:member_id>/delete', methods=["GET"])
 def get_event_infos(member_id):
     return util.build_response("Not Implemented yet", code=404)
 
 
-@app.route('/api/users/<int:member_id>/favorites/add/<int:drink_id>', methods=["GET"])
-def get_event_infos(member_id, drink_id):
-    return util.build_response("Not Implemented yet", code=404)
-
-
-@app.route('/api/users/<int:member_id>/favorites/remove/<int:drink_id>', methods=["GET"])
-def get_event_infos(member_id, drink_id):
+@app.route('/api/users/add', methods=["GET"])
+def add_user():
+    """
+    Input:
+    {
+        name:<name>,
+        money:<money>,
+        password:<password>
+    }
+    """
     return util.build_response("Not Implemented yet", code=404)
 
 
 @app.route('/api/drinks', methods=["GET"])
-def get_event_infos():
+def get_drinks():
     return util.build_response("Not Implemented yet", code=404)
 
 
-@app.route('/api/drinks/buy', methods=["GET"])
-def get_event_infos():
+@app.route('/api/drinks/<int:drink_id>/price', methods=["POST"])
+def set_drink_price(drink_id):
+    """
+    Input:
+    {
+        price:<price>
+    }
+    """
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/drinks/<int:drink_id>/stock', methods=["POST"])
+def set_drink_stock(drink_id):
+    """
+    Input:
+    {
+        stock:<new stock>
+    }
+    """
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/drinks/<int:drink_id>/delete', methods=["POST"])
+def delete_drink(drink_id):
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/drinks/add', methods=["POST"])
+def add_drink():
+    """
+    Input:
+    {
+        name:<name>,
+        price:<price in euro>,
+        stock:<stock>
+    }
+    """
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/drinks/buy', methods=["POST"])
+def buy_drink():
     """
     Input:
     {
@@ -78,6 +152,16 @@ def get_event_infos():
         member:<member_id>
     }
     """
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/transactions', methods=["GET"])
+def get_transactions():
+    return util.build_response("Not Implemented yet", code=404)
+
+
+@app.route('/api/transactions/<int:drink_id>/undo', methods=["GET"])
+def undo_transaction():
     return util.build_response("Not Implemented yet", code=404)
 
 
