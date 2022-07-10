@@ -30,34 +30,6 @@ def authenticated(fn):
     return wrapper
 
 
-# def checkTrainer(request: Request):
-#     if not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
-#         return util.build_response("Unauthorized", 403)
-
-#     if not (db.isTrainer(request.cookies.get('memberID')) or db.isExecutive(request.cookies.get('memberID'))):
-#         return util.build_response("Unauthorized", 403)
-#     return None
-
-
-# def checkExecutive(request: Request):
-#     if not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
-#         return util.build_response("Unauthorized", 403)
-#     if not db.isExecutive(request.cookies.get('memberID')):
-#         return util.build_response("Unauthorized", 403)
-#     return None
-
-
-# def memberIDFromRequest(request: Request):
-#     return request.cookies.get('memberID')
-
-
-# def infosAboutSelfOrTrainer(request: Request, memberID):
-#     if checkTrainer(request):
-#         if not int(memberID) == int(memberIDFromRequest(request)):
-#             return util.build_response("Unauthorized", 403)
-#     return None
-
-
 @app.route('/api/event/infos/<string:event_URL>', methods=["GET"])
 def get_event_infos(event_URL):
     event_infos = db.get_event_infos(event_URL)
