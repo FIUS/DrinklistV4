@@ -1,5 +1,6 @@
 import React from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
+import Spacer from '../../Common/Spacer'
 import AddDrink from './AddDrink'
 import Drink from './Drink'
 import style from './drinks.module.scss'
@@ -26,6 +27,7 @@ const Drinks = (props: Props) => {
                 </div>
 
             </div>
+            <Spacer vertical={50} />
             <NavigationButton destination='/admin' />
         </>
     )

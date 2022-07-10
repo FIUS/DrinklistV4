@@ -1,0 +1,12 @@
+@import "../../Common/variables.module.scss";
+
+.table{
+    padding: $padding;
+}
+
+.firstRowAlign{
+    display: flex;
+    align-items: flex-end;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
