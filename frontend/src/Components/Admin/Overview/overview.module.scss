@@ -3,6 +3,7 @@
 .overview{
     padding: $padding;
     display: flex;
+    flex-wrap: wrap;
     gap: $flex-gap;
 }
 

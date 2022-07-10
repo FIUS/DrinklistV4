@@ -11,10 +11,30 @@ type Props = {}
 const Overview = (props: Props) => {
     return (
         <div className={style.overview}>
-            <Button size="large" className={style.button} variant='contained'>Getränke <SportsBarIcon /></Button>
-            <Button size="large" className={style.button} variant='contained'>Mitglieder <PersonIcon /></Button>
-            <Button size="large" className={style.button} variant='contained'>Transaktionen <ReceiptLongIcon /></Button>
-            <Button size="large" className={style.button} variant='contained'>Einstellungen <Settings /></Button>
+            <Button
+                size="large"
+                className={style.button}
+                variant='contained'>
+                Getränke <SportsBarIcon />
+            </Button>
+            <Button
+                size="large"
+                className={style.button}
+                variant='contained'>
+                Mitglieder <PersonIcon />
+            </Button>
+            <Button
+                size="large"
+                className={style.button}
+                variant='contained'>
+                Transaktionen <ReceiptLongIcon />
+            </Button>
+            <Button
+                size="large"
+                className={style.button}
+                variant='contained'>
+                Einstellungen <Settings />
+            </Button>
         </div>
     )
 }
