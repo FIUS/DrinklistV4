@@ -1,5 +1,5 @@
 import { TextField, Typography } from '@mui/material'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ type Props = {}
 const Overview = (props: Props) => {
     const dispatch = useDispatch()
     const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const [searchfield, setsearchfield] = useState("")
 
     useEffect(() => {
         if (common.drinks === null || common.members === null || common.drinkCategories === null) {
@@ -39,10 +40,20 @@ const Overview = (props: Props) => {
                 <Typography variant='h4'>Wer bist du?</Typography>
             </div>
 
-            <TextField className={style.input} placeholder="Name" />
+            <TextField
+                className={style.input}
+                placeholder="Name"
+                type="search"
+                value={searchfield}
+                onChange={
+                    (value) => { setsearchfield(value.target.value) }
+                }
+            />
 
             <div className={style.buttonArea}>
-                {common.members?.map(value => {
+                {common.members?.filter((f_value) => {
+                    return searchfield === "" || f_value.name.toLowerCase().includes(searchfield.toLowerCase())
+                }).map(value => {
                     if (!value.hidden) {
                         return <UserButton key={value.id} name={value.name} id={value.id} />
                     }
