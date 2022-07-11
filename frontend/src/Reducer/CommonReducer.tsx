@@ -3,13 +3,15 @@ import { Drink, Member } from "../types/ResponseTypes"
 const initialState: CommonReducerType = {
     drinks: null,
     drinkCategories: null,
-    members: null
+    members: null,
+    favorites: null
 }
 
 export type CommonReducerType = {
     drinks: Array<Drink> | null,
     drinkCategories: Array<string> | null,
     members: Array<Member> | null,
+    favorites: Array<number> | null,
 }
 
 const reducer = (state = initialState, { type, payload }: any) => {
@@ -26,6 +28,10 @@ const reducer = (state = initialState, { type, payload }: any) => {
 
         case "SET_DRINK_CATEGORIES":
             newState.drinkCategories = payload
+            return newState
+
+        case "SET_FAVORITES":
+            newState.favorites = payload
             return newState
         default:
             return state

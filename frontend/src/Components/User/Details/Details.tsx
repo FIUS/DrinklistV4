@@ -8,7 +8,7 @@ import Spacer from '../../Common/Spacer'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions';
-import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
+import { setDrinkCategories, setDrinks, setFavorites, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
 import { Transaction } from "../../../types/ResponseTypes"
 
@@ -38,6 +38,11 @@ const Details = (props: Props) => {
                     dispatch(setMembers(value.content))
                 }
             })
+            doGetRequest("users/" + params.userid + "/favorites").then((value) => {
+                if (value.code === 200) {
+                    dispatch(setFavorites(value.content))
+                }
+            })
 
         }
     }, [common.drinks, common.members, common.drinkCategories, dispatch])
@@ -59,7 +64,10 @@ const Details = (props: Props) => {
                         <Typography variant='h3'>Kontostand:</Typography>
                         <Typography variant='h3'>38,15€</Typography>
                     </div>
-                    <BalanceBox />
+                    <BalanceBox favorites={common.drinks?.filter((value) => {
+                        return common.favorites?.includes(value.id)
+                    })}
+                        memberID={params.userid ? params.userid : ""} />
                 </div>
 
                 <div className={style.buyDrinkContainer}>
@@ -73,7 +81,7 @@ const Details = (props: Props) => {
                             return <>
                                 <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
                                 {drinks?.map(value => {
-                                    return <DrinkButton drink={value} />
+                                    return <DrinkButton drink={value} memberID={params.userid ? params.userid : ""} />
                                 })}
                             </>
                         })}

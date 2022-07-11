@@ -20,3 +20,10 @@ export const setDrinkCategories = (categories: Array<string>) => {
         payload: categories
     }
 }
+
+export const setFavorites = (favorites: Array<string>) => {
+    return {
+        type: "SET_FAVORITES",
+        payload: favorites
+    }
+}

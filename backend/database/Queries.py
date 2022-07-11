@@ -59,8 +59,9 @@ class Queries:
     def remove_user_favorite(self, member_id, drink_id):
         favorite: Favorite = self.session.query(Favorite).filter_by(
             member_id=member_id, drink_id=drink_id).first()
-        self.session.delete(favorite)
-        self.session.commit()
+        if favorite is not None:
+            self.session.delete(favorite)
+            self.session.commit()
 
     def change_user_password(self, member_id, new_password):
         pw_hash, salt = TokenManager.hashPassword(new_password)
