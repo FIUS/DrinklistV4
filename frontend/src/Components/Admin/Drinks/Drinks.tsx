@@ -16,15 +16,15 @@ const Drinks = (props: Props) => {
     const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
 
     useEffect(() => {
-        if (common.drinks === null) {
-            doGetRequest("drinks").then((value) => {
-                if (value.code === 200) {
-                    dispatch(setDrinks(value.content))
-                }
-            })
 
-        }
-    }, [common.drinks, common.members, common.drinkCategories, dispatch])
+        doGetRequest("drinks").then((value) => {
+            if (value.code === 200) {
+                dispatch(setDrinks(value.content))
+            }
+        })
+
+
+    }, [dispatch])
 
     return (
         <>

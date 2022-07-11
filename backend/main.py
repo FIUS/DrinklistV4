@@ -75,9 +75,9 @@ def toggle_user_visibility(member_id):
     return util.build_response("Changed visibility")
 
 
-@app.route('/api/users/<int:member_id>/delete', methods=["GET"])
+@app.route('/api/users/<int:member_id>/delete', methods=["POST"])
 def get_event_infos(member_id):
-    return util.build_response("Not Implemented yet", code=404)
+    return util.build_response("Not Implemented yet", code=501)
 
 
 @app.route('/api/users/add', methods=["POST"])
