@@ -179,6 +179,19 @@ class Queries:
                                      member_id=member_id, amount=amount))
         self.session.commit()
 
+    def checkPassword(self, name, password):
+        member: Member = self.session.query(
+            Member).filter_by(name=name).first()
+        if member is None:
+            return None
+
+        hashed_pw = TokenManager.hashPassword(password, member.salt)
+
+        if hashed_pw == member.password:
+            return member.id
+        else:
+            return None
+
     def create_dummy_data(self) -> None:
         hashedPassword, salt = TokenManager.hashPassword("unsafe")
         self.session.add(

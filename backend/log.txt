@@ -1,0 +1,21 @@
+[07/11/22 15:02:35] Login -> User logged in
+[07/11/22 15:03:09] Login -> User logged in
+[07/11/22 15:03:28] Login -> User logged in
+[07/11/22 15:08:06] Login -> User logged in
+[07/11/22 15:10:31] Login -> User logged in
+[07/11/22 15:11:28] Login -> User logged in
+[07/11/22 15:15:00] Login -> User logged in
+[07/11/22 15:16:25] Login -> User logged in
+[07/11/22 15:18:24] Login -> User logged in
+[07/11/22 15:18:43] Login -> User logged in
+[07/11/22 15:21:26] Logout -> MemberID: 1
+[07/11/22 15:21:44] Login -> User logged in
+[07/11/22 15:21:57] Login -> User logged in
+[07/11/22 15:22:07] Login -> User logged in
+[07/11/22 15:34:25] Logout -> MemberID: 2
+[07/11/22 15:35:16] Login -> User logged in
+[07/11/22 15:40:02] Logout -> MemberID: 3
+[07/11/22 15:40:06] Login -> User logged in
+[07/11/22 15:40:28] Logout -> MemberID: 1
+[07/11/22 15:40:58] Login -> User logged in
+[07/11/22 15:41:23] Login -> User logged in

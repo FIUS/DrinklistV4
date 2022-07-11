@@ -5,7 +5,8 @@ const initialState: CommonReducerType = {
     drinkCategories: null,
     members: null,
     favorites: null,
-    history: null
+    history: null,
+    isLoggedIn: false
 }
 
 export type CommonReducerType = {
@@ -13,7 +14,8 @@ export type CommonReducerType = {
     drinkCategories: Array<string> | null,
     members: Array<Member> | null,
     favorites: Array<number> | null,
-    history: Array<Transaction> | null
+    history: Array<Transaction> | null,
+    isLoggedIn: boolean
 }
 
 const reducer = (state = initialState, { type, payload }: any) => {
@@ -38,6 +40,10 @@ const reducer = (state = initialState, { type, payload }: any) => {
 
         case "SET_HISTORY":
             newState.history = payload
+            return newState
+
+        case "SET_LOGIN":
+            newState.isLoggedIn = payload
             return newState
         default:
             return state

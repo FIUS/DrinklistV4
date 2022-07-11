@@ -10,6 +10,7 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions';
 import { setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
+import Cookies from 'js-cookie'
 
 type Props = {}
 
@@ -19,6 +20,7 @@ const Details = (props: Props) => {
     const dispatch = useDispatch()
     const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
     const [searchField, setsearchField] = useState("")
+    const [isUser, setisUser] = useState(false)
 
     useEffect(() => {
         if (common.drinks === null || common.members === null || common.drinkCategories === null || common.history === null) {
@@ -54,6 +56,15 @@ const Details = (props: Props) => {
             }
         })
     }, [dispatch, params.userid])
+
+    useEffect(() => {
+        const memberID = Cookies.get("memberID");
+        const notUndefined = memberID !== undefined ? parseInt(memberID) : 0;
+
+        if (notUndefined > 2) {
+            setisUser(true)
+        }
+    }, [])
 
 
     const balancePaper = () => {
@@ -150,7 +161,7 @@ const Details = (props: Props) => {
 
             </div>
             <Spacer vertical={50} />
-            <NavigationButton destination='/' />
+            {!isUser ? <NavigationButton destination='/' /> : <></>}
         </>
     )
 }

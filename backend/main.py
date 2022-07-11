@@ -33,7 +33,7 @@ def authenticated(fn):
 def admin(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if request.cookies.get('memberID') != 1 or not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
+        if int(request.cookies.get('memberID')) != 1 or not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
             return util.build_response("Unauthorized", 403)
         return fn(*args, **kwargs)
     wrapper.__name__ = fn.__name__
@@ -243,6 +243,27 @@ def login_Check():
 @admin
 def login_Check_Admin():
     return util.build_response("OK")
+
+
+@app.route('/api/login', methods=["POST"])
+def login():
+    """
+    Input:
+    {
+        name:<name>,
+        password:<password>
+    }
+    """
+    post_data = request.json
+    name = post_data["name"]
+    password = post_data["password"]
+    member_id = db.checkPassword(name, password)
+
+    if member_id is not None:
+        util.log("Login", "User logged in")
+        token = token_manager.create_token(member_id)
+        return util.build_response("Login successfull", cookieToken=token, cookieMemberID=member_id)
+    return util.build_response("Unauthorized", code=403)
 
 
 @app.route('/api/logout', methods=["POST"])

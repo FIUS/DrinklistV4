@@ -11,6 +11,7 @@ import { CssBaseline } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
 import TopBar from './Components/Common/TopBar/TopBar';
 import Routing from './Components/Routing/Routing';
+import LoginChecker from './Components/Common/LoginChecker/LoginChecker';
 
 function App() {
   const [themeCookie, setthemeCookie] = useState(0)
@@ -26,6 +27,7 @@ function App() {
         <div className="App">
           <CssBaseline />
           <Provider store={store}>
+            <LoginChecker />
             <TopBar />
             <Routing />
           </Provider>
