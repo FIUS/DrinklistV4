@@ -25,7 +25,6 @@ const AddDrink = (props: Props) => {
             onMouseLeave={() => setisHovered(false)}
             elevation={isHovered ? 5 : 3}
         >
-
             <TextField
                 placeholder='Getränkename'
                 variant='standard'
