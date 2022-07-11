@@ -10,10 +10,7 @@ const BalanceBox = (props: Props) => {
         <div className={style.balanceBoxContainer}>
             <Typography variant='h4'>Favoriten</Typography>
             <div className={style.drinkButtonContainer}>
-                <DrinkButton />
-                <DrinkButton />
-                <DrinkButton />
-                <DrinkButton />
+
             </div>
         </div>
     )

@@ -28,7 +28,7 @@ class Queries:
             member: Member = m
             output.append(member.to_dict())
 
-        return output
+        return output[2:]
 
     def get_user_favorites(self, member_id):
         favorites = self.session.query(
@@ -46,7 +46,9 @@ class Queries:
         output = []
         for e in history:
             entry: Transaction = e
-            output.append(entry.to_dict())
+            element = entry.to_dict()
+            element["date"] = element["date"].strftime('%Y-%m-%dT%H:%M:%SZ')
+            output.append(element)
 
         return output
 
@@ -123,6 +125,17 @@ class Queries:
 
         return None
 
+    def get_drink_categories(self):
+        drinks = self.session.query(Drink).all()
+        output = []
+
+        for d in drinks:
+            drink: Drink = d
+            if drink.category not in output:
+                output.append(drink.category)
+
+        return output
+
     def get_transactions(self):
         transactions = self.session.query(Transaction).all()
         output = []
@@ -135,16 +148,9 @@ class Queries:
     def delete_transaction(self, transaction_id):
         transaction: Transaction = self.session.query(
             Transaction).filter_by(id=transaction_id).first()
-        connectedTransaction: Transaction = transaction.connected
         member: Member = self.session.query(Member).filter_by(
             id=transaction.member_id).first()
         member.balance -= transaction.amount
-
-        if connectedTransaction is not None:
-            member: Member = self.session.query(Member).filter_by(
-                id=connectedTransaction.member_id).first()
-            member.balance -= connectedTransaction.amount
-            self.session.delete(connectedTransaction)
 
         self.session.delete(transaction)
 
@@ -154,4 +160,19 @@ class Queries:
         hashedPassword, salt = TokenManager.hashPassword("unsafe")
         self.session.add(
             Member(name="admin", password=hashedPassword, salt=salt))
+        self.session.add(
+            Member(name="moderator", password=hashedPassword, salt=salt))
+        for i in range(34):
+            self.session.add(
+                Member(name=f"Benutzer {i}", password=hashedPassword, salt=salt))
+
+        for i in range(17):
+            self.session.add(
+                Drink(name=f"Drink {i}", stock=i*2, price=i*1.5))
+        self.session.commit()
+
+        for i in range(17):
+            self.session.add(
+                Transaction(description=f"Drink bought {i}", member_id=5, amount=-0.60))
+
         self.session.commit()

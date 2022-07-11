@@ -15,11 +15,6 @@ class Transaction(db.Model):
     amount = sql.Column(sql.Float, nullable=True)
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
 
-    connected_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'Transaction.id'), nullable=True)
-    connected = relationship(
-        'database.Transaction.Transaction', lazy="joined")
-
     def to_dict(self):
         return {
             "id": self.id,

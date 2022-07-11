@@ -80,7 +80,7 @@ def get_event_infos(member_id):
     return util.build_response("Not Implemented yet", code=404)
 
 
-@app.route('/api/users/add', methods=["GET"])
+@app.route('/api/users/add', methods=["POST"])
 def add_user():
     """
     Input:
@@ -98,6 +98,11 @@ def add_user():
 @app.route('/api/drinks', methods=["GET"])
 def get_drinks():
     return util.build_response(db.get_drinks())
+
+
+@app.route('/api/drinks/categories', methods=["GET"])
+def get_drink_categories():
+    return util.build_response(db.get_drink_categories())
 
 
 @app.route('/api/drinks/<int:drink_id>/price', methods=["POST"])

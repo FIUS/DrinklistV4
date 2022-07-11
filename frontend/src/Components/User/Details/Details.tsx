@@ -1,14 +1,56 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { CommonReducerType } from '../../../Reducer/CommonReducer';
+import { doGetRequest } from '../../Common/StaticFunctions';
+import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
+import { useParams } from 'react-router-dom'
+import { Transaction } from "../../../types/ResponseTypes"
 
 type Props = {}
 
 const Details = (props: Props) => {
+
+    const params = useParams()
+    const dispatch = useDispatch()
+    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const [history, sethistory] = useState<Array<Transaction>>([])
+
+    useEffect(() => {
+        if (common.drinks === null || common.members === null || common.drinkCategories === null) {
+            doGetRequest("drinks").then((value) => {
+                if (value.code === 200) {
+                    dispatch(setDrinks(value.content))
+                }
+            })
+            doGetRequest("drinks/categories").then((value) => {
+                if (value.code === 200) {
+                    dispatch(setDrinkCategories(value.content))
+                }
+            })
+            doGetRequest("users").then((value) => {
+                if (value.code === 200) {
+                    dispatch(setMembers(value.content))
+                }
+            })
+
+        }
+    }, [common.drinks, common.members, common.drinkCategories, dispatch])
+
+    useEffect(() => {
+        doGetRequest("users/" + params.userid + "/history").then((value) => {
+            if (value.code === 200) {
+                sethistory(value.content)
+            }
+        })
+    }, [params.userid])
+
+
     return (
         <>
             <div className={style.details}>
@@ -24,12 +66,17 @@ const Details = (props: Props) => {
                     <Typography variant='h4'>Ich nehme...</Typography>
                     <TextField placeholder='Suche...' />
                     <div className={style.buyDrinkContainerInner}>
-                        <Typography variant='h6' style={{ width: "100%" }}>Bier</Typography>
-                        {Array(6).fill(<DrinkButton />)}
-                        <Typography variant='h6' style={{ width: "100%" }}>Paulaner</Typography>
-                        {Array(7).fill(<DrinkButton />)}
-                        <Typography variant='h6' style={{ width: "100%" }}>Softdrinks</Typography>
-                        {Array(9).fill(<DrinkButton />)}
+                        {common.drinkCategories?.map(category => {
+                            const drinks = common.drinks?.filter(value => {
+                                return value.category === category
+                            })
+                            return <>
+                                <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
+                                {drinks?.map(value => {
+                                    return <DrinkButton drink={value} />
+                                })}
+                            </>
+                        })}
                     </div>
                 </div>
 
@@ -46,20 +93,19 @@ const Details = (props: Props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {Array(33).fill(
-                                    <TableRow
-                                        key={"row.name"}
-                                    >
-                                        <TableCell component="th" scope="row">
-                                            Paulaner Spezi
-                                        </TableCell>
-                                        <TableCell>0,60€</TableCell>
-                                        <TableCell>25.066.2022 18:23 Uhr</TableCell>
-
-                                    </TableRow>
-
-
-                                )}
+                                {history.map(value => {
+                                    return <>
+                                        <TableRow
+                                            key={value.id}
+                                        >
+                                            <TableCell component="th" scope="row">
+                                                {value.description}
+                                            </TableCell>
+                                            <TableCell>{value.amount.toFixed(2)}€</TableCell>
+                                            <TableCell>{new Date(value.date).toISOString()}</TableCell>
+                                        </TableRow>
+                                    </>
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
