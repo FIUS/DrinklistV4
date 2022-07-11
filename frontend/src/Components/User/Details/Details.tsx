@@ -1,5 +1,5 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
@@ -18,6 +18,7 @@ const Details = (props: Props) => {
     const params = useParams()
     const dispatch = useDispatch()
     const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const [searchField, setsearchField] = useState("")
 
     useEffect(() => {
         if (common.drinks === null || common.members === null || common.drinkCategories === null || common.history === null) {
@@ -95,18 +96,23 @@ const Details = (props: Props) => {
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'>Ich nehme...</Typography>
-                    <TextField placeholder='Suche...' />
+                    <TextField placeholder='Suche...' value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
                     <div className={style.buyDrinkContainerInner}>
                         {common.drinkCategories?.map(category => {
                             const drinks = common.drinks?.filter(value => {
                                 return value.category === category
                             })
-                            return <>
-                                <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
-                                {drinks?.map(value => {
-                                    return <DrinkButton drink={value} memberID={params.userid ? params.userid : ""} />
-                                })}
-                            </>
+                            const filteredDrinks = drinks?.filter((t_value) => { return searchField === "" || t_value.name.toLowerCase().includes(searchField.toLowerCase()) }).map(value => {
+                                return <DrinkButton drink={value} memberID={params.userid ? params.userid : ""} />
+                            });
+                            if (filteredDrinks?.length !== 0) {
+                                return <>
+                                    <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
+                                    {filteredDrinks}
+                                </>
+                            } else {
+                                return <></>
+                            }
                         })}
                     </div>
                 </div>
