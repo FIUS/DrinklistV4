@@ -55,7 +55,7 @@ const DrinkButton = (props: Props) => {
                     <div className={style.innerbuttonright}>
                         <SellOutlinedIcon />
                         <Spacer horizontal={5} />
-                        {props.drink.price}€
+                        {props.drink.price.toFixed(2)}€
                         <Spacer horizontal={15} />
                         <Inventory2OutlinedIcon />
                         <Spacer horizontal={5} />

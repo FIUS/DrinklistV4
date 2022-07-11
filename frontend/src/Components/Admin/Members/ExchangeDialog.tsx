@@ -77,11 +77,11 @@ const ExchangeDialog = (props: Props) => {
 
                     doPostRequest("users/" + props.member.id + "/deposit", { amount: amount }).then(value => {
                         if (value.code === 200) {
-                            setamount(0)
                             doGetRequest("users").then((value) => {
                                 if (value.code === 200) {
                                     dispatch(setMembers(value.content))
                                 }
+                                setamount(0)
                             })
                             props.close()
                         }
