@@ -36,4 +36,3 @@ def log(prefix, message):
         output_string = f"[{time}] {prefix} -> {message}"
         with open("logs/log.txt", 'a+') as f:
             f.write(f"{output_string}\n")
-
