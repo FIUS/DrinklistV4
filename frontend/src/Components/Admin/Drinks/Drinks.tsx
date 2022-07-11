@@ -40,7 +40,7 @@ const Drinks = (props: Props) => {
                         const drinks = common.drinks?.filter(value => {
                             return value.category === category
                         });
-                        console.log(drinks)
+
                         return <div className={style.drinksContainerInner}>
                             <Typography variant='h4' style={{ width: "100%" }}>{category}</Typography>
                             {drinks?.map((value) => {

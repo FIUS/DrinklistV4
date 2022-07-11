@@ -7,7 +7,7 @@ import Spacer from '../../Common/Spacer';
 import { Add } from '@mui/icons-material';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
-import { setDrinks } from '../../../Actions/CommonAction';
+import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
 
 type Props = {}
 
@@ -50,11 +50,12 @@ const AddDrink = (props: Props) => {
                 freeSolo
                 options={categoryAutofill}
                 value={categoryname}
-                onChange={(event, value) => setcategoryname(value !== null ? value : "")}
+                onChange={(event, value) => { setcategoryname(value !== null ? value : "") }}
                 renderInput={(params) =>
                     <TextField {...params}
                         label='Kategorie'
                         variant='standard'
+                        onChange={(value) => { setcategoryname(value.target.value) }}
                     />
                 }
             />
@@ -109,6 +110,11 @@ const AddDrink = (props: Props) => {
                                             setdrinkname("")
                                             setprice(0)
                                             setstock(0)
+                                        }
+                                    })
+                                    doGetRequest("drinks/categories").then((value) => {
+                                        if (value.code === 200) {
+                                            dispatch(setDrinkCategories(value.content))
                                         }
                                     })
                                 }
