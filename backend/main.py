@@ -168,10 +168,10 @@ def buy_drink():
 
 @app.route('/api/transactions', methods=["GET"])
 def get_transactions():
-    return util.build_response(db.get_transactions(), code=404)
+    return util.build_response(db.get_transactions())
 
 
-@app.route('/api/transactions/<int:transaction_id>/undo', methods=["GET"])
+@app.route('/api/transactions/<int:transaction_id>/undo', methods=["POST"])
 def undo_transaction(transaction_id):
     db.delete_transaction(transaction_id)
     return util.build_response("Transaction undone")

@@ -1,5 +1,5 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
@@ -8,9 +8,8 @@ import Spacer from '../../Common/Spacer'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions';
-import { setDrinkCategories, setDrinks, setFavorites, setMembers } from '../../../Actions/CommonAction';
+import { setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
-import { Transaction } from "../../../types/ResponseTypes"
 
 type Props = {}
 
@@ -19,10 +18,9 @@ const Details = (props: Props) => {
     const params = useParams()
     const dispatch = useDispatch()
     const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
-    const [history, sethistory] = useState<Array<Transaction>>([])
 
     useEffect(() => {
-        if (common.drinks === null || common.members === null || common.drinkCategories === null) {
+        if (common.drinks === null || common.members === null || common.drinkCategories === null || common.history === null) {
             doGetRequest("drinks").then((value) => {
                 if (value.code === 200) {
                     dispatch(setDrinks(value.content))
@@ -33,37 +31,62 @@ const Details = (props: Props) => {
                     dispatch(setDrinkCategories(value.content))
                 }
             })
-            doGetRequest("users").then((value) => {
-                if (value.code === 200) {
-                    dispatch(setMembers(value.content))
-                }
-            })
-            doGetRequest("users/" + params.userid + "/favorites").then((value) => {
-                if (value.code === 200) {
-                    dispatch(setFavorites(value.content))
-                }
-            })
+
 
         }
-    }, [common.drinks, common.members, common.drinkCategories, dispatch, params.userid])
+    }, [common.drinks, common.members, common.drinkCategories, common.history, dispatch])
 
     useEffect(() => {
-        doGetRequest("users/" + params.userid + "/history").then((value) => {
+        doGetRequest("users").then((value) => {
             if (value.code === 200) {
-                sethistory(value.content)
+                dispatch(setMembers(value.content))
             }
         })
-    }, [params.userid])
+        doGetRequest("users/" + params.userid + "/favorites").then((value) => {
+            if (value.code === 200) {
+                dispatch(setFavorites(value.content))
+            }
+        })
+        doGetRequest("users/" + params.userid + "/history").then((value) => {
+            if (value.code === 200) {
+                dispatch(setHistory(value.content))
+            }
+        })
+    }, [dispatch, params.userid])
+
+
+    const balancePaper = () => {
+        const balance = common.members?.find((value) => {
+            return value.id === parseInt(params.userid ? params.userid : "")
+        })?.balance
+        const balanceNotNull = balance !== undefined ? balance : 0
+        if (balanceNotNull > 0) {
+            return <Paper className={style.balanceTop} >
+                <Typography variant='h3'>Kontostand:</Typography>
+                <Typography variant='h2' color="limegreen">
+                    {common.members?.find((value) => {
+                        return value.id === parseInt(params.userid ? params.userid : "")
+                    })?.balance.toFixed(2)}€
+                </Typography>
+            </Paper>
+        } else {
+            return <Paper className={style.balanceTop}>
+                <Typography variant='h3'>Kontostand:</Typography>
+                <Typography variant='h2' color="darkred">
+                    {common.members?.find((value) => {
+                        return value.id === parseInt(params.userid ? params.userid : "")
+                    })?.balance.toFixed(2)}€
+                </Typography>
+            </Paper>
+        }
+    }
 
 
     return (
         <>
             <div className={style.details}>
                 <div className={style.balanceContainer}>
-                    <div className={style.balanceTop}>
-                        <Typography variant='h3'>Kontostand:</Typography>
-                        <Typography variant='h3'>38,15€</Typography>
-                    </div>
+                    {balancePaper()}
                     <BalanceBox favorites={common.drinks?.filter((value) => {
                         return common.favorites?.includes(value.id)
                     })}
@@ -101,7 +124,7 @@ const Details = (props: Props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {history.map(value => {
+                                {common.history?.map(value => {
                                     return <>
                                         <TableRow
                                             key={value.id}

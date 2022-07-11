@@ -21,5 +21,5 @@ class Transaction(db.Model):
             "description": self.description,
             "memberID": self.member_id,
             "amount": self.amount,
-            "date": self.date
+            "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ')
         }

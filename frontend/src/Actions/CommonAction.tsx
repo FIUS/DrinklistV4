@@ -27,3 +27,10 @@ export const setFavorites = (favorites: Array<string>) => {
         payload: favorites
     }
 }
+
+export const setHistory = (history: Array<string>) => {
+    return {
+        type: "SET_HISTORY",
+        payload: history
+    }
+}

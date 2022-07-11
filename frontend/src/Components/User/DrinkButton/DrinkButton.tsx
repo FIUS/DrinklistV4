@@ -7,7 +7,7 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Spacer from '../../Common/Spacer';
 import { Drink } from '../../../types/ResponseTypes';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
-import { setFavorites } from '../../../Actions/CommonAction';
+import { setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 
@@ -23,7 +23,26 @@ const DrinkButton = (props: Props) => {
 
     return (
         <div className={style.container}>
-            <Button variant='contained'>
+            <Button variant='contained' onClick={(value) => {
+                doPostRequest("drinks/buy",
+                    {
+                        drinkID: props.drink.id,
+                        memberID: props.memberID
+                    }).then(value => {
+                        if (value.code === 200) {
+                            doGetRequest("users/" + props.memberID + "/history").then((value) => {
+                                if (value.code === 200) {
+                                    dispatch(setHistory(value.content))
+                                }
+                            })
+                            doGetRequest("users").then((value) => {
+                                if (value.code === 200) {
+                                    dispatch(setMembers(value.content))
+                                }
+                            })
+                        }
+                    })
+            }}>
                 {props.drink.name}
                 <Spacer horizontal={15} />
                 <SellOutlinedIcon />

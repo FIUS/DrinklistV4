@@ -46,10 +46,9 @@ class Queries:
         output = []
         for e in history:
             entry: Transaction = e
-            element = entry.to_dict()
-            element["date"] = element["date"].strftime('%Y-%m-%dT%H:%M:%SZ')
-            output.append(element)
+            output.append(entry.to_dict())
 
+        output.reverse()
         return output
 
     def add_user_favorite(self, member_id, drink_id):
@@ -144,6 +143,7 @@ class Queries:
             transaction: Transaction = t
             output.append(transaction.to_dict())
 
+        output.reverse()
         return output
 
     def delete_transaction(self, transaction_id):

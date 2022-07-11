@@ -1,10 +1,11 @@
-import { Drink, Member } from "../types/ResponseTypes"
+import { Drink, Member, Transaction } from "../types/ResponseTypes"
 
 const initialState: CommonReducerType = {
     drinks: null,
     drinkCategories: null,
     members: null,
-    favorites: null
+    favorites: null,
+    history: null
 }
 
 export type CommonReducerType = {
@@ -12,6 +13,7 @@ export type CommonReducerType = {
     drinkCategories: Array<string> | null,
     members: Array<Member> | null,
     favorites: Array<number> | null,
+    history: Array<Transaction> | null
 }
 
 const reducer = (state = initialState, { type, payload }: any) => {
@@ -32,6 +34,10 @@ const reducer = (state = initialState, { type, payload }: any) => {
 
         case "SET_FAVORITES":
             newState.favorites = payload
+            return newState
+
+        case "SET_HISTORY":
+            newState.history = payload
             return newState
         default:
             return state

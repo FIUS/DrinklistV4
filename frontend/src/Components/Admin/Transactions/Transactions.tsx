@@ -1,13 +1,25 @@
 import { Undo } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Transaction } from '../../../types/ResponseTypes';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
+import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import style from './transactions.module.scss';
 
 type Props = {}
 
 const Transactions = (props: Props) => {
+    const [transactions, settransactions] = useState<Array<Transaction>>([])
+
+    useEffect(() => {
+        doGetRequest("transactions").then((value) => {
+            if (value.code === 200) {
+                settransactions(value.content)
+            }
+        })
+    }, [])
+
     return (
         <>
             <div className={style.table}>
@@ -23,26 +35,37 @@ const Transactions = (props: Props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-
-                            {Array(33).fill(
-                                <TableRow
-                                    key={"row.name"}
+                            {transactions.map((value) => {
+                                return <TableRow
+                                    key={value.id}
                                 >
                                     <TableCell component="th" scope="row">
-                                        Test transaktion
+                                        {value.description}
                                     </TableCell>
-                                    <TableCell>Tom</TableCell>
+                                    <TableCell>{value.memberID}</TableCell>
                                     <TableCell>
-                                        0,60€
-                                    </TableCell>
-                                    <TableCell>
-                                        26.06.2022 16:32Uhr
+                                        {value.amount.toFixed(2)}€
                                     </TableCell>
                                     <TableCell>
-                                        <Button><Undo /></Button>
+                                        {value.date}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button onClick={(s_value) => {
+                                            doPostRequest("transactions/" + value.id + "/undo", "").then(t_value => {
+                                                if (t_value.code === 200) {
+                                                    doGetRequest("transactions").then((value) => {
+                                                        if (value.code === 200) {
+                                                            settransactions(value.content)
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }}>
+                                            <Undo />
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
-                            )}
+                            })}
                         </TableBody>
                     </Table>
                 </TableContainer>
