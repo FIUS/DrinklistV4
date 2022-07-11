@@ -5,3 +5,21 @@
     align-items: center;
     gap: $flex-gap;
 }
+
+.button{
+    min-width: 300px;
+}
+
+.innerbutton{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.innerbuttonright{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}

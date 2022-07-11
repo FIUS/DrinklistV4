@@ -23,7 +23,7 @@ const DrinkButton = (props: Props) => {
 
     return (
         <div className={style.container}>
-            <Button variant='contained' onClick={(value) => {
+            <Button className={style.button} variant='contained' onClick={(value) => {
                 doPostRequest("drinks/buy",
                     {
                         drinkID: props.drink.id,
@@ -48,15 +48,20 @@ const DrinkButton = (props: Props) => {
                         }
                     })
             }}>
-                {props.drink.name}
-                <Spacer horizontal={15} />
-                <SellOutlinedIcon />
-                <Spacer horizontal={5} />
-                {props.drink.price}€
-                <Spacer horizontal={15} />
-                <Inventory2OutlinedIcon />
-                <Spacer horizontal={5} />
-                {props.drink.stock}
+                <div className={style.innerbutton}>
+                    <div>
+                        {props.drink.name}
+                    </div>
+                    <div className={style.innerbuttonright}>
+                        <SellOutlinedIcon />
+                        <Spacer horizontal={5} />
+                        {props.drink.price}€
+                        <Spacer horizontal={15} />
+                        <Inventory2OutlinedIcon />
+                        <Spacer horizontal={5} />
+                        {props.drink.stock}
+                    </div>
+                </div>
             </Button>
             <Rating
                 value={common.favorites?.includes(props.drink.id) ? 1 : 0}
