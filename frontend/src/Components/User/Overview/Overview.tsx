@@ -1,4 +1,4 @@
-import { TextField, Typography } from '@mui/material'
+import { Grow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
@@ -51,11 +51,13 @@ const Overview = (props: Props) => {
             />
 
             <div className={style.buttonArea}>
-                {common.members?.filter((f_value) => {
-                    return searchfield === "" || f_value.name.toLowerCase().includes(searchfield.toLowerCase())
-                }).map(value => {
+                {common.members?.map(value => {
                     if (!value.hidden) {
-                        return <UserButton key={value.id} name={value.name} id={value.id} />
+                        return <Grow in={searchfield === "" || value.name.toLowerCase().includes(searchfield.toLowerCase())} key={value.id}>
+                            <div >
+                                <UserButton key={value.id} name={value.name} id={value.id} />
+                            </div>
+                        </Grow>
                     }
                     return <></>
                 })}
@@ -65,3 +67,4 @@ const Overview = (props: Props) => {
 }
 
 export default Overview
+//

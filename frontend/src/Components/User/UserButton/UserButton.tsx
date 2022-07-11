@@ -16,7 +16,9 @@ const UserButton = (props: Props) => {
             variant='contained'
             className={style.button}
             onClick={() => navigate("/user/" + props.id)}
-        >{props.name}</Button>
+        >
+            {props.name}
+        </Button>
     )
 }
 

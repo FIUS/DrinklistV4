@@ -1,4 +1,4 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Grow, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
@@ -102,13 +102,12 @@ const Details = (props: Props) => {
                             const drinks = common.drinks?.filter(value => {
                                 return value.category === category
                             })
-                            const filteredDrinks = drinks?.filter((t_value) => { return searchField === "" || t_value.name.toLowerCase().includes(searchField.toLowerCase()) }).map(value => {
-                                return <DrinkButton drink={value} memberID={params.userid ? params.userid : ""} />
-                            });
-                            if (filteredDrinks?.length !== 0) {
+                            if (drinks?.some((value) => searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase()))) {
                                 return <>
                                     <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
-                                    {filteredDrinks}
+                                    {drinks?.map((value) => {
+                                        return <Grow in={searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase())}><div><DrinkButton drink={value} memberID={params.userid ? params.userid : ""} /></div></Grow>
+                                    })}
                                 </>
                             } else {
                                 return <></>
