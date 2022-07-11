@@ -118,6 +118,7 @@ class Queries:
             Member).filter_by(id=member_id).first()
 
         member.balance -= drink.price
+        drink.stock -= 1
         self.session.add(Transaction(
             description=f"{drink.name} has been bought", member_id=member.id, amount=(-drink.price)))
 
