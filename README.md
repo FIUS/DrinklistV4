@@ -2,4 +2,4 @@
 * Required package for pip install: libpq-dev; python-dev
 
 ## Deploy Frontend
-You need ne mount the file   [`env.js`](frontend/public/environment/env.js) in the folder `/app/build/environment` in order for the frontend to work. Customize the values as needed
+You need to mount the file   [`env.js`](frontend/public/environment/env.js) in the folder `/app/build/environment` in order for the frontend to work. Customize the values as needed
