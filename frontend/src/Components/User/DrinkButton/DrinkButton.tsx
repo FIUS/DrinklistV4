@@ -7,7 +7,7 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Spacer from '../../Common/Spacer';
 import { Drink } from '../../../types/ResponseTypes';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
-import { setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
+import { setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 
@@ -30,6 +30,11 @@ const DrinkButton = (props: Props) => {
                         memberID: props.memberID
                     }).then(value => {
                         if (value.code === 200) {
+                            doGetRequest("drinks").then((value) => {
+                                if (value.code === 200) {
+                                    dispatch(setDrinks(value.content))
+                                }
+                            })
                             doGetRequest("users/" + props.memberID + "/history").then((value) => {
                                 if (value.code === 200) {
                                     dispatch(setHistory(value.content))
