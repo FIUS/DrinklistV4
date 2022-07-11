@@ -1,5 +1,5 @@
-import { Button, Paper, TextField } from '@mui/material'
-import React, { useState } from 'react';
+import { Autocomplete, Button, Paper, TextField } from '@mui/material'
+import React, { useEffect, useState } from 'react';
 import style from './drinks.module.scss';
 import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
@@ -14,9 +14,22 @@ type Props = {}
 const AddDrink = (props: Props) => {
     const [isHovered, setisHovered] = useState(false)
     const [drinkname, setdrinkname] = useState("")
+    const [categoryname, setcategoryname] = useState("")
     const [price, setprice] = useState(0.0)
     const [stock, setstock] = useState(0)
+    const [categoryAutofill, setcategoryAutofill] = useState([])
     const dispatch = useDispatch()
+
+    useEffect(() => {
+
+        doGetRequest("drinks/categories").then(value => {
+            if (value.code === 200) {
+                setcategoryAutofill(value.content)
+            }
+        })
+
+    }, [])
+
 
     return (
         <Paper
@@ -26,12 +39,26 @@ const AddDrink = (props: Props) => {
             elevation={isHovered ? 5 : 3}
         >
             <TextField
-                placeholder='Getränkename'
+                label='Getränkename'
                 variant='standard'
                 value={drinkname}
                 onChange={(value) => {
                     setdrinkname(value.target.value)
                 }} />
+            <Spacer vertical={20} />
+            <Autocomplete
+                freeSolo
+                options={categoryAutofill}
+                value={categoryname}
+                onChange={(event, value) => setcategoryname(value !== null ? value : "")}
+                renderInput={(params) =>
+                    <TextField {...params}
+                        label='Kategorie'
+                        variant='standard'
+                    />
+                }
+            />
+
             <Spacer vertical={20} />
             <div className={style.buttonsContainer} >
                 <div className={style.smallTextFieldContainer}>
@@ -68,8 +95,13 @@ const AddDrink = (props: Props) => {
                     variant='outlined'
                     onClick={(value) => {
                         if (drinkname !== "") {
-
-                            doPostRequest("drinks/add", { name: drinkname, price: price, stock: stock }).then(value => {
+                            let requestBody = null;
+                            if (categoryname !== "") {
+                                requestBody = { name: drinkname, price: price, stock: stock, category: categoryname }
+                            } else {
+                                requestBody = { name: drinkname, price: price, stock: stock }
+                            }
+                            doPostRequest("drinks/add", requestBody).then(value => {
                                 if (value.code === 200) {
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {

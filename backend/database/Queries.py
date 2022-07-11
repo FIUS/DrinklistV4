@@ -106,8 +106,13 @@ class Queries:
         self.session.delete(drink)
         self.session.commit()
 
-    def add_drink(self, name, price, stock):
-        self.session.add(Drink(name=name, stock=stock, price=price))
+    def add_drink(self, name, price, stock, category):
+        if category is None:
+            self.session.add(Drink(name=name, stock=stock, price=price))
+        else:
+            self.session.add(Drink(name=name, stock=stock,
+                                   price=price, category=category))
+
         self.session.commit()
 
     def buy_drink(self, member_id, drink_id):

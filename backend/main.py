@@ -143,11 +143,12 @@ def add_drink():
     {
         name:<name>,
         price:<price in euro>,
-        stock:<stock>
+        stock:<stock>,
+        category?:<category>
     }
     """
     db.add_drink(request.json["name"],
-                 request.json["price"], request.json["stock"])
+                 request.json["price"], request.json["stock"], request.json["category"] if "category" in request.json else None)
     return util.build_response("Drink added")
 
 
