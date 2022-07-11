@@ -6,56 +6,53 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
-import { Drink } from '../../../types/ResponseTypes';
-import { setDrinks } from '../../../Actions/CommonAction';
-import { useDispatch } from 'react-redux';
+import { doPostRequest } from '../../Common/StaticFunctions';
+import { Member } from '../../../types/ResponseTypes';
 
 type Props = {
     isOpen: boolean,
     close: () => void,
-    drink: Drink
+    member: Member
 }
 
-const DrinkPriceDialog = (props: Props) => {
-    let price = props.drink.price
-    const dispatch = useDispatch()
+const PasswordDialog = (props: Props) => {
 
+    let newPassword = ""
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Neuer Preis</DialogTitle>
+            <DialogTitle>Neues Passwort festlegen</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Gebe hier den neuen Preis für das Getränk '{props.drink.name}' ein
+                    Gebe hier das neue passwort für den nutzer '{props.member.name}' ein
                 </DialogContentText>
                 <TextField
                     fullWidth
                     autoFocus
-                    defaultValue={price}
+                    defaultValue={newPassword}
                     margin="dense"
-                    label='Preis in Euro'
+                    label='Passwort'
                     variant='standard'
-                    type='number'
-                    onChange={(value) => price = parseFloat(value.target.value)}
+                    type='password'
+                    onChange={(value) => newPassword = value.target.value}
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.close}>Abbrechen</Button>
                 <Button onClick={() => {
-                    doPostRequest("drinks/" + props.drink.id + "/price", { price: price }).then(value => {
+                    if (newPassword === "") {
+                        return
+                    }
+
+                    doPostRequest("users/" + props.member.id + "/password", { password: newPassword }).then(value => {
                         if (value.code === 200) {
                             props.close()
-                            doGetRequest("drinks").then((value) => {
-                                if (value.code === 200) {
-                                    dispatch(setDrinks(value.content))
-                                }
-                            })
                         }
                     })
+
                 }}>Aktualisieren</Button>
             </DialogActions>
         </Dialog>
     )
 }
 
-export default DrinkPriceDialog
+export default PasswordDialog

@@ -1,0 +1,24 @@
+@import "../../Common/variables.module.scss";
+
+.outter{
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(3*$flex-gap);
+}
+
+.inner{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.arrow{
+    height: 70px !important;
+    width: 70px !important;
+    transform: scaleX(1.5);
+}
+
+.textfield{
+    width: 105px ;
+}

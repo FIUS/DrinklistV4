@@ -22,6 +22,7 @@ type Props = {
 const DrinkStockDialog = (props: Props) => {
     const dispatch = useDispatch()
     let stock = props.drink.stock
+    let stockIncrease = 0
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
             <DialogTitle>Neue Verfügbarkeit</DialogTitle>
@@ -67,6 +68,32 @@ const DrinkStockDialog = (props: Props) => {
                             })
                         }}>
                             Setzen
+                        </Button>
+                    </div>
+                    <div className={style.stockDialogInner}>
+                        <TextField
+                            autoFocus
+                            defaultValue={stockIncrease}
+                            margin="dense"
+                            label='Erhöhen um...'
+                            variant='standard'
+                            type='number'
+                            fullWidth
+                            onChange={(value) => { stockIncrease = parseInt(value.target.value) }}
+                        />
+                        <Button variant='outlined' onClick={() => {
+                            doPostRequest("drinks/" + props.drink.id + "/stock/increase", { stock: stockIncrease }).then(value => {
+                                if (value.code === 200) {
+                                    doGetRequest("drinks").then((value) => {
+                                        if (value.code === 200) {
+                                            dispatch(setDrinks(value.content))
+                                            props.close()
+                                        }
+                                    })
+                                }
+                            })
+                        }}>
+                            Erhöhen
                         </Button>
                     </div>
                 </div>

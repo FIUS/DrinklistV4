@@ -75,6 +75,18 @@ def toggle_user_visibility(member_id):
     return util.build_response("Changed visibility")
 
 
+@app.route('/api/users/<int:member_id>/deposit', methods=["POST"])
+def user_deposit(member_id):
+    """
+    Input:
+    {
+        amount:<amount>
+    }
+    """
+    db.deposit_user(member_id, float(request.json["amount"]))
+    return util.build_response("Money added")
+
+
 @app.route('/api/users/<int:member_id>/delete', methods=["POST"])
 def get_event_infos(member_id):
     db.delete_user(member_id)
@@ -127,6 +139,18 @@ def set_drink_stock(drink_id):
     }
     """
     db.change_drink_stock(drink_id, request.json["stock"])
+    return util.build_response("Stock changed")
+
+
+@app.route('/api/drinks/<int:drink_id>/stock/increase', methods=["POST"])
+def set_drink_stock_increase(drink_id):
+    """
+    Input:
+    {
+        stock:<amount to increase>
+    }
+    """
+    db.change_drink_stock(drink_id, request.json["stock"], is_increase=True)
     return util.build_response("Stock changed")
 
 

@@ -1,4 +1,4 @@
-import { AddBox, Delete, Key, DownhillSkiing } from '@mui/icons-material';
+import { AddBox, Delete, DownhillSkiing } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -8,6 +8,7 @@ import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setMembers } from '../../../Actions/CommonAction';
+import DialogManager from './DialogManager';
 
 type Props = {}
 
@@ -117,7 +118,7 @@ const Members = (props: Props) => {
                                     </TableCell>
                                     <TableCell>{value.balance.toFixed(2)}€</TableCell>
                                     <TableCell>
-                                        <Button><Key /></Button>
+                                        <DialogManager member={value} />
                                         <Button onClick={() => {
                                             doPostRequest("users/" + value.id + "/visibility/toggle", "").then((s_value) => {
                                                 if (s_value.code === 200) {

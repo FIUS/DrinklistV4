@@ -96,9 +96,12 @@ class Queries:
         drink.price = price
         self.session.commit()
 
-    def change_drink_stock(self, drink_id, stock):
+    def change_drink_stock(self, drink_id, stock, is_increase=False):
         drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
-        drink.stock = stock
+        if not is_increase:
+            drink.stock = stock
+        else:
+            drink.stock += stock
         self.session.commit()
 
     def delete_drink(self, drink_id):
@@ -166,6 +169,14 @@ class Queries:
     def delete_user(self, member_id):
         self.session.delete(self.session.query(
             Member).filter_by(id=member_id).first())
+        self.session.commit()
+
+    def deposit_user(self, member_id, amount):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        member.balance += amount
+        self.session.add(Transaction(description=f"Desposit",
+                                     member_id=member_id, amount=amount))
         self.session.commit()
 
     def create_dummy_data(self) -> None:
