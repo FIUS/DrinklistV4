@@ -30,34 +30,50 @@ def authenticated(fn):
     return wrapper
 
 
+def admin(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if request.cookies.get('memberID') != 1 or not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
+            return util.build_response("Unauthorized", 403)
+        return fn(*args, **kwargs)
+    wrapper.__name__ = fn.__name__
+    return wrapper
+
+
 @app.route('/api/users', methods=["GET"])
+@authenticated
 def get_users():
     return util.build_response(db.get_users())
 
 
 @app.route('/api/users/<int:member_id>/favorites', methods=["GET"])
+@authenticated
 def get_user_favorites(member_id):
     return util.build_response(db.get_user_favorites(member_id))
 
 
 @app.route('/api/users/<int:member_id>/history', methods=["GET"])
+@authenticated
 def get_user_history(member_id):
     return util.build_response(db.get_user_history(member_id))
 
 
 @app.route('/api/users/<int:member_id>/favorites/add/<int:drink_id>', methods=["POST"])
+@authenticated
 def add_user_favorite(member_id, drink_id):
     db.add_user_favorite(member_id, drink_id)
     return util.build_response("Added favorite")
 
 
 @app.route('/api/users/<int:member_id>/favorites/remove/<int:drink_id>', methods=["POST"])
+@authenticated
 def remove_user_favorite(member_id, drink_id):
     db.remove_user_favorite(member_id, drink_id)
     return util.build_response("Removed favorite")
 
 
 @app.route('/api/users/<int:member_id>/password', methods=["POST"])
+@admin
 def change_user_password(member_id):
     """
     Input:
@@ -70,12 +86,14 @@ def change_user_password(member_id):
 
 
 @app.route('/api/users/<int:member_id>/visibility/toggle', methods=["POST"])
+@admin
 def toggle_user_visibility(member_id):
     db.change_user_visibility(member_id)
     return util.build_response("Changed visibility")
 
 
 @app.route('/api/users/<int:member_id>/deposit', methods=["POST"])
+@admin
 def user_deposit(member_id):
     """
     Input:
@@ -88,12 +106,14 @@ def user_deposit(member_id):
 
 
 @app.route('/api/users/<int:member_id>/delete', methods=["POST"])
+@admin
 def get_event_infos(member_id):
     db.delete_user(member_id)
     return util.build_response("User deleted")
 
 
 @app.route('/api/users/add', methods=["POST"])
+@admin
 def add_user():
     """
     Input:
@@ -109,16 +129,19 @@ def add_user():
 
 
 @app.route('/api/drinks', methods=["GET"])
+@authenticated
 def get_drinks():
     return util.build_response(db.get_drinks())
 
 
 @app.route('/api/drinks/categories', methods=["GET"])
+@authenticated
 def get_drink_categories():
     return util.build_response(db.get_drink_categories())
 
 
 @app.route('/api/drinks/<int:drink_id>/price', methods=["POST"])
+@admin
 def set_drink_price(drink_id):
     """
     Input:
@@ -131,6 +154,7 @@ def set_drink_price(drink_id):
 
 
 @app.route('/api/drinks/<int:drink_id>/stock', methods=["POST"])
+@admin
 def set_drink_stock(drink_id):
     """
     Input:
@@ -143,6 +167,7 @@ def set_drink_stock(drink_id):
 
 
 @app.route('/api/drinks/<int:drink_id>/stock/increase', methods=["POST"])
+@admin
 def set_drink_stock_increase(drink_id):
     """
     Input:
@@ -155,12 +180,14 @@ def set_drink_stock_increase(drink_id):
 
 
 @app.route('/api/drinks/<int:drink_id>/delete', methods=["POST"])
+@admin
 def delete_drink(drink_id):
     db.delete_drink(drink_id)
     return util.build_response("Drink deleted")
 
 
 @app.route('/api/drinks/add', methods=["POST"])
+@admin
 def add_drink():
     """
     Input:
@@ -177,6 +204,7 @@ def add_drink():
 
 
 @app.route('/api/drinks/buy', methods=["POST"])
+@authenticated
 def buy_drink():
     """
     Input:
@@ -193,11 +221,13 @@ def buy_drink():
 
 
 @app.route('/api/transactions', methods=["GET"])
+@authenticated
 def get_transactions():
     return util.build_response(db.get_transactions())
 
 
 @app.route('/api/transactions/<int:transaction_id>/undo', methods=["POST"])
+@admin
 def undo_transaction(transaction_id):
     db.delete_transaction(transaction_id)
     return util.build_response("Transaction undone")
@@ -205,7 +235,13 @@ def undo_transaction(transaction_id):
 
 @app.route('/api/login/check', methods=["GET"])
 @authenticated
-def loginCheck():
+def login_Check():
+    return util.build_response("OK")
+
+
+@app.route('/api/login/admin/check', methods=["GET"])
+@admin
+def login_Check_Admin():
     return util.build_response("OK")
 
 
