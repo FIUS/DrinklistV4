@@ -46,7 +46,9 @@ const Login = (props: Props) => {
                         }
                     })
                 }}
-            >Login</Button>
+            >
+                Login
+            </Button>
         </div>
     )
 }
