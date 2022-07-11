@@ -16,10 +16,15 @@ class Transaction(db.Model):
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
 
     def to_dict(self):
-        return {
+        output = {
             "id": self.id,
             "description": self.description,
             "memberID": self.member_id,
             "amount": self.amount,
             "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ')
         }
+
+        if self.member is not None:
+            output["memberName"] = self.member.name
+
+        return output

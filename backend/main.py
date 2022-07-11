@@ -77,7 +77,8 @@ def toggle_user_visibility(member_id):
 
 @app.route('/api/users/<int:member_id>/delete', methods=["POST"])
 def get_event_infos(member_id):
-    return util.build_response("Not Implemented yet", code=501)
+    db.delete_user(member_id)
+    return util.build_response("User deleted")
 
 
 @app.route('/api/users/add', methods=["POST"])

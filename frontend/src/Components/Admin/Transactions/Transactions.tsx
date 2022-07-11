@@ -42,7 +42,7 @@ const Transactions = (props: Props) => {
                                     <TableCell component="th" scope="row">
                                         {value.description}
                                     </TableCell>
-                                    <TableCell>{value.memberID}</TableCell>
+                                    <TableCell>{value.memberName ? value.memberName : value.memberID}</TableCell>
                                     <TableCell>
                                         {value.amount.toFixed(2)}€
                                     </TableCell>

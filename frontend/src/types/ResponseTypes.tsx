@@ -17,6 +17,7 @@ export type Transaction = {
     id: number,
     description: string,
     memberID: number,
+    memberName?: string,
     amount: number,
     date: string
 }           

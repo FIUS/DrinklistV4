@@ -157,6 +157,11 @@ class Queries:
 
         self.session.commit()
 
+    def delete_user(self, member_id):
+        self.session.delete(self.session.query(
+            Member).filter_by(id=member_id).first())
+        self.session.commit()
+
     def create_dummy_data(self) -> None:
         hashedPassword, salt = TokenManager.hashPassword("unsafe")
         self.session.add(
