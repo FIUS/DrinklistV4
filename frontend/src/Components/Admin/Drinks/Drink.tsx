@@ -7,13 +7,20 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import Spacer from '../../Common/Spacer';
 import DrinkPriceDialog from './DrinkPriceDialog';
 import DrinkStockDialog from './DrinkStockDialog';
+import { Drink as DrinkType } from '../../../types/ResponseTypes';
+import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { useDispatch } from 'react-redux';
+import { setDrinks } from '../../../Actions/CommonAction';
 
-type Props = {}
+type Props = {
+    drink: DrinkType
+}
 
 const Drink = (props: Props) => {
     const [isHovered, setisHovered] = useState(false)
     const [priceDialogOpen, setpriceDialogOpen] = useState(false)
     const [stockDialogOpen, setstockDialogOpen] = useState(false)
+    const dispatch = useDispatch()
 
     return (
         <Paper
@@ -23,25 +30,42 @@ const Drink = (props: Props) => {
             elevation={isHovered ? 3 : 1}
         >
             <Typography variant="h6">
-                Johinnesbeer-Zitrone
+                {props.drink.name}
             </Typography>
             <div className={style.buttonsContainer} >
                 <Button onClick={() => setpriceDialogOpen(true)}>
-                    0,60€
+                    {props.drink.price.toFixed(2)}€
                     <Spacer horizontal={5} />
                     <SellOutlinedIcon />
                 </Button>
                 <Button onClick={() => setstockDialogOpen(true)}>
-                    25
+                    {props.drink.stock}
                     <Spacer horizontal={5} />
                     <Inventory2OutlinedIcon />
                 </Button>
-                <Button>
+                <Button onClick={() => {
+                    doPostRequest("drinks/" + props.drink.id + "/delete", "").then(value => {
+                        if (value.code === 200) {
+                            doGetRequest("drinks").then((value) => {
+                                if (value.code === 200) {
+                                    dispatch(setDrinks(value.content))
+                                }
+                            })
+                        }
+                    })
+                }}>
                     <DeleteOutlineOutlinedIcon />
                 </Button>
             </div>
-            <DrinkPriceDialog isOpen={priceDialogOpen} close={() => setpriceDialogOpen(false)} drinkname="Paulaner Spezi" />
-            <DrinkStockDialog isOpen={stockDialogOpen} close={() => setstockDialogOpen(false)} drinkname="Paulaner Spezi" />
+            <DrinkPriceDialog
+                isOpen={priceDialogOpen}
+                close={() => setpriceDialogOpen(false)}
+                drink={props.drink}
+            />
+            <DrinkStockDialog
+                isOpen={stockDialogOpen}
+                close={() => setstockDialogOpen(false)}
+                drink={props.drink} />
         </Paper>
     )
 }

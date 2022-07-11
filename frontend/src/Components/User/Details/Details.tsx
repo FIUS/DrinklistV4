@@ -45,7 +45,7 @@ const Details = (props: Props) => {
             })
 
         }
-    }, [common.drinks, common.members, common.drinkCategories, dispatch])
+    }, [common.drinks, common.members, common.drinkCategories, dispatch, params.userid])
 
     useEffect(() => {
         doGetRequest("users/" + params.userid + "/history").then((value) => {
