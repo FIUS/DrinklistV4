@@ -10,6 +10,7 @@
 .drinksContainerInner{
     @extend .drinksContainer;
     margin-top: $padding;
+    width: 100%;
 }
 
 .drinkPaper{
