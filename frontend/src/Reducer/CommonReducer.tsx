@@ -6,7 +6,8 @@ const initialState: CommonReducerType = {
     members: null,
     favorites: null,
     history: null,
-    isLoggedIn: false
+    isLoggedIn: false,
+
 }
 
 export type CommonReducerType = {
@@ -15,7 +16,7 @@ export type CommonReducerType = {
     members: Array<Member> | null,
     favorites: Array<number> | null,
     history: Array<Transaction> | null,
-    isLoggedIn: boolean
+    isLoggedIn: boolean,
 }
 
 const reducer = (state = initialState, { type, payload }: any) => {

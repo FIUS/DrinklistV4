@@ -1,7 +1,6 @@
-import Config from "../../environment.json";
 
 export const doPostRequest = async (path, data) => {
-    const resp = await fetch(Config.DOMAIN + path,
+    const resp = await fetch(window.globalTS.DOMAIN + path,
         {
             credentials: 'include',
             method: "POST",
@@ -21,7 +20,7 @@ export const doPostRequest = async (path, data) => {
 };
 
 export const doGetRequest = async (path) => {
-    const userInput = await fetch(Config.DOMAIN + path,
+    const userInput = await fetch(window.globalTS.DOMAIN + path,
         {
             credentials: 'include',
             method: "GET",
@@ -41,7 +40,7 @@ export const doGetRequest = async (path) => {
 };
 
 export const downloadPDF = async (path) => {
-    return fetch(Config.DOMAIN + path, {
+    return fetch(window.globalTS.DOMAIN + path, {
         method: 'GET',
         credentials: 'include',
         headers: {
