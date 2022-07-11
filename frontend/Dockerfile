@@ -16,8 +16,6 @@ RUN npm install -g serve
 # add app
 COPY . ./
 
-RUN mv ./env.json ./src/environment.json
-
 RUN npm run build 
 
 # start app
