@@ -51,9 +51,11 @@ const DrinkButton = (props: Props) => {
                 {props.drink.name}
                 <Spacer horizontal={15} />
                 <SellOutlinedIcon />
+                <Spacer horizontal={5} />
                 {props.drink.price}€
                 <Spacer horizontal={15} />
                 <Inventory2OutlinedIcon />
+                <Spacer horizontal={5} />
                 {props.drink.stock}
             </Button>
             <Rating
