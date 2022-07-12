@@ -1,4 +1,4 @@
-import { AddBox, Delete, DownhillSkiing } from '@mui/icons-material';
+import { AddBox, Delete, DownhillSkiing, LocalBar, LocalFireDepartment, Money, Person, VisibilityOff } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -9,6 +9,8 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setMembers } from '../../../Actions/CommonAction';
 import DialogManager from './DialogManager';
+import Infobox from '../../Common/InfoBox/Infobox';
+import StatisticBox from '../../Common/InfoBox/StatisticBox';
 
 type Props = {}
 
@@ -30,8 +32,58 @@ const Members = (props: Props) => {
 
 
     }, [dispatch])
+
+    const calcBudget = () => {
+        let budget = 0
+        common.members?.forEach(member => budget += member.balance)
+        return budget
+    }
+
+    const calcHiddenUsers = () => {
+        let amount = 0
+        common.members?.forEach(member => amount += member.hidden ? 1 : 0)
+        return amount
+    }
+
+    const calcTopDepter = () => {
+        if (common.members?.length === 0 || !common.members) {
+            return "No users"
+        }
+        let balance = common.members[0].balance
+        let username = common.members[0].name
+        common.members.forEach(member => {
+            if (member.balance < balance) {
+                balance = member.balance;
+                username = member.name
+            }
+        })
+        return username
+    }
+
     return (
         <>
+            <div className={style.statisticBoxes}>
+                <StatisticBox
+                    headline='Total Budget'
+                    text={calcBudget().toFixed(2) + "€"}
+                    icon={<Money />}
+                    colorCode="#bb58cc" />
+                <StatisticBox
+                    headline='Total Users'
+                    text={common.members ? common.members.length.toString() : "0"}
+                    icon={<Person />}
+                    colorCode="#bb58cc" />
+                <StatisticBox
+                    headline='Hidden User'
+                    text={calcHiddenUsers().toString()}
+                    icon={< VisibilityOff />}
+                    colorCode="#bb58cc" />
+                <StatisticBox
+                    headline='Top Depter'
+                    text={calcTopDepter()}
+                    icon={<LocalFireDepartment />}
+                    colorCode="#bb58cc" />
+            </div>
             <div className={style.table}>
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
