@@ -30,7 +30,7 @@ function App() {
             <LoginChecker />
             <Box sx={{ display: 'flex' }}>
               <TopBar />
-              <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+              <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0 }}>
                 <Toolbar />
                 <Routing />
               </Box>
