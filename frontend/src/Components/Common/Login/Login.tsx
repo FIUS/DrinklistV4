@@ -15,7 +15,7 @@ const Login = (props: Props) => {
 
     return (
         <div className={style.outterContainer}>
-            <Typography variant="h3">Wilkommen zur Drinklist</Typography>
+            <Typography variant="h3">Willkommen zur Drinklist</Typography>
             <Typography variant="h4">Bitte logge dich ein!</Typography>
             <Spacer vertical={40} />
             <TextField
