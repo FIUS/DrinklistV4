@@ -1,4 +1,3 @@
-import { Money } from '@mui/icons-material'
 import { Avatar, Typography } from '@mui/material'
 import React from 'react'
 import Infobox from './Infobox'

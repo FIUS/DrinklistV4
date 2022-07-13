@@ -1,4 +1,4 @@
-import { AddBox, Delete, DownhillSkiing, LocalBar, LocalFireDepartment, Money, Person, VisibilityOff } from '@mui/icons-material';
+import { AddBox, Delete, DownhillSkiing, LocalFireDepartment, Money, Person, VisibilityOff } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -9,7 +9,6 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setMembers } from '../../../Actions/CommonAction';
 import DialogManager from './DialogManager';
-import Infobox from '../../Common/InfoBox/Infobox';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 
 type Props = {}

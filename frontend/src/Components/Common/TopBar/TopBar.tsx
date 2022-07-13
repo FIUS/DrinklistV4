@@ -1,5 +1,5 @@
 import { Person, SettingsOutlined } from '@mui/icons-material'
-import { AppBar, Button, IconButton, Slide, Toolbar, Typography } from '@mui/material'
+import { AppBar, Button, IconButton, Slide, Toolbar } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Spacer from '../Spacer'
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,8 +11,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';

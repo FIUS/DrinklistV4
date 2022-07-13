@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import style from './infobox.module.scss';
 
 type Props = {
