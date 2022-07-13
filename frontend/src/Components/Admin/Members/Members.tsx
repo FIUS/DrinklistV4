@@ -86,9 +86,10 @@ const Members = (props: Props) => {
             </div>
             <div className={style.table}>
                 <TableContainer component={Paper}>
-                    <Table aria-label="simple table">
+                    <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>
+                                <TableCell className={style.searchID}>#</TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Konto</TableCell>
                                 <TableCell>Modifizieren</TableCell>
@@ -97,7 +98,9 @@ const Members = (props: Props) => {
                         <TableBody>
                             <TableRow
                                 key={"row.name"}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
+                                <TableCell></TableCell>
                                 <TableCell component="th" scope="row">
                                     <TextField
                                         variant='standard'
@@ -160,11 +163,38 @@ const Members = (props: Props) => {
                                 </TableCell>
 
                             </TableRow>
+                            <TableRow>
+                                <TableCell>
+                                    <TextField
+                                        variant='outlined'
+                                        label="Suche..."
+                                        value={password}
+                                        onChange={(value) => {
+                                            setpassword(value.target.value)
+                                        }}
+                                        className={style.searchID}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        variant='outlined'
+                                        label="Suche..."
+                                        value={password}
+                                        onChange={(value) => {
+                                            setpassword(value.target.value)
+                                        }}
+                                        className={style.searchName}
+                                    />
+                                </TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                            </TableRow>
                             {common.members?.map(value => {
                                 return <TableRow
                                     key={value.id}
                                     className={value.hidden ? style.hidden : ""}
                                 >
+                                    <TableCell>{value.id}</TableCell>
                                     <TableCell component="th" scope="row">
                                         {value.name}
                                     </TableCell>

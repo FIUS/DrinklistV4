@@ -24,7 +24,7 @@ const Transactions = (props: Props) => {
         <>
             <div className={style.table}>
                 <TableContainer component={Paper}>
-                    <Table aria-label="simple table">
+                    <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>
                                 <TableCell>Beschreibung</TableCell>
