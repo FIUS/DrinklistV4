@@ -12,6 +12,8 @@ import { setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } f
 import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 
+const historyLocationThreshold = 1400;
+
 type Props = {}
 
 const Details = (props: Props) => {
@@ -93,6 +95,36 @@ const Details = (props: Props) => {
         }
     }
 
+    const history = <div className={style.historyContainer}>
+        <Typography variant='h4'>History</Typography>
+
+        <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Beschreibung</TableCell>
+                        <TableCell>Betrag</TableCell>
+                        <TableCell>Datum</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {common.history?.map(value => {
+                        return <>
+                            <TableRow
+                                key={value.id}
+                            >
+                                <TableCell component="th" scope="row">
+                                    {value.description}
+                                </TableCell>
+                                <TableCell>{value.amount.toFixed(2)}€</TableCell>
+                                <TableCell>{new Date(value.date).toISOString()}</TableCell>
+                            </TableRow>
+                        </>
+                    })}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    </div>
 
     return (
         <>
@@ -103,14 +135,15 @@ const Details = (props: Props) => {
                         return common.favorites?.includes(value.id)
                     })}
                         memberID={params.userid ? params.userid : ""} />
+                    {window.innerWidth <= historyLocationThreshold ? <></> : history}
                 </div>
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'>Ich nehme...</Typography>
                     <TextField placeholder='Suche...' value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
                     <div className={style.buyDrinkContainerInner}>
-                        {common.drinkCategories?.map(category => {
-                            const drinks = common.drinks?.filter(value => {
+                        {common.drinkCategories?.sort((category1, category2) => category1.localeCompare(category2)).map(category => {
+                            const drinks = common.drinks?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).filter(value => {
                                 return value.category === category
                             })
                             if (drinks?.some((value) => searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase()))) {
@@ -127,36 +160,7 @@ const Details = (props: Props) => {
                     </div>
                 </div>
 
-                <div className={style.historyContainer}>
-                    <Typography variant='h4'>History</Typography>
-
-                    <TableContainer component={Paper}>
-                        <Table aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Beschreibung</TableCell>
-                                    <TableCell>Betrag</TableCell>
-                                    <TableCell>Datum</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {common.history?.map(value => {
-                                    return <>
-                                        <TableRow
-                                            key={value.id}
-                                        >
-                                            <TableCell component="th" scope="row">
-                                                {value.description}
-                                            </TableCell>
-                                            <TableCell>{value.amount.toFixed(2)}€</TableCell>
-                                            <TableCell>{new Date(value.date).toISOString()}</TableCell>
-                                        </TableRow>
-                                    </>
-                                })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </div>
+                {window.innerWidth > historyLocationThreshold ? <></> : history}
 
 
             </div>

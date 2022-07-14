@@ -16,10 +16,30 @@
     align-items: center;
     justify-content: space-between;
     min-width: 250px;
+    
 }
 
-.innerbuttonright{
+.innerbuttonContainer{
     display: flex;
     flex-direction: row;
     align-items: center;
+    position: relative;
+    min-width: 130px;
+}
+
+.tag{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.pricetag{
+    @extend .tag;
+    left: 0px;
+}
+
+.stockTag{
+    @extend .tag;
+    left: 80px;
 }

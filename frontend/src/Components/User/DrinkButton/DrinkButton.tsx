@@ -52,14 +52,17 @@ const DrinkButton = (props: Props) => {
                     <div>
                         {props.drink.name}
                     </div>
-                    <div className={style.innerbuttonright}>
-                        <SellOutlinedIcon />
-                        <Spacer horizontal={5} />
-                        {props.drink.price.toFixed(2)}€
-                        <Spacer horizontal={15} />
-                        <Inventory2OutlinedIcon />
-                        <Spacer horizontal={5} />
-                        {props.drink.stock}
+                    <div className={style.innerbuttonContainer}>
+                        <div className={style.pricetag} >
+                            <SellOutlinedIcon />
+                            <Spacer horizontal={5} />
+                            {props.drink.price.toFixed(2)}€
+                        </div>
+                        <div className={style.stockTag}>
+                            <Inventory2OutlinedIcon />
+                            <Spacer horizontal={5} />
+                            {props.drink.stock}
+                        </div>
                     </div>
                 </div>
             </Button>

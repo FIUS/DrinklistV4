@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material'
+import { Slide, Typography } from '@mui/material'
 import React from 'react'
 import { Drink } from '../../../types/ResponseTypes'
 import DrinkButton from '../DrinkButton/DrinkButton'
@@ -10,14 +10,22 @@ type Props = {
 }
 
 const BalanceBox = (props: Props) => {
+    const containerRef = React.useRef(null);
+
+    if (props.favorites === undefined) {
+        return <></>
+    }
+
     return (
         <div className={style.balanceBoxContainer}>
-            <Typography variant='h4'>Favoriten</Typography>
-            <div className={style.drinkButtonContainer}>
-                {props.favorites?.map((value) => {
-                    return <DrinkButton drink={value}
+            {props.favorites?.length > 0 ? <Typography variant='h4'>Favoriten</Typography> : <></>}
+            <div className={style.drinkButtonContainer} ref={containerRef}>
+                {props.favorites?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).map((value) => {
+                    return <Slide in={true} key={value.id} container={containerRef.current} direction="right"><div><DrinkButton drink={value}
                         memberID={props.memberID}
                         key={props.memberID} />
+                    </div>
+                    </Slide>
                 })}
             </div>
         </div>
