@@ -20,6 +20,8 @@ const Members = (props: Props) => {
     const [name, setname] = useState("")
     const [balance, setbalance] = useState(0.0)
     const [password, setpassword] = useState("")
+    const [searchName, setsearchName] = useState("")
+    const [searchID, setsearchID] = useState("")
 
     useEffect(() => {
 
@@ -58,6 +60,12 @@ const Members = (props: Props) => {
         })
         return username
     }
+
+    const filteredMembers = common.members?.filter(value => {
+        return ((value.name.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
+            (value.id.toString().toLowerCase().includes(searchID.toLowerCase()) || searchID === "")) ||
+            (searchName === "" && searchID === "")
+    })
 
     return (
         <>
@@ -108,6 +116,7 @@ const Members = (props: Props) => {
                                         onChange={(value) => {
                                             setname(value.target.value)
                                         }}
+                                        size="small"
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -121,6 +130,7 @@ const Members = (props: Props) => {
                                                 setbalance(parseFloat(value.target.value))
                                             }
                                         }}
+                                        size="small"
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -133,6 +143,7 @@ const Members = (props: Props) => {
                                             onChange={(value) => {
                                                 setpassword(value.target.value)
                                             }}
+                                            size="small"
                                         />
                                         <Button onClick={(value) => {
                                             if (name !== "" && password !== "") {
@@ -167,28 +178,31 @@ const Members = (props: Props) => {
                                     <TextField
                                         variant='outlined'
                                         label="Suche..."
-                                        value={password}
+                                        value={searchID}
                                         onChange={(value) => {
-                                            setpassword(value.target.value)
+                                            setsearchID(value.target.value)
                                         }}
                                         className={style.searchID}
+                                        size="small"
+                                        type="number"
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <TextField
                                         variant='outlined'
                                         label="Suche..."
-                                        value={password}
+                                        value={searchName}
                                         onChange={(value) => {
-                                            setpassword(value.target.value)
+                                            setsearchName(value.target.value)
                                         }}
                                         className={style.searchName}
+                                        size="small"
                                     />
                                 </TableCell>
                                 <TableCell></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
-                            {common.members?.map(value => {
+                            {filteredMembers?.map(value => {
                                 return <TableRow
                                     key={value.id}
                                     className={value.hidden ? style.hidden : ""}
