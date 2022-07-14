@@ -1,5 +1,5 @@
 import { Undo } from '@mui/icons-material';
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { Transaction } from '../../../types/ResponseTypes';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -11,6 +11,9 @@ type Props = {}
 
 const Transactions = (props: Props) => {
     const [transactions, settransactions] = useState<Array<Transaction>>([])
+    const [searchDescription, setsearchDescription] = useState("")
+    const [searchName, setsearchName] = useState("")
+    const [searchDate, setsearchDate] = useState("")
 
     useEffect(() => {
         doGetRequest("transactions").then((value) => {
@@ -20,6 +23,13 @@ const Transactions = (props: Props) => {
         })
     }, [])
 
+    const filteredTransactions = transactions.filter(value => {
+        return ((value.description.toLowerCase().includes(searchDescription.toLowerCase()) || searchDescription === "") &&
+            (value.memberName?.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
+            (value.date.toLowerCase().includes(searchDate.toLowerCase()) || searchDate === "")) ||
+            (searchDescription === "" && searchName === "" && searchDate === "")
+    })
+
     return (
         <>
             <div className={style.table}>
@@ -27,6 +37,7 @@ const Transactions = (props: Props) => {
                     <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>
+                                <TableCell>#</TableCell>
                                 <TableCell>Beschreibung</TableCell>
                                 <TableCell>Konto</TableCell>
                                 <TableCell>Wert</TableCell>
@@ -35,11 +46,54 @@ const Transactions = (props: Props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {transactions.map((value) => {
+
+                            <TableCell component="th" scope="row">
+                                <Typography variant='h6'>{filteredTransactions.length}</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <TextField
+                                    size='small'
+                                    label="Suche..."
+                                    value={searchDescription}
+                                    onChange={(value) => {
+                                        setsearchDescription(value.target.value)
+                                    }}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <TextField
+                                    size='small'
+                                    label="Suche..."
+                                    value={searchName}
+                                    onChange={(value) => {
+                                        setsearchName(value.target.value)
+                                    }}
+                                />
+                            </TableCell>
+                            <TableCell>
+
+                            </TableCell>
+                            <TableCell>
+                                <TextField
+                                    size='small'
+                                    label="Suche..."
+                                    value={searchDate}
+                                    onChange={(value) => {
+                                        setsearchDate(value.target.value)
+                                    }}
+                                />
+                            </TableCell>
+                            <TableCell>
+
+                            </TableCell>
+                            {filteredTransactions.map((value) => {
                                 return <TableRow
                                     key={value.id}
                                 >
                                     <TableCell component="th" scope="row">
+                                        {value.id}
+                                    </TableCell>
+                                    <TableCell>
                                         {value.description}
                                     </TableCell>
                                     <TableCell>{value.memberName ? value.memberName : value.memberID}</TableCell>
