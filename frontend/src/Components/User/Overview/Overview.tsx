@@ -54,7 +54,7 @@ const Overview = (props: Props) => {
                 {common.members?.map(value => {
                     if (!value.hidden) {
                         return <Grow in={searchfield === "" || value.name.toLowerCase().includes(searchfield.toLowerCase())} key={value.id}>
-                            <div >
+                            <div style={{ width: "100%" }}>
                                 <UserButton key={value.id} name={value.name} id={value.id} />
                             </div>
                         </Grow>
