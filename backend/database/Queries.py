@@ -175,7 +175,7 @@ class Queries:
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
         member.balance += amount
-        self.session.add(Transaction(description=f"Desposit",
+        self.session.add(Transaction(description=f"Deposit",
                                      member_id=member_id, amount=amount))
         self.session.commit()
 
