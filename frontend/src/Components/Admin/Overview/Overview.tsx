@@ -13,6 +13,8 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { LocalFireDepartment, Money, Person, VisibilityOff } from '@mui/icons-material';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
 import { doGetRequest } from '../../Common/StaticFunctions';
+import Infobox from '../../Common/InfoBox/Infobox';
+import { Area, AreaChart, CartesianGrid, Legend, Tooltip, YAxis } from 'recharts';
 
 type Props = {}
 
@@ -94,6 +96,23 @@ const Overview = (props: Props) => {
                     text={calcTopDepter()}
                     icon={<LocalFireDepartment />}
                     colorCode="#bb58cc" />
+                <Infobox headline='Money distribution' >
+                    <AreaChart width={window.innerWidth / 3} height={200} data={common.members?.sort(
+                        (m1, m2) => m1.balance - m2.balance).map(
+                            (value) => {
+                                return {
+                                    Balances: value.balance
+                                }
+                            }
+                        )
+                    }>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <YAxis unit="€" />
+                        <Tooltip />
+                        <Legend />
+                        <Area type="monotone" dataKey="Balances" stroke="#bb58cc" fillOpacity={0.5} fill="#bb58cc" />
+                    </AreaChart >
+                </Infobox>
             </div>
             <div className={style.overview}>
                 <Button
