@@ -11,6 +11,8 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Domain under which the application runs
 * `DEBUG`
   * If set a developent server is used for more debug info
+* `DB_CONNECTION`
+  * Path to sqlite file or connection string for postress etc.
 * `ADMIN_USERNAME`
   * Username of admin user
 * `ADMIN_PASSWORD`
@@ -19,7 +21,7 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Username of moderator
 * `MOD_PASSWORD`
   * Password of moderator
-  
+
 ### Importing from old Drinklist
 * `X-AUTH-TOKEN`
   * If you need to import data from an old drinklist provide an admin api token and this drinklist will fetch all data from the old drinklist
