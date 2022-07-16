@@ -11,6 +11,10 @@ import { setMembers } from '../../../Actions/CommonAction';
 import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 
+declare global {
+    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
+}
+
 type Props = {}
 
 const Members = (props: Props) => {
@@ -74,22 +78,22 @@ const Members = (props: Props) => {
                     headline='Total Budget'
                     text={calcBudget().toFixed(2) + "€"}
                     icon={<Money />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
                     headline='Total Users'
                     text={common.members ? common.members.length.toString() : "0"}
                     icon={<Person />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
                     headline='Hidden User'
                     text={calcHiddenUsers().toString()}
                     icon={< VisibilityOff />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
                     headline='Top Depter'
                     text={calcTopDepter()}
                     icon={<LocalFireDepartment />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
             </div>
             <div className={style.table}>
                 <TableContainer component={Paper}>

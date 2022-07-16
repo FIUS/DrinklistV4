@@ -9,6 +9,12 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions'
 import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction'
 import { Typography } from '@mui/material'
+import StatisticBox from '../../Common/InfoBox/StatisticBox'
+import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
+
+declare global {
+    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
+}
 
 type Props = {}
 
@@ -31,10 +37,36 @@ const Drinks = (props: Props) => {
 
 
     }, [dispatch])
+
+    const calcMissing = () => {
+        if (common.drinks?.length === 0 || !common.drinks) {
+            return "No drinks"
+        }
+        let stock = common.drinks[0].stock
+        let name = common.drinks[0].name
+        common.drinks.forEach(drink => {
+            if (drink.stock < stock) {
+                stock = drink.stock;
+                name = drink.name
+            }
+        })
+        return name + " (" + stock + ")"
+    }
+
+
     return (
         <>
             <div className={style.drinksOutterContainer}>
-                <AddDrink />
+                <div className={style.topContainer}>
+                    <AddDrink />
+                    <StatisticBox
+                        headline='Least Stock Drink'
+                        icon={<ReportGmailerrorredIcon />}
+                        text={calcMissing()}
+                        colorCode={window.globalTS.ICON_COLOR}
+                        noPadding
+                    />
+                </div>
                 <div className={style.drinksContainer}>
                     {common.drinkCategories?.map(category => {
                         const drinks = common.drinks?.filter(value => {

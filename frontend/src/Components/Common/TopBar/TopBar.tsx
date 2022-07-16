@@ -23,7 +23,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 type Props = {}
 
 declare global {
-    interface Window { globalTS: { MOBILE_THRESHOLD: number }; }
+    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
 }
 
 const TopBar = (props: Props) => {

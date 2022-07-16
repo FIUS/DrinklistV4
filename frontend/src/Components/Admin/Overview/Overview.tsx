@@ -16,6 +16,10 @@ import { doGetRequest } from '../../Common/StaticFunctions';
 import Infobox from '../../Common/InfoBox/Infobox';
 import { Area, AreaChart, CartesianGrid, Legend, Tooltip, YAxis } from 'recharts';
 
+declare global {
+    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
+}
+
 type Props = {}
 
 const Overview = (props: Props) => {
@@ -80,22 +84,22 @@ const Overview = (props: Props) => {
                     headline='Total Budget'
                     text={calcBudget().toFixed(2) + "€"}
                     icon={<Money />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
                     headline='Total Users'
                     text={common.members ? common.members.length.toString() : "0"}
                     icon={<Person />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
                     headline='Hidden User'
                     text={calcHiddenUsers().toString()}
                     icon={< VisibilityOff />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
                     headline='Top Depter'
                     text={calcTopDepter()}
                     icon={<LocalFireDepartment />}
-                    colorCode="#bb58cc" />
+                    colorCode={window.globalTS.ICON_COLOR} />
                 <Infobox headline='Money distribution' >
                     <AreaChart width={window.innerWidth / 3} height={200} data={common.members?.sort(
                         (m1, m2) => m1.balance - m2.balance).map(

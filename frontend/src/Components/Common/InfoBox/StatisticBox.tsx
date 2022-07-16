@@ -3,16 +3,21 @@ import React from 'react'
 import Infobox from './Infobox'
 import style from './infobox.module.scss';
 
+declare global {
+    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
+}
+
 type Props = {
     headline: string,
     text: string,
     icon: JSX.Element
     colorCode?: string,
+    noPadding?: boolean
 }
 
 const StatisticBox = (props: Props) => {
     return (
-        <Infobox headline={props.headline} >
+        <Infobox headline={props.headline} noPadding={props.noPadding} >
             <div className={style.statisticBox}>
                 <Typography variant='h5'>{props.text}</Typography>
                 <Avatar sx={{ bgcolor: props.colorCode ? props.colorCode : "#a9a9a9" }}>{props.icon}</Avatar>
