@@ -1,3 +1,4 @@
+import requests
 from authenticator import TokenManager
 import util
 from datetime import datetime, timedelta
@@ -76,10 +77,10 @@ class Queries:
         user.hidden = not user.hidden
         self.session.commit()
 
-    def add_user(self, name, money, password):
+    def add_user(self, name, money, password, hidden=False):
         pw_hash, salt = TokenManager.hashPassword(password)
         self.session.add(
-            Member(name=name, balance=money, password=pw_hash, salt=salt))
+            Member(name=name, balance=money, password=pw_hash, salt=salt, hidden=hidden))
         self.session.commit()
 
     def get_drinks(self):
@@ -109,7 +110,7 @@ class Queries:
         self.session.delete(drink)
         self.session.commit()
 
-    def add_drink(self, name, price, stock, category):
+    def add_drink(self, name, price, stock, category=None):
         if category is None:
             self.session.add(Drink(name=name, stock=stock, price=price))
         else:
@@ -145,8 +146,12 @@ class Queries:
 
         return output
 
-    def get_transactions(self):
-        transactions = self.session.query(Transaction).all()
+    def get_transactions(self, limit=None):
+        transactions = []
+        if limit is not None:
+            transactions = self.session.query(Transaction).limit(limit).all()
+        else:
+            transactions = self.session.query(Transaction).all()
         output = []
         for t in transactions:
             transaction: Transaction = t
@@ -198,17 +203,48 @@ class Queries:
             Member(name="admin", password=hashedPassword, salt=salt))
         self.session.add(
             Member(name="moderator", password=hashedPassword, salt=salt))
-        for i in range(34):
-            self.session.add(
-                Member(name=f"Benutzer {i}", password=hashedPassword, salt=salt))
 
-        for i in range(17):
-            self.session.add(
-                Drink(name=f"Drink {i}", stock=i*2, price=i*1.5))
-        self.session.commit()
+        if util.token is not None and util.old_domain is not None:
 
-        for i in range(17):
-            self.session.add(
-                Transaction(description=f"Drink bought {i}", member_id=5, amount=-0.60))
+            # Import Users
+            resp = requests.get(f"https://{util.old_domain}/api/users",
+                                headers={"x-auth-token": util.token}, timeout=3)
 
-        self.session.commit()
+            for user in resp.json():
+                self.add_user(user["name"], user["balance"]/100,
+                              "unsafe", hidden=True if user["hidden"] == 1 else False)
+                print("User", user["name"], "imported")
+
+            print("-->", len(resp.json()), "users imported")
+            print()
+
+            # Import Drinks
+            resp = requests.get(f"https://{util.old_domain}/api/beverages",
+                                headers={"x-auth-token": util.token}, timeout=3)
+
+            for drink in resp.json():
+                self.add_drink(
+                    drink["name"], drink["price"]/100, drink["stock"])
+                print("Drink", drink["name"], "imported")
+
+            print("-->", len(resp.json()), "drinks imported")
+            print()
+
+            # Import Transactions
+            users = self.get_users()
+            for user in users:
+                resp = requests.get(f"https://{util.old_domain}/api/orders/{user['name']}",
+                                    headers={"x-auth-token": util.token}, timeout=3)
+
+                for transaction in resp.json():
+                    date = datetime.strptime(
+                        transaction["timestamp"], "%Y-%m-%d %H:%M:%S")
+                    self.session.add(Transaction(
+                        description=transaction["reason"], member_id=user["id"], amount=transaction["amount"]/100, date=date))
+
+                    print("Transaction", transaction["reason"],
+                          "for user", user["name"], "imported")
+                print()
+            print("Starting to commit Transactions to database")
+            self.session.commit()
+            print("Done")

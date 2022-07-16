@@ -3,14 +3,25 @@ import json
 import os
 import datetime
 import time
-cookie_expire = int(os.environ.get("cookie_expire_time")) * \
-    60*60 if os.environ.get("cookie_expire_time") else 60**3
-domain = os.environ.get("domain") if os.environ.get(
-    "domain") else "127.0.0.1:3000"
-admin_pw = os.environ.get("adminpw") if os.environ.get(
-    "adminpw") else "unsafe"
+cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
+    60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
+domain = os.environ.get("DOMAIN") if os.environ.get(
+    "DOMAIN") else "127.0.0.1:3000"
 logging_enabled = True if os.environ.get(
-    "logging") else False
+    "DEBUG") else False
+
+token = os.environ.get("X-AUTH-TOKEN")
+old_domain = os.environ.get("OLD-DOMAIN")
+
+admin_username = os.environ.get("ADMIN_USERNAME") if os.environ.get(
+    "ADMIN_USERNAME") else "admin"
+admin_password = os.environ.get("ADMIN_PASSWORD") if os.environ.get(
+    "ADMIN_PASSWORD") else "unsafe"
+
+moderator_username = os.environ.get(
+    "MOD_USERNAME") if os.environ.get("MOD_USERNAME") else "moderator"
+moderator_password = os.environ.get(
+    "MOD_PASSWORD") if os.environ.get("MOD_PASSWORD") else "unsafe"
 
 os.environ['TZ'] = 'Europe/London'
 time.tzset()

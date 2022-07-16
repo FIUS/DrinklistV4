@@ -1,4 +1,4 @@
-import { Button } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import React from 'react'
 import style from './drinkbutton.module.scss'
 import Rating from '@mui/material/Rating';
@@ -49,9 +49,9 @@ const DrinkButton = (props: Props) => {
                     })
             }}>
                 <div className={style.innerbutton}>
-                    <div>
+                    <Typography variant='h6'>
                         {props.drink.name}
-                    </div>
+                    </Typography>
                     <div className={style.innerbuttonContainer}>
                         <div className={style.pricetag} >
                             <SellOutlinedIcon />

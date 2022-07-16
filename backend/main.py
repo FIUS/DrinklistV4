@@ -226,6 +226,12 @@ def get_transactions():
     return util.build_response(db.get_transactions())
 
 
+@app.route('/api/transactions/limit/<int:limit>', methods=["GET"])
+@authenticated
+def get_transactions_limited(limit):
+    return util.build_response(db.get_transactions(limit))
+
+
 @app.route('/api/transactions/<int:transaction_id>/undo', methods=["POST"])
 @admin
 def undo_transaction(transaction_id):

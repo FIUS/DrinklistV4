@@ -42,6 +42,8 @@ const Details = (props: Props) => {
     }, [common.drinks, common.members, common.drinkCategories, common.history, dispatch])
 
     useEffect(() => {
+        dispatch(setHistory([]))
+        dispatch(setFavorites([]))
         doGetRequest("users").then((value) => {
             if (value.code === 200) {
                 dispatch(setMembers(value.content))

@@ -3,3 +3,25 @@
 
 ## Deploy Frontend
 You need to mount the file   [`env.js`](frontend/public/environment/env.js) in the folder `/app/build/environment` in order for the frontend to work. Customize the values as needed
+
+## Backend Environment Variables
+* `COOKIE_EXPIRE_TIME`
+  * Hours that login cookies are stored
+* `DOMAIN`
+  * Domain under which the application runs
+* `DEBUG`
+  * If set a developent server is used for more debug info
+* `ADMIN_USERNAME`
+  * Username of admin user
+* `ADMIN_PASSWORD`
+  * Password of admin user
+* `MOD_USERNAME`
+  * Username of moderator
+* `MOD_PASSWORD`
+  * Password of moderator
+  
+### Importing from old Drinklist
+* `X-AUTH-TOKEN`
+  * If you need to import data from an old drinklist provide an admin api token and this drinklist will fetch all data from the old drinklist
+* `OLD-DOMAIN`
+  * If you need to import data from an old drinklist provide the domain under which the drinklist is hosted
