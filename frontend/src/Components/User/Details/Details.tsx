@@ -12,7 +12,7 @@ import { setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } f
 import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 
-const historyLocationThreshold = 1400;
+const historyLocationThreshold = 1650;
 
 type Props = {}
 
