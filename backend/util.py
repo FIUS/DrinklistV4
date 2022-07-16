@@ -10,8 +10,8 @@ domain = os.environ.get("DOMAIN") if os.environ.get(
 logging_enabled = True if os.environ.get(
     "DEBUG") else False
 
-token = os.environ.get("X-AUTH-TOKEN")
-old_domain = os.environ.get("OLD-DOMAIN")
+token = os.environ.get("X_AUTH_TOKEN")
+old_domain = os.environ.get("OLD_DOMAIN")
 
 admin_username = os.environ.get("ADMIN_USERNAME") if os.environ.get(
     "ADMIN_USERNAME") else "admin"

@@ -23,7 +23,7 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Password of moderator
 
 ### Importing from old Drinklist
-* `X-AUTH-TOKEN`
+* `X_AUTH_TOKEN`
   * If you need to import data from an old drinklist provide an admin api token and this drinklist will fetch all data from the old drinklist
-* `OLD-DOMAIN`
+* `OLD_DOMAIN`
   * If you need to import data from an old drinklist provide the domain under which the drinklist is hosted
