@@ -21,7 +21,7 @@ const TopDepter = (props: Props) => {
                 username = member.name
             }
         })
-        return username
+        return `${username} (${balance.toFixed(2)}€)`
     }
 
     return (
