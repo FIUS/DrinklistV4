@@ -1,4 +1,4 @@
-import { AddBox, Delete, DownhillSkiing, LocalFireDepartment, Money, Person, VisibilityOff } from '@mui/icons-material';
+import { AddBox, Delete, DownhillSkiing, Money, Person, VisibilityOff } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -10,6 +10,7 @@ import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setMembers } from '../../../Actions/CommonAction';
 import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
+import TopDepter from '../Common/TopDepter/TopDepter';
 
 declare global {
     interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
@@ -50,20 +51,6 @@ const Members = (props: Props) => {
         return amount
     }
 
-    const calcTopDepter = () => {
-        if (common.members?.length === 0 || !common.members) {
-            return "No users"
-        }
-        let balance = common.members[0].balance
-        let username = common.members[0].name
-        common.members.forEach(member => {
-            if (member.balance < balance) {
-                balance = member.balance;
-                username = member.name
-            }
-        })
-        return username
-    }
 
     const filteredMembers = common.members?.filter(value => {
         return ((value.name.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
@@ -89,11 +76,7 @@ const Members = (props: Props) => {
                     text={calcHiddenUsers().toString()}
                     icon={< VisibilityOff />}
                     colorCode={window.globalTS.ICON_COLOR} />
-                <StatisticBox
-                    headline='Top Depter'
-                    text={calcTopDepter()}
-                    icon={<LocalFireDepartment />}
-                    colorCode={window.globalTS.ICON_COLOR} />
+                <TopDepter members={common.members} />
             </div>
             <div className={style.table}>
                 <TableContainer component={Paper}>

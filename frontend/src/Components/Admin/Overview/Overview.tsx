@@ -10,11 +10,12 @@ import Spacer from '../../Common/Spacer';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { LocalFireDepartment, Money, Person, VisibilityOff } from '@mui/icons-material';
+import { Money, Person, VisibilityOff } from '@mui/icons-material';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
 import { doGetRequest } from '../../Common/StaticFunctions';
 import Infobox from '../../Common/InfoBox/Infobox';
 import { Area, AreaChart, CartesianGrid, Legend, Tooltip, YAxis } from 'recharts';
+import TopDepter from '../Common/TopDepter/TopDepter';
 
 declare global {
     interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
@@ -62,20 +63,6 @@ const Overview = (props: Props) => {
         return amount
     }
 
-    const calcTopDepter = () => {
-        if (common.members?.length === 0 || !common.members) {
-            return "No users"
-        }
-        let balance = common.members[0].balance
-        let username = common.members[0].name
-        common.members.forEach(member => {
-            if (member.balance < balance) {
-                balance = member.balance;
-                username = member.name
-            }
-        })
-        return username
-    }
 
     return (
         <>
@@ -95,11 +82,7 @@ const Overview = (props: Props) => {
                     text={calcHiddenUsers().toString()}
                     icon={< VisibilityOff />}
                     colorCode={window.globalTS.ICON_COLOR} />
-                <StatisticBox
-                    headline='Top Depter'
-                    text={calcTopDepter()}
-                    icon={<LocalFireDepartment />}
-                    colorCode={window.globalTS.ICON_COLOR} />
+                <TopDepter members={common.members} />
                 <Infobox headline='Money distribution' >
                     <AreaChart width={window.innerWidth / 3} height={200} data={common.members?.sort(
                         (m1, m2) => m1.balance - m2.balance).map(
