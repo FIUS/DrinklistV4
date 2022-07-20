@@ -14,6 +14,8 @@ class Transaction(db.Model):
         'database.Member.Member', lazy="joined")
     amount = sql.Column(sql.Float, nullable=True)
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
+    checkout_id = sql.Column(sql.Integer, sql.ForeignKey(
+        'checkout.id'), nullable=True, default=None)
 
     def to_dict(self):
         output = {
