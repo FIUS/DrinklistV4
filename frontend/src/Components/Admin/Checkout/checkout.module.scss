@@ -1,0 +1,10 @@
+@import "../../Common/variables.module.scss";
+
+.container{
+    padding:$padding;
+}
+
+.entryBottomInfo{
+    display:flex;
+    flex-direction: row-reverse;
+}

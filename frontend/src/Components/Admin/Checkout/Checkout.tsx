@@ -1,10 +1,18 @@
+import style from './checkout.module.scss';
 import React from 'react'
+import CheckoutEntry from './CheckoutEntry';
 
 type Props = {}
 
 const Checkout = (props: Props) => {
     return (
-        <div>Checkout</div>
+        <div className={style.container}>
+            <CheckoutEntry date={new Date()} />
+            <CheckoutEntry date={new Date()} />
+            <CheckoutEntry date={new Date()} />
+            <CheckoutEntry date={new Date()} />
+            <CheckoutEntry date={new Date()} />
+        </div>
     )
 }
 
