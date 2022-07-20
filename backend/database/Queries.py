@@ -204,6 +204,8 @@ class Queries:
         self.session.add(
             Member(name="moderator", password=hashedPassword, salt=salt))
 
+        self.session.commit()
+
         if util.token is not None and util.old_domain is not None:
 
             # Import Users
