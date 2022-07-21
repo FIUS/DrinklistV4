@@ -239,6 +239,23 @@ def undo_transaction(transaction_id):
     return util.build_response("Transaction undone")
 
 
+@app.route('/api/checkout', methods=["GET"])
+@admin
+def get_checkout():
+    return util.build_response(db.get_checkouts())
+
+@app.route('/api/checkout', methods=["POST"])
+@admin
+def do_checkout():
+    return util.build_response(db.do_checkout(request.json))
+
+
+@app.route('/api/checkout/<int:checkout_id>', methods=["GET"])
+@admin
+def get_checkout_expanded(checkout_id):
+    return util.build_response(db.get_checkout_expanded(checkout_id))
+
+
 @app.route('/api/login/check', methods=["GET"])
 @authenticated
 def login_Check():

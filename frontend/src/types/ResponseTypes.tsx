@@ -20,4 +20,10 @@ export type Transaction = {
     memberName?: string,
     amount: number,
     date: string
-}           
+}
+
+export type Checkout = {
+    id: number,
+    date: string,
+    transactions?: Array<Transaction>
+}

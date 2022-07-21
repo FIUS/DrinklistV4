@@ -1,0 +1,25 @@
+@import "../../Common/variables.module.scss";
+
+.container {
+    padding: $padding;
+}
+
+.entryBottomInfo {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.newCheckoutContainer {
+    display: flex;
+    gap: $flex-gap;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.newCheckoutContainerHeadline {
+    display: flex;
+    gap: $flex-gap;
+    flex-direction: row;
+    align-items: center;
+}

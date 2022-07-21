@@ -184,6 +184,38 @@ class Queries:
                                      member_id=member_id, amount=amount))
         self.session.commit()
 
+    def get_checkouts(self):
+        checkouts = self.session.query(Checkout).all()
+        output = []
+        for c in checkouts:
+            checkout: Checkout = c
+            output.append(checkout.dict())
+        return output
+
+    def get_checkout_expanded(self, id):
+        checkout: Checkout = self.session.query(
+            Checkout).filter_by(id=id).first()
+
+        return checkout.dict_expanded()
+
+    def do_checkout(self, checkouts):
+        checkout: Checkout = Checkout()
+        self.session.add(checkout)
+        self.session.commit()
+
+        for c in checkouts:
+            member_id = c["memberID"]
+            amount = c["amount"]
+
+            member: Member = self.session.query(
+                Member).filter_by(id=member_id).first()
+            member.balance += amount
+
+            self.session.add(Transaction(
+                description="Checkout", member_id=member_id, amount=amount, checkout_id=checkout.id))
+
+            self.session.commit()
+
     def checkPassword(self, name, password):
         member: Member = self.session.query(
             Member).filter_by(name=name).first()
@@ -203,6 +235,17 @@ class Queries:
             Member(name="admin", password=hashedPassword, salt=salt))
         self.session.add(
             Member(name="moderator", password=hashedPassword, salt=salt))
+
+        self.session.commit()
+        c = Checkout()
+        self.session.add(c)
+        self.session.commit()
+
+        self.session.add(Transaction(
+            description="transaction[]", member_id=1, amount=1, checkout_id=c.id))
+        self.session.add(Transaction(
+            description="transaction[33]", member_id=1, amount=1, checkout_id=c.id))
+        self.session.commit()
 
         if util.token is not None and util.old_domain is not None:
 

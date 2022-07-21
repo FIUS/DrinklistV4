@@ -1,5 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom';
+import Checkout from '../Admin/Checkout/Checkout';
 import Drinks from '../Admin/Drinks/Drinks';
 import Members from '../Admin/Members/Members';
 import AdminOverview from '../Admin/Overview/Overview';
@@ -22,6 +23,7 @@ const Routing = (props: Props) => {
                 <Route path="/admin/members" element={<Members />} />
                 <Route path="/admin/transactions" element={<Transactions />} />
                 <Route path="/admin/drinks" element={<Drinks />} />
+                <Route path="/admin/checkout" element={<Checkout />} />
                 <Route path="/admin/settings" element={<Settings />} />
             </Routes>
         </>

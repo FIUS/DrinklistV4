@@ -19,6 +19,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { Settings } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 
 type Props = {}
 
@@ -155,6 +156,14 @@ const TopBar = (props: Props) => {
                                         <ReceiptLongIcon />
                                     </ListItemIcon>
                                     <ListItemText primary="Transaktionen" />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton onClick={() => navigate("/admin/checkout")}>
+                                    <ListItemIcon>
+                                        <AccountBalanceIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Abrechnungen" />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
