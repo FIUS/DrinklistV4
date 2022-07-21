@@ -134,6 +134,11 @@ const Checkout = (props: Props) => {
                             })).then(value => {
                                 if (value.code === 200) {
                                     resetAdd()
+                                    doGetRequest("checkout").then(value => {
+                                        if (value.code === 200) {
+                                            setcheckouts(value.content)
+                                        }
+                                    })
                                 }
                             })
                         }
