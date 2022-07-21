@@ -244,6 +244,11 @@ def undo_transaction(transaction_id):
 def get_checkout():
     return util.build_response(db.get_checkouts())
 
+@app.route('/api/checkout', methods=["POST"])
+@admin
+def do_checkout():
+    return util.build_response(db.do_checkout(request.json))
+
 
 @app.route('/api/checkout/<int:checkout_id>', methods=["GET"])
 @admin

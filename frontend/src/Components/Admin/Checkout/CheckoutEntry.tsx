@@ -54,7 +54,7 @@ const CheckoutEntry = (props: Props) => {
                             <TableRow>
                                 <TableCell className={style.searchID}>#</TableCell>
                                 <TableCell>Name</TableCell>
-                                <TableCell>Menge</TableCell>
+                                <TableCell>Betrag</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

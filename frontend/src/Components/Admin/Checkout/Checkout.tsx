@@ -1,7 +1,7 @@
 import style from './checkout.module.scss';
 import React, { useEffect, useState } from 'react'
 import CheckoutEntry from './CheckoutEntry';
-import { doGetRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { Checkout as CheckoutType, Member } from '../../../types/ResponseTypes';
 import { Autocomplete, Button, TextField, Typography } from '@mui/material';
 import { AddBox } from '@mui/icons-material';
@@ -113,7 +113,9 @@ const Checkout = (props: Props) => {
             </TableContainer>
                 <Button
                     onClick={() => {
-                        console.log(toCheckout)
+                        doPostRequest("checkout", toCheckout.map(value => {
+                            return { memberID: value.member.id, amount: value.amount }
+                        }))
                     }}
                 >
                     Abrechnung abschließen
