@@ -237,15 +237,6 @@ class Queries:
             Member(name="moderator", password=hashedPassword, salt=salt))
 
         self.session.commit()
-        c = Checkout()
-        self.session.add(c)
-        self.session.commit()
-
-        self.session.add(Transaction(
-            description="transaction[]", member_id=1, amount=1, checkout_id=c.id))
-        self.session.add(Transaction(
-            description="transaction[33]", member_id=1, amount=1, checkout_id=c.id))
-        self.session.commit()
 
         if util.token is not None and util.old_domain is not None:
 
