@@ -7,10 +7,11 @@ import { Autocomplete, Button, TextField, Typography } from '@mui/material';
 import { AddBox } from '@mui/icons-material';
 import Spacer from '../../Common/Spacer';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { RootStateOrAny, useSelector } from 'react-redux';
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
 import CloseIcon from '@mui/icons-material/Close';
+import { setMembers } from '../../../Actions/CommonAction';
 
 type Props = {}
 
@@ -20,7 +21,9 @@ const Checkout = (props: Props) => {
     const [isAddOpen, setisAddOpen] = useState(false)
     const [selectedUser, setselectedUser] = useState("")
     const [toCheckout, settoCheckout] = useState<Array<{ member: Member, amount: number }>>([])
+
     const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const dispatch = useDispatch()
 
     useEffect(() => {
         doGetRequest("checkout").then(value => {
@@ -28,8 +31,19 @@ const Checkout = (props: Props) => {
                 setcheckouts(value.content)
             }
         })
-    }, [])
 
+        if (!common.members || common.members?.length === 0)
+            doGetRequest("users").then((value) => {
+                if (value.code === 200) {
+                    dispatch(setMembers(value.content))
+                }
+            })
+    }, [dispatch, common.members])
+
+    const resetAdd = () => {
+        setselectedUser("")
+        settoCheckout([])
+    }
 
     const addDialog = () => {
         if (isAddOpen) {
@@ -115,7 +129,11 @@ const Checkout = (props: Props) => {
                     onClick={() => {
                         doPostRequest("checkout", toCheckout.map(value => {
                             return { memberID: value.member.id, amount: value.amount }
-                        }))
+                        })).then(value => {
+                            if (value.code === 200) {
+                                resetAdd()
+                            }
+                        })
                     }}
                 >
                     Abrechnung abschließen
@@ -135,7 +153,12 @@ const Checkout = (props: Props) => {
                         Neue Abrechnung
                     </Typography>
                     <Button
-                        onClick={() => setisAddOpen(!isAddOpen)}
+                        onClick={() => {
+                            if (isAddOpen) {
+                                resetAdd();
+                            }
+                            setisAddOpen(!isAddOpen)
+                        }}
                     >
                         {isAddOpen ? <CloseIcon /> : <AddBox />}
                     </Button>
