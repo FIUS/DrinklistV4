@@ -7,32 +7,32 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import style from './checkout.module.scss';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { doGetRequest } from '../../Common/StaticFunctions';
-import { Transaction } from '../../../types/ResponseTypes';
+import { Checkout } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
 
 
 type Props = {
-    date: Date
+    checkout: Checkout
 }
 
 const CheckoutEntry = (props: Props) => {
 
     const [isExpanded, setisExpanded] = useState(false)
-    const [transactions, settransactions] = useState<Array<Transaction>>([])
+    const [loadedCheckout, setloadedCheckout] = useState<Checkout>()
 
     useEffect(() => {
         if (isExpanded) {
-            doGetRequest("checkout").then(value => {
+            doGetRequest("checkout/" + props.checkout.id).then(value => {
                 if (value.code === 200) {
-                    settransactions(value.content)
+                    setloadedCheckout(value.content)
                 }
             })
         }
-    }, [isExpanded])
+    }, [isExpanded, props.checkout.id])
 
     const sumTransactions = () => {
         let sum = 0;
-        transactions.forEach(value => sum += value.amount)
+        loadedCheckout?.transactions?.forEach(value => sum += value.amount)
         return sum
     }
 
@@ -43,7 +43,9 @@ const CheckoutEntry = (props: Props) => {
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
             >
-                <Typography>Abrechnung {props.date.toLocaleDateString("de-DE")}</Typography>
+                <Typography>
+                    Abrechnung {new Date(props.checkout.date).toLocaleDateString("de-DE")}
+                </Typography>
             </AccordionSummary>
             <AccordionDetails>
                 <TableContainer component={Paper}>
@@ -56,7 +58,7 @@ const CheckoutEntry = (props: Props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {transactions?.map(value => {
+                            {loadedCheckout?.transactions?.map(value => {
                                 return <TableRow
                                     key={value.id}
                                 >
