@@ -43,6 +43,7 @@ const Checkout = (props: Props) => {
     const resetAdd = () => {
         setselectedUser("")
         settoCheckout([])
+        setisAddOpen(false)
     }
 
     const addDialog = () => {
@@ -127,13 +128,15 @@ const Checkout = (props: Props) => {
             </TableContainer>
                 <Button
                     onClick={() => {
-                        doPostRequest("checkout", toCheckout.map(value => {
-                            return { memberID: value.member.id, amount: value.amount }
-                        })).then(value => {
-                            if (value.code === 200) {
-                                resetAdd()
-                            }
-                        })
+                        if (toCheckout.find(checkout => checkout.amount === 0) === undefined) {
+                            doPostRequest("checkout", toCheckout.map(value => {
+                                return { memberID: value.member.id, amount: value.amount }
+                            })).then(value => {
+                                if (value.code === 200) {
+                                    resetAdd()
+                                }
+                            })
+                        }
                     }}
                 >
                     Abrechnung abschließen
@@ -156,8 +159,9 @@ const Checkout = (props: Props) => {
                         onClick={() => {
                             if (isAddOpen) {
                                 resetAdd();
+                            } else {
+                                setisAddOpen(true)
                             }
-                            setisAddOpen(!isAddOpen)
                         }}
                     >
                         {isAddOpen ? <CloseIcon /> : <AddBox />}
