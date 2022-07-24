@@ -46,6 +46,16 @@ const Checkout = (props: Props) => {
         setisAddOpen(false)
     }
 
+    const checkCanAddUser = () => {
+        const toAdd = common.members?.find(value => {
+            return value.name === selectedUser
+        })
+        if (toAdd && toCheckout.find(value => value.member.id === toAdd.id) === undefined) {
+            return toAdd
+        }
+        return null
+    }
+
     const addDialog = () => {
         if (isAddOpen) {
             return <><TableContainer component={Paper}>
@@ -71,6 +81,7 @@ const Checkout = (props: Props) => {
                                             label='Name'
                                             variant='standard'
                                             onChange={(value) => { setselectedUser(value.target.value) }}
+                                            className={style.textfield}
                                         />
                                     }
                                 />
@@ -81,11 +92,10 @@ const Checkout = (props: Props) => {
                             </TableCell>
                             <TableCell>
                                 <Button
+                                    disabled={checkCanAddUser() === null}
                                     onClick={() => {
-                                        const toAdd = common.members?.find(value => {
-                                            return value.name === selectedUser
-                                        })
-                                        if (toAdd && toCheckout.find(value => value.member.id === toAdd.id) === undefined) {
+                                        const toAdd = checkCanAddUser()
+                                        if (toAdd !== null) {
                                             settoCheckout([...toCheckout, { member: toAdd, amount: 0 }].sort((a, b) => a.member.id - b.member.id))
                                             setselectedUser("")
                                         }
@@ -105,11 +115,16 @@ const Checkout = (props: Props) => {
                                     {value.member.balance.toFixed(2)}€
                                 </TableCell>
                                 <TableCell>
-                                    <TextField label="Betrag" type="number" onChange={(textValue) => {
-                                        const newValue = textValue.target.value
-                                        const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
-                                        settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
-                                    }} />
+                                    <TextField
+                                        label="Betrag"
+                                        type="number"
+                                        onChange={(textValue) => {
+                                            const newValue = textValue.target.value
+                                            const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
+                                            settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
+                                        }
+                                        }
+                                        className={style.textfield} />
                                 </TableCell>
                                 <TableCell>
                                     <Button
@@ -127,6 +142,9 @@ const Checkout = (props: Props) => {
                 </Table>
             </TableContainer>
                 <Button
+                    disabled={
+                        toCheckout.find(checkout => checkout.amount === 0) !== undefined
+                    }
                     onClick={() => {
                         if (toCheckout.find(checkout => checkout.amount === 0) === undefined) {
                             doPostRequest("checkout", toCheckout.map(value => {

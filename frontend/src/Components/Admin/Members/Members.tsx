@@ -1,4 +1,4 @@
-import { AddBox, Delete, DownhillSkiing, Money, Person, VisibilityOff } from '@mui/icons-material';
+import { AddBox, Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -212,7 +212,7 @@ const Members = (props: Props) => {
                                                 }
                                             })
                                         }}>
-                                            <DownhillSkiing />
+                                            <VisibilityOff />
                                         </Button>
                                         <Button onClick={() => {
                                             doPostRequest("users/" + value.id + "/delete", "").then((s_value) => {

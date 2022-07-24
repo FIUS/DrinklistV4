@@ -523,6 +523,13 @@ export const theme02 = createTheme({
                     }
                 }
             }
+        },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    maxWidth: (window.innerWidth - 30) + "px"
+                }
+            }
         }
     },
     palette: {
