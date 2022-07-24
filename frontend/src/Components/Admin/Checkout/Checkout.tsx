@@ -143,7 +143,7 @@ const Checkout = (props: Props) => {
             </TableContainer>
                 <Button
                     disabled={
-                        toCheckout.find(checkout => checkout.amount === 0) !== undefined
+                        toCheckout.find(checkout => checkout.amount === 0) !== undefined || toCheckout.length === 0
                     }
                     onClick={() => {
                         if (toCheckout.find(checkout => checkout.amount === 0) === undefined) {
