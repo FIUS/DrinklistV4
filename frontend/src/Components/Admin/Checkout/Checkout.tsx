@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import CheckoutEntry from './CheckoutEntry';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { Checkout as CheckoutType, Member } from '../../../types/ResponseTypes';
-import { Autocomplete, Button, TextField, Typography } from '@mui/material';
+import { Autocomplete, Button, Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
 import { AddBox } from '@mui/icons-material';
 import Spacer from '../../Common/Spacer';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
@@ -22,6 +22,7 @@ const Checkout = (props: Props) => {
     const [isAddOpen, setisAddOpen] = useState(false)
     const [selectedUser, setselectedUser] = useState("")
     const [toCheckout, settoCheckout] = useState<Array<{ member: Member, amount: number }>>([])
+    const [cashCheckboxChecked, setcashCheckboxChecked] = useState(false)
 
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const dispatch = useDispatch()
@@ -59,89 +60,190 @@ const Checkout = (props: Props) => {
 
     const addDialog = () => {
         if (isAddOpen) {
-            return <><TableContainer component={Paper}>
-                <Table aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Aktueller Kontostand</TableCell>
-                            <TableCell>Buchung</TableCell>
-                            <TableCell>Hinzufügen / <br /> Entfernen</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Autocomplete
-                                    freeSolo
-                                    options={common.members ? common.members.map(value => value.name) : []}
-                                    value={selectedUser}
-                                    onChange={(event, value) => { setselectedUser(value !== null ? value : "") }}
-                                    renderInput={(params) =>
-                                        <TextField {...params}
-                                            label='Name'
-                                            variant='standard'
-                                            onChange={(value) => { setselectedUser(value.target.value) }}
-                                            className={style.textfield}
-                                        />
-                                    }
-                                />
-                            </TableCell>
-                            <TableCell>
-                            </TableCell>
-                            <TableCell>
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    disabled={checkCanAddUser() === null}
-                                    onClick={() => {
-                                        const toAdd = checkCanAddUser()
-                                        if (toAdd !== null) {
-                                            settoCheckout([...toCheckout, { member: toAdd, amount: 0 }].sort((a, b) => a.member.id - b.member.id))
-                                            setselectedUser("")
-                                        }
-                                    }
-                                    }
-                                >
-                                    <AddBox />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                        {toCheckout.map((value) => {
-                            return <TableRow>
+            return <>
+                <Typography variant='overline'> Einzahlungen</Typography>
+                <TableContainer component={Paper}>
+                    <Table aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Aktueller Kontostand</TableCell>
+                                <TableCell>Buchung</TableCell>
+                                <TableCell>Hinzufügen / <br /> Entfernen</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
                                 <TableCell component="th" scope="row">
-                                    {value.member.name}
+                                    <Autocomplete
+                                        freeSolo
+                                        options={common.members ? common.members.map(value => value.name) : []}
+                                        value={selectedUser}
+                                        onChange={(event, value) => { setselectedUser(value !== null ? value : "") }}
+                                        renderInput={(params) =>
+                                            <TextField {...params}
+                                                label='Name'
+                                                variant='standard'
+                                                onChange={(value) => { setselectedUser(value.target.value) }}
+                                                className={style.textfield}
+                                            />
+                                        }
+                                    />
                                 </TableCell>
                                 <TableCell>
-                                    {value.member.balance.toFixed(2)}€
                                 </TableCell>
                                 <TableCell>
-                                    <TextField
-                                        label="Betrag"
-                                        type="number"
-                                        onChange={(textValue) => {
-                                            const newValue = textValue.target.value
-                                            const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
-                                            settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
-                                        }
-                                        }
-                                        className={style.textfield} />
                                 </TableCell>
                                 <TableCell>
                                     <Button
+                                        disabled={checkCanAddUser() === null}
                                         onClick={() => {
-                                            settoCheckout(toCheckout.filter(checkout => checkout.member.id !== value.member.id))
-                                        }}
+                                            const toAdd = checkCanAddUser()
+                                            if (toAdd !== null) {
+                                                settoCheckout([...toCheckout, { member: toAdd, amount: 0 }].sort((a, b) => a.member.id - b.member.id))
+                                                setselectedUser("")
+                                            }
+                                        }
+                                        }
                                     >
-                                        <IndeterminateCheckBoxIcon />
+                                        <AddBox />
                                     </Button>
                                 </TableCell>
                             </TableRow>
-                        })}
+                            {toCheckout.map((value) => {
+                                return <TableRow>
+                                    <TableCell component="th" scope="row">
+                                        {value.member.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {value.member.balance.toFixed(2)}€
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            label="Betrag"
+                                            type="number"
+                                            value={toCheckout.find((member) => member.member.id === value.member.id)?.amount}
+                                            onChange={(textValue) => {
+                                                const newValue = textValue.target.value
+                                                const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
+                                                settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
+                                            }
+                                            }
+                                            className={style.textfield} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            onClick={() => {
+                                                settoCheckout(toCheckout.filter(checkout => checkout.member.id !== value.member.id))
+                                            }}
+                                        >
+                                            <IndeterminateCheckBoxIcon />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            })}
 
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Typography variant='overline'> Rechnungen</Typography>
+                <TableContainer component={Paper}>
+                    <Table aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Rechnungsname</TableCell>
+                                <TableCell>Betrag</TableCell>
+                                <TableCell>Hinzufügen / <br /> Entfernen</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell component="th" scope="row">
+                                    <TextField
+                                        label='Name'
+                                        variant='standard'
+                                        onChange={(value) => { setselectedUser(value.target.value) }}
+                                        className={style.textfield}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        label='Betrag'
+                                        variant='standard'
+                                        onChange={(value) => { setselectedUser(value.target.value) }}
+                                        className={style.textfield}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        disabled={checkCanAddUser() === null}
+                                        onClick={() => {
+                                            const toAdd = checkCanAddUser()
+                                            if (toAdd !== null) {
+                                                settoCheckout([...toCheckout, { member: toAdd, amount: 0 }].sort((a, b) => a.member.id - b.member.id))
+                                                setselectedUser("")
+                                            }
+                                        }
+                                        }
+                                    >
+                                        <AddBox />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                            {toCheckout.map((value) => {
+                                return <TableRow>
+                                    <TableCell component="th" scope="row">
+                                        {value.member.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {value.member.balance.toFixed(2)}€
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            label="Betrag"
+                                            type="number"
+                                            value={toCheckout.find((member) => member.member.id === value.member.id)?.amount}
+                                            onChange={(textValue) => {
+                                                const newValue = textValue.target.value
+                                                const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
+                                                settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
+                                            }
+                                            }
+                                            className={style.textfield} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            onClick={() => {
+                                                settoCheckout(toCheckout.filter(checkout => checkout.member.id !== value.member.id))
+                                            }}
+                                        >
+                                            <IndeterminateCheckBoxIcon />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            })}
+
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                <FormGroup>
+                    <FormControlLabel control={
+                        <Checkbox checked={cashCheckboxChecked}
+                            onChange={(value) => setcashCheckboxChecked(value.target.checked)} />
+                    }
+                        label="Kasse nach Einzahlung gezählt"
+                    />
+                </FormGroup>
+                {cashCheckboxChecked ?
+                    <TextField
+                        label='Neuer Kassenstand'
+                        variant='outlined'
+                        onChange={(value) => { setselectedUser(value.target.value) }}
+                        className={style.textfield}
+                    /> : <></>
+
+                }
                 <Button
                     disabled={
                         toCheckout.find(checkout => {
@@ -168,6 +270,7 @@ const Checkout = (props: Props) => {
                 >
                     Abrechnung abschließen
                 </Button>
+
             </>
 
         } else {

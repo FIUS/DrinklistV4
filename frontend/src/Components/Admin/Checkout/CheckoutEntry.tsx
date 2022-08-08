@@ -10,7 +10,6 @@ import { doGetRequest } from '../../Common/StaticFunctions';
 import { Checkout } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
 
-
 type Props = {
     checkout: Checkout
 }
@@ -48,6 +47,13 @@ const CheckoutEntry = (props: Props) => {
                 </Typography>
             </AccordionSummary>
             <AccordionDetails>
+                <div className={style.entryBottomInfo}>
+                    <Typography variant="h5">
+                        Kasse vor Abrechnung: {sumTransactions()}€
+                    </Typography>
+                </div>
+                <Typography variant='overline'> Einzahlungen</Typography>
+                <Spacer vertical={10} />
                 <TableContainer component={Paper} className={style.table}>
                     <Table aria-label="simple table" size='small'>
                         <TableHead>
@@ -73,14 +79,77 @@ const CheckoutEntry = (props: Props) => {
                                     </TableCell>
                                 </TableRow>
                             })}
+                            <TableRow
+                            >
+                                <TableCell component="th" scope="row">
 
+                                </TableCell>
+                                <TableCell>
+
+                                </TableCell>
+                                <TableCell className={style.sum}>
+                                    {sumTransactions()}€
+                                </TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <Spacer vertical={30} />
+                <Typography variant='overline'> Rechnungen</Typography>
+                <Spacer vertical={10} />
+                <TableContainer component={Paper} className={style.table}>
+                    <Table aria-label="simple table" size='small'>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell className={style.searchID}>#</TableCell>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Betrag</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {loadedCheckout?.transactions?.map(value => {
+                                return <TableRow
+                                    key={value.id}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {value.id}
+                                    </TableCell>
+                                    <TableCell>
+                                        {value.memberName}
+                                    </TableCell>
+                                    <TableCell>
+                                        {value.amount.toFixed(2)}€
+                                    </TableCell>
+                                </TableRow>
+                            })}
+                            <TableRow
+                            >
+                                <TableCell component="th" scope="row">
+
+                                </TableCell>
+                                <TableCell>
+
+                                </TableCell>
+                                <TableCell className={style.sum}>
+                                    {sumTransactions()}€
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Spacer vertical={40} />
+                <div className={style.entryBottomInfo}>
+                    <Typography variant="h5">
+                        Kasse erwartet: {sumTransactions()}€
+                    </Typography>
+                    <Typography variant="h5">
+                        Kasse gezählt: {sumTransactions()}€
+                    </Typography>
+                </div>
                 <Spacer vertical={25} />
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        Gesamt: {sumTransactions()}€
+                        Schwund: {sumTransactions()}€
                     </Typography>
                 </div>
             </AccordionDetails>

@@ -7,6 +7,7 @@
 .entryBottomInfo {
     display: flex;
     flex-direction: row-reverse;
+    gap: 70px;
 }
 
 .newCheckoutContainer {
@@ -31,4 +32,8 @@
 .table{
     width: 80%;
     min-width: fit-content;
+}
+
+.sum{
+    background-color: rgba(255, 255, 255, 0.178);
 }
