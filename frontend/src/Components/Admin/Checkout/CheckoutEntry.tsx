@@ -48,7 +48,7 @@ const CheckoutEntry = (props: Props) => {
                 </Typography>
             </AccordionSummary>
             <AccordionDetails>
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} className={style.table}>
                     <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>

@@ -806,6 +806,13 @@ export const darkTheme3 = createTheme({
                     width: "fit-content"
                 }
             }
+        },
+        MuiAutocomplete: {
+            styleOverrides: {
+                listbox: {
+                    background: "rgba(0,0,0,0.5);"
+                }
+            }
         }
     }
 });
