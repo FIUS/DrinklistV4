@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import session
 from sqlalchemy.sql import func
 from database.Models import *
-
+from sqlalchemy import desc
 from typing import List
 import constants
 
@@ -149,9 +149,11 @@ class Queries:
     def get_transactions(self, limit=None):
         transactions = []
         if limit is not None:
-            transactions = self.session.query(Transaction).limit(limit).all()
+            transactions = self.session.query(Transaction).order_by(
+                desc(Transaction.date)).limit(limit).all()
         else:
-            transactions = self.session.query(Transaction).all()
+            transactions = self.session.query(
+                Transaction).order_by(desc(Transaction.date)).all()
         output = []
         for t in transactions:
             transaction: Transaction = t
@@ -266,6 +268,7 @@ class Queries:
 
             # Import Transactions
             users = self.get_users()
+            transactions = []
             for user in users:
                 resp = requests.get(f"https://{util.old_domain}/api/orders/{user['name']}",
                                     headers={"x-auth-token": util.token}, timeout=3)
@@ -273,12 +276,26 @@ class Queries:
                 for transaction in resp.json():
                     date = datetime.strptime(
                         transaction["timestamp"], "%Y-%m-%d %H:%M:%S")
-                    self.session.add(Transaction(
-                        description=transaction["reason"], member_id=user["id"], amount=transaction["amount"]/100, date=date))
+                    transactions.append(
+                        {
+                            "description": transaction["reason"],
+                            "member_id": user["id"],
+                            "amount": transaction["amount"]/100,
+                            "date": date
+                        })
 
                     print("Transaction", transaction["reason"],
-                          "for user", user["name"], "imported")
+                          "for user", user["name"], "loaded")
                 print()
+            print("Sorting transactions...")
+            transactions.sort(key=lambda x: x.get('date'))
+            print("Done sorting transactions")
+            for t in transactions:
+                self.session.add(Transaction(description=t["description"],
+                                             member_id=t["member_id"],
+                                             amount=t["amount"],
+                                             date=t["date"]))
+
             print("Starting to commit Transactions to database")
             self.session.commit()
             print("Done")
