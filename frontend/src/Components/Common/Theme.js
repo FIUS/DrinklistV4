@@ -699,5 +699,115 @@ export const theme02 = createTheme({
     }
 });
 
+export const darkTheme3 = createTheme({
+    palette: {
+        primary: {
+            main: "#064663"
+        },
+        secondary: {
+            main: "#ECB365"
+        },
+        text: {
+            primary: "#eeeeee"
+        }
+    },
+    components: {
+        MuiScopedCssBaseline: {
+            styleOverrides: {
+                root: {
+                    background: [
+                        "rgba(7, 71, 100, 1.0);",
+                        "-webkit-radial-gradient(top left, rgba(7, 71, 100, 1.0), rgba(4, 29, 51, 1.0));",
+                        "-moz-radial-gradient(top left, rgba(7, 71, 100, 1.0), rgba(4, 29, 51, 1.0));",
+                        "radial-gradient(to bottom right, rgba(7, 71, 100, 1.0), rgba(4, 29, 51, 1.0));",
+                    ],
+                    minHeight: "100vh"
+                }
+            }
+        },
+        MuiPaper: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
+                }
+            }
+        },
+        MuiButtonBase: {
+            styleOverrides: {
+                root: {
+                    color: "#ECB365"
+                }
+            }
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    color: "#ECB365"
+                }
+            }
+        },
+        MuiSvgIcon: {
+            styleOverrides: {
+                root: {
+                    color: "#eeeeee"
+                }
+            }
+        },
+        MuiTableCell: {
+            styleOverrides: {
+                root: {
+                    borderBottom: "none"
+                }
+            }
+        },
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: "#064663"
+                }
+            }
+        },
+        MuiInputBase: {
+            styleOverrides: {
+                input: {
+                    marginBottom: "3px",
+                    color: "white"
+                }
+            }
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    color: "rgba(255,255,255,0.8)",
+                    "&.Mui-focused": {
+                        color: "rgba(255,255,255,0.8)"
+                    }
+                }, focused: {}
+            }
+        },
+        MuiDialogContentText: {
+            styleOverrides: {
+                root: {
+                    color: "rgba(255,255,255,0.9)"
+                }
+            }
+        },
+        MuiTableHead: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(255,255,255,0.05);"
+                }
+            }
+        },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    maxWidth: (window.innerWidth - 30) + "px",
+                    width: "fit-content"
+                }
+            }
+        }
+    }
+});
 
-export const themes = [normalTheme, darkTheme1, darkTheme2, theme02]
+export const themes = [normalTheme, darkTheme1, darkTheme2, theme02, darkTheme3]

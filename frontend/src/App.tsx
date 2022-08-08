@@ -7,7 +7,7 @@ import allReducer from './Reducer/reducerCombiner';
 import { createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
-import { Box, CssBaseline, Toolbar } from '@mui/material';
+import { Box, CssBaseline, ScopedCssBaseline, Toolbar } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
 import TopBar from './Components/Common/TopBar/TopBar';
 import Routing from './Components/Routing/Routing';
@@ -24,19 +24,22 @@ function App() {
   return (
     <ThemeProvider theme={themes[themeCookie]}>
       <Router>
-        <div className="App">
-          <CssBaseline />
-          <Provider store={store}>
-            <LoginChecker />
-            <Box sx={{ display: 'flex' }}>
-              <TopBar />
-              <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0 }}>
-                <Toolbar />
-                <Routing />
+
+        <ScopedCssBaseline>
+          <div className="App">
+            <CssBaseline />
+            <Provider store={store}>
+              <LoginChecker />
+              <Box sx={{ display: 'flex' }}>
+                <TopBar />
+                <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0 }}>
+                  <Toolbar />
+                  <Routing />
+                </Box>
               </Box>
-            </Box>
-          </Provider>
-        </div>
+            </Provider>
+          </div>
+        </ScopedCssBaseline>
       </Router>
     </ThemeProvider >
   );

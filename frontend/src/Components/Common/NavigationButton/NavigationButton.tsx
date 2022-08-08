@@ -1,4 +1,4 @@
-import { Button, Paper } from '@mui/material'
+import { Button } from '@mui/material'
 import React from 'react'
 import style from './navigationbutton.module.scss'
 import { useNavigate } from 'react-router-dom';
@@ -11,14 +11,14 @@ const NavigationButton = (props: Props) => {
     const navigate = useNavigate();
 
     return (
-        <Paper className={style.footer}>
+        <div className={style.footer}>
             <Button
                 className={style.footerButton}
                 variant='contained'
                 onClick={() => navigate(props.destination)}>
                 Zurück
             </Button>
-        </Paper>
+        </div>
     )
 }
 

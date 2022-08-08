@@ -97,7 +97,7 @@ const Overview = (props: Props) => {
                         <YAxis unit="€" />
                         <Tooltip />
                         <Legend />
-                        <Area type="monotone" dataKey="Balances" stroke="#bb58cc" fillOpacity={0.5} fill="#bb58cc" />
+                        <Area type="monotone" dataKey="Balances" stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
                     </AreaChart >
                 </Infobox>
             </div>

@@ -41,6 +41,7 @@ const AddDrink = (props: Props) => {
             <TextField
                 label='Getränkename'
                 variant='standard'
+                style={{ height: "50px" }}
                 value={drinkname}
                 onChange={(value) => {
                     setdrinkname(value.target.value)
