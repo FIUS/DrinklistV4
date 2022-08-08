@@ -8,7 +8,7 @@ import style from './overview.module.scss'
 import { useNavigate } from 'react-router-dom';
 import Spacer from '../../Common/Spacer';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { Money, Person, VisibilityOff } from '@mui/icons-material';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
@@ -16,6 +16,7 @@ import { doGetRequest } from '../../Common/StaticFunctions';
 import Infobox from '../../Common/InfoBox/Infobox';
 import { Area, AreaChart, CartesianGrid, Legend, Tooltip, YAxis } from 'recharts';
 import TopDepter from '../Common/TopDepter/TopDepter';
+import { RootState } from '../../../Reducer/reducerCombiner';
 
 declare global {
     interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
@@ -29,7 +30,7 @@ const Overview = (props: Props) => {
     const buttonSize = { width: 50, height: 50 }
     const dispatch = useDispatch();
 
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
 
     useEffect(() => {
         if (common.drinks === null || common.members === null || common.drinkCategories === null) {

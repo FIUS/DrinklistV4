@@ -7,11 +7,12 @@ import { Autocomplete, Button, TextField, Typography } from '@mui/material';
 import { AddBox } from '@mui/icons-material';
 import Spacer from '../../Common/Spacer';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
 import CloseIcon from '@mui/icons-material/Close';
 import { setMembers } from '../../../Actions/CommonAction';
+import { RootState } from '../../../Reducer/reducerCombiner';
 
 type Props = {}
 
@@ -22,7 +23,7 @@ const Checkout = (props: Props) => {
     const [selectedUser, setselectedUser] = useState("")
     const [toCheckout, settoCheckout] = useState<Array<{ member: Member, amount: number }>>([])
 
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const dispatch = useDispatch()
 
     useEffect(() => {

@@ -5,12 +5,13 @@ import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions';
 import { setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
+import { RootState } from '../../../Reducer/reducerCombiner'
 
 const historyLocationThreshold = 1650;
 
@@ -20,7 +21,7 @@ const Details = (props: Props) => {
 
     const params = useParams()
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchField, setsearchField] = useState("")
     const [isUser, setisUser] = useState(false)
 

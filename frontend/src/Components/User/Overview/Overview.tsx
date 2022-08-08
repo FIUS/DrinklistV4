@@ -2,16 +2,17 @@ import { Grow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
+import { RootState } from '../../../Reducer/reducerCombiner';
 
 type Props = {}
 
 const Overview = (props: Props) => {
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchfield, setsearchfield] = useState("")
 
     useEffect(() => {

@@ -8,8 +8,9 @@ import Spacer from '../../Common/Spacer';
 import { Drink } from '../../../types/ResponseTypes';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
+import { RootState } from '../../../Reducer/reducerCombiner';
 
 type Props = {
     drink: Drink,
@@ -19,7 +20,7 @@ type Props = {
 
 const DrinkButton = (props: Props) => {
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
 
     return (
         <div className={style.container}>

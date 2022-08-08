@@ -3,7 +3,7 @@ import { AppBar, Button, IconButton, Slide, Toolbar } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Spacer from '../Spacer'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { RootStateOrAny, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doPostRequest } from '../StaticFunctions';
 import Divider from '@mui/material/Divider';
@@ -20,6 +20,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { Settings } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import { RootState } from '../../../Reducer/reducerCombiner';
 
 type Props = {}
 
@@ -31,7 +32,7 @@ const TopBar = (props: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const drawerWidth = 240;
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [drawerOpen, setdrawerOpen] = useState(true)
     const [drawerVisible, setdrawerVisible] = useState(true)
 

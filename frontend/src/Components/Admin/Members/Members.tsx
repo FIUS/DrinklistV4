@@ -4,13 +4,14 @@ import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
 import style from './member.module.scss';
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setMembers } from '../../../Actions/CommonAction';
 import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
+import { RootState } from '../../../Reducer/reducerCombiner';
 
 declare global {
     interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
@@ -20,7 +21,7 @@ type Props = {}
 
 const Members = (props: Props) => {
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
 
     const [name, setname] = useState("")
     const [balance, setbalance] = useState(0.0)

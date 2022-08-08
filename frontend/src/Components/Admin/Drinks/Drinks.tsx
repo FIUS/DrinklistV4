@@ -4,13 +4,14 @@ import Spacer from '../../Common/Spacer'
 import AddDrink from './AddDrink'
 import Drink from './Drink'
 import style from './drinks.module.scss'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions'
 import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction'
 import { Typography } from '@mui/material'
 import StatisticBox from '../../Common/InfoBox/StatisticBox'
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
+import { RootState } from '../../../Reducer/reducerCombiner'
 
 declare global {
     interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
@@ -20,7 +21,7 @@ type Props = {}
 
 const Drinks = (props: Props) => {
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootStateOrAny) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common);
 
     useEffect(() => {
 
