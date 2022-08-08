@@ -18,7 +18,7 @@ function App() {
   const store = createStore(allReducer, composeWithDevTools())
 
   useEffect(() => {
-    setthemeCookie(Cookies.get("theme") !== undefined ? Number(Cookies.get("theme")) : 3)
+    setthemeCookie(Cookies.get("theme") !== undefined ? Number(Cookies.get("theme")) : 4)
   }, [])
 
   return (
