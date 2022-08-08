@@ -129,7 +129,7 @@ class Queries:
         member.balance -= drink.price
         drink.stock -= 1
         self.session.add(Transaction(
-            description=f"{drink.name} has been bought", member_id=member.id, amount=(-drink.price)))
+            description=f"{drink.name}", member_id=member.id, amount=(-drink.price)))
 
         self.session.commit()
 
