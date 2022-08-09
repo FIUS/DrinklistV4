@@ -7,7 +7,7 @@ import Spacer from '../../Common/Spacer';
 import { Add } from '@mui/icons-material';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
-import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
+import { openErrorToast, openToast, setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
 
 type Props = {}
 
@@ -21,13 +21,11 @@ const AddDrink = (props: Props) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-
         doGetRequest("drinks/categories").then(value => {
             if (value.code === 200) {
                 setcategoryAutofill(value.content)
             }
         })
-
     }, [])
 
 
@@ -105,6 +103,7 @@ const AddDrink = (props: Props) => {
                             }
                             doPostRequest("drinks/add", requestBody).then(value => {
                                 if (value.code === 200) {
+                                    dispatch(openToast({ message: "Getränk hinzugefügt" }))
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {
                                             dispatch(setDrinks(value.content))
@@ -118,6 +117,8 @@ const AddDrink = (props: Props) => {
                                             dispatch(setDrinkCategories(value.content))
                                         }
                                     })
+                                } else {
+                                    dispatch(openErrorToast())
                                 }
                             })
                         }

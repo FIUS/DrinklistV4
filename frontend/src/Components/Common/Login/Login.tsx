@@ -1,6 +1,8 @@
 import { Button, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { openToast } from '../../../Actions/CommonAction';
 import Spacer from '../Spacer';
 import { doPostRequest } from '../StaticFunctions';
 import style from './login.module.scss'
@@ -10,6 +12,7 @@ type Props = {}
 const Login = (props: Props) => {
     const [searchParams,] = useSearchParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [username, setusername] = useState("")
     const [password, setpassword] = useState("")
 
@@ -43,6 +46,8 @@ const Login = (props: Props) => {
                             const notNullSeachParam = searchParam !== null ? searchParam : "/";
 
                             navigate(notNullSeachParam)
+                        } else {
+                            dispatch(openToast({ message: "Falsches Passwort oder Benutzernname", type: "error", headline: "Fehler" }))
                         }
                     })
                 }}

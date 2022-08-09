@@ -7,7 +7,7 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Spacer from '../../Common/Spacer';
 import { Drink } from '../../../types/ResponseTypes';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
-import { setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
+import { openErrorToast, openToast, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { RootState } from '../../../Reducer/reducerCombiner';
@@ -31,6 +31,7 @@ const DrinkButton = (props: Props) => {
                         memberID: props.memberID
                     }).then(value => {
                         if (value.code === 200) {
+                            dispatch(openToast({ message: props.drink.name + " gekauft" }))
                             doGetRequest("drinks").then((value) => {
                                 if (value.code === 200) {
                                     dispatch(setDrinks(value.content))
@@ -46,6 +47,8 @@ const DrinkButton = (props: Props) => {
                                     dispatch(setMembers(value.content))
                                 }
                             })
+                        } else {
+                            dispatch(openErrorToast())
                         }
                     })
             }}>

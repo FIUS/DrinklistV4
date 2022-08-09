@@ -12,6 +12,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import TopBar from './Components/Common/TopBar/TopBar';
 import Routing from './Components/Routing/Routing';
 import LoginChecker from './Components/Common/LoginChecker/LoginChecker';
+import Toast from './Components/Common/Toast/Toast';
 
 function App() {
   const [themeCookie, setthemeCookie] = useState(0)
@@ -30,6 +31,7 @@ function App() {
             <CssBaseline />
             <Provider store={store}>
               <LoginChecker />
+              <Toast />
               <Box sx={{ display: 'flex' }}>
                 <TopBar />
                 <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0 }}>

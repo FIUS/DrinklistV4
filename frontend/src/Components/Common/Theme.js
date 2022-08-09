@@ -824,6 +824,26 @@ export const darkTheme3 = createTheme({
                     maxWidth: (window.innerWidth - 30) + "px"
                 }
             }
+        },
+        MuiAlert: {
+            styleOverrides: {
+                standardError: {
+                    backgroundColor: "rgb(40 20 20);",
+                    color: "#ffa99c"
+                },
+                standardInfo: {
+                    backgroundColor: "rgb(10 30 30);",
+                    color: "#67d0ff"
+                },
+                standardSuccess: {
+                    backgroundColor: "rgb(20 40 20);",
+                    color: "#60df66"
+                },
+                standardWarning: {
+                    backgroundColor: "rgb(30 30 10);",
+                    color: "#ffb346"
+                }
+            }
         }
     }
 });

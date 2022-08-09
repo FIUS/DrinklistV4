@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
 import CloseIcon from '@mui/icons-material/Close';
-import { setMembers } from '../../../Actions/CommonAction';
+import { openErrorToast, openToast, setMembers } from '../../../Actions/CommonAction';
 import { RootState } from '../../../Reducer/reducerCombiner';
 
 type Props = {}
@@ -286,7 +286,10 @@ const Checkout = (props: Props) => {
                                         if (value.code === 200) {
                                             setcheckouts(value.content)
                                         }
+                                        dispatch(openToast({ message: "Abrechnung hinzugefügt" }))
                                     })
+                                } else {
+                                    dispatch(openErrorToast())
                                 }
                             })
                         }
