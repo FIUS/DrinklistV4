@@ -27,3 +27,9 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * If you need to import data from an old drinklist provide an admin api token and this drinklist will fetch all data from the old drinklist
 * `OLD_DOMAIN`
   * If you need to import data from an old drinklist provide the domain under which the drinklist is hosted
+
+## Used Colors
+* #041C32
+* #04293A
+* #064663
+* #ECB365
