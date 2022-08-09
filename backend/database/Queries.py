@@ -164,6 +164,9 @@ class Queries:
 
         return output
 
+    def get_transaction(self, transaction_id) -> dict:
+        return self.session.query(Transaction).filter_by(id=transaction_id).first().to_dict()
+
     def delete_transaction(self, transaction_id):
         transaction: Transaction = self.session.query(
             Transaction).filter_by(id=transaction_id).first()

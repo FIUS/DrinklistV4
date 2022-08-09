@@ -1,6 +1,6 @@
 @import "../../Common/variables.module.scss";
 
-.container{
+.container {
     position: fixed;
     bottom: 0px;
     left: $padding;
@@ -8,9 +8,10 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    max-width: 92vw;
 }
 
-.alert{
+.alert {
     width: fit-content;
     min-width: 300px;
 }

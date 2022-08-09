@@ -19,7 +19,8 @@ export type Transaction = {
     memberID: number,
     memberName?: string,
     amount: number,
-    date: string
+    date: string,
+    revertable: boolean
 }
 
 export type Checkout = {

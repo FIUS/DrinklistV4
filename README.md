@@ -21,6 +21,8 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Username of moderator
 * `MOD_PASSWORD`
   * Password of moderator
+* `UNDO_TIMELIMIT`
+  * The time a user can undo transactions in minutes
 
 ### Importing from old Drinklist
 * `X_AUTH_TOKEN`

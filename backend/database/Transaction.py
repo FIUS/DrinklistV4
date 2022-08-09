@@ -1,7 +1,8 @@
 import sqlalchemy as sql
 from web import sql_database as db
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timedelta
+import util
 
 
 class Transaction(db.Model):
@@ -22,7 +23,8 @@ class Transaction(db.Model):
             "description": self.description,
             "memberID": self.member_id,
             "amount": self.amount,
-            "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ')
+            "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "revertable": self.date+timedelta(minutes=util.undo_timelimit) >= datetime.now()
         }
 
         if self.member is not None:

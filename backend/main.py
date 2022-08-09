@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import TaskScheduler
 from flask import helpers
@@ -21,6 +21,10 @@ taskScheduler = TaskScheduler.TaskScheduler()
 taskScheduler.start()
 
 
+def is_admin():
+    return int(request.cookies.get('memberID')) == 1 and token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token'))
+
+
 def authenticated(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -34,7 +38,7 @@ def authenticated(fn):
 def admin(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if int(request.cookies.get('memberID')) != 1 or not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
+        if not is_admin():
             return util.build_response("Unauthorized", 403)
         return fn(*args, **kwargs)
     wrapper.__name__ = fn.__name__
@@ -234,8 +238,14 @@ def get_transactions_limited(limit):
 
 
 @app.route('/api/transactions/<int:transaction_id>/undo', methods=["POST"])
-@admin
+@authenticated
 def undo_transaction(transaction_id):
+    if not is_admin():
+        transaction_date = datetime.strptime(db.get_transaction(transaction_id)[
+                                             'date'], "%Y-%m-%dT%H:%M:%SZ")
+        if transaction_date+timedelta(minutes=util.undo_timelimit) < datetime.now():
+            return util.build_response("Too late", code=412)
+
     db.delete_transaction(transaction_id)
     return util.build_response("Transaction undone")
 

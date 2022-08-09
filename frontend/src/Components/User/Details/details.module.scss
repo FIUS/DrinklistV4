@@ -73,3 +73,12 @@
 .footerButton{
     width: 100%;
 }
+
+.deleteContainer{
+    width: fit-content;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}

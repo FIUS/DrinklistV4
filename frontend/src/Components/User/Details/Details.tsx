@@ -1,4 +1,4 @@
-import { Grow, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, Grow, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
@@ -7,11 +7,12 @@ import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { doGetRequest } from '../../Common/StaticFunctions';
-import { setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
+import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
+import { Delete } from '@mui/icons-material'
 
 const historyLocationThreshold = 1650;
 
@@ -98,6 +99,13 @@ const Details = (props: Props) => {
         }
     }
 
+    const shouldAddUndoColumn = () => {
+        return common.history?.find(value => {
+            return value.revertable
+        }) !== undefined
+    }
+
+
     const history = <div className={style.historyContainer}>
         <Typography variant='h4'>History</Typography>
 
@@ -108,6 +116,7 @@ const Details = (props: Props) => {
                         <TableCell>Beschreibung</TableCell>
                         <TableCell>Betrag</TableCell>
                         <TableCell>Datum</TableCell>
+                        {shouldAddUndoColumn() ? <TableCell >Rückgängig</TableCell> : <></>}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -121,13 +130,38 @@ const Details = (props: Props) => {
                                 </TableCell>
                                 <TableCell>{value.amount.toFixed(2)}€</TableCell>
                                 <TableCell>{new Date(value.date).toISOString()}</TableCell>
+                                {value.revertable ? <TableCell className={style.deleteContainer}>
+                                    <Button onClick={() => {
+                                        doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
+                                            if (innerValue.code === 200) {
+                                                dispatch(openToast({ message: value.description + " nicht mehr abgestrichen" }))
+                                                doGetRequest("users/" + params.userid + "/history").then((value) => {
+                                                    if (value.code === 200) {
+                                                        dispatch(setHistory(value.content))
+                                                    }
+                                                })
+                                            } else if (innerValue.code === 412) {
+                                                dispatch(openToast({
+                                                    message: "Bitte wende dich an den Getränkelisten verwalter um dies rückgängig zu machen",
+                                                    headline: "Zeitlimit abgelaufen",
+                                                    duration: 10000,
+                                                    type: "error"
+                                                }))
+                                            } else {
+                                                dispatch(openErrorToast())
+                                            }
+                                        })
+                                    }}>
+                                        <Delete />
+                                    </Button>
+                                </TableCell> : <></>}
                             </TableRow>
                         </>
                     })}
                 </TableBody>
             </Table>
         </TableContainer>
-    </div>
+    </div >
 
     return (
         <>

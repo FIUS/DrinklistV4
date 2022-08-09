@@ -31,7 +31,7 @@ const DrinkButton = (props: Props) => {
                         memberID: props.memberID
                     }).then(value => {
                         if (value.code === 200) {
-                            dispatch(openToast({ message: props.drink.name + " gekauft" }))
+                            dispatch(openToast({ message: props.drink.name + " abgestrichen" }))
                             doGetRequest("drinks").then((value) => {
                                 if (value.code === 200) {
                                     dispatch(setDrinks(value.content))
