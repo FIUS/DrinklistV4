@@ -810,7 +810,7 @@ export const darkTheme3 = createTheme({
         MuiAutocomplete: {
             styleOverrides: {
                 listbox: {
-                    background: "rgba(0,0,0,0.5);"
+                    background: "rgba(0,0,0,0.85); "
                 }
             }
         },
