@@ -1,4 +1,4 @@
-import { Button, TextField, Typography } from '@mui/material';
+import { Button, FormControl, Input, InputLabel, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -16,6 +16,19 @@ const Login = (props: Props) => {
     const [username, setusername] = useState("")
     const [password, setpassword] = useState("")
 
+    const login = () => {
+        doPostRequest("login", { name: username, password: password }).then((value) => {
+            if (value.code === 200) {
+                const searchParam = searchParams.get("originalPath")
+                const notNullSeachParam = searchParam !== null ? searchParam : "/";
+
+                navigate(notNullSeachParam)
+            } else {
+                dispatch(openToast({ message: "Falsches Passwort oder Benutzernname", type: "error", headline: "Fehler" }))
+            }
+        })
+    }
+
     return (
         <div className={style.outterContainer}>
             <Typography variant="h3">Willkommen zur Drinklist</Typography>
@@ -27,29 +40,25 @@ const Login = (props: Props) => {
                 value={username}
                 onChange={(value) => { setusername(value.target.value) }}
             />
+
             <Spacer vertical={30} />
-            <TextField
-                className={style.textfield}
-                label="Passwort"
-                type="password"
-                value={password}
-                onChange={(value) => { setpassword(value.target.value) }}
-            />
+            <form className={style.textfield} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); console.log("slsdlf"); login() }}>
+                <FormControl className={style.form}>
+                    <TextField
+                        fullWidth
+                        label="Passwort"
+                        type="password"
+                        value={password}
+                        onChange={(value) => { setpassword(value.target.value) }}
+                    />
+                </FormControl>
+            </form>
             <Spacer vertical={40} />
             <Button
                 size='large'
                 variant='contained'
                 onClick={() => {
-                    doPostRequest("login", { name: username, password: password }).then((value) => {
-                        if (value.code === 200) {
-                            const searchParam = searchParams.get("originalPath")
-                            const notNullSeachParam = searchParam !== null ? searchParam : "/";
-
-                            navigate(notNullSeachParam)
-                        } else {
-                            dispatch(openToast({ message: "Falsches Passwort oder Benutzernname", type: "error", headline: "Fehler" }))
-                        }
-                    })
+                    login()
                 }}
             >
                 Login

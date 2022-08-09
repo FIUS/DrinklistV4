@@ -1,6 +1,6 @@
 @import "../../Common/variables.module.scss";
 
-.outterContainer{
+.outterContainer {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -10,7 +10,11 @@
     padding: $padding;
 }
 
-.textfield{
+.textfield {
     width: 80%;
     min-width: 320px;
+}
+
+.form {
+    width: 100%;
 }
