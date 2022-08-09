@@ -191,7 +191,7 @@ const Details = (props: Props) => {
                                 return <>
                                     <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
                                     {drinks?.map((value) => {
-                                        return <Grow in={searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase())}><div><DrinkButton drink={value} memberID={params.userid ? params.userid : ""} /></div></Grow>
+                                        return <Grow in={searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase())} unmountOnExit><div><DrinkButton drink={value} memberID={params.userid ? params.userid : ""} /></div></Grow>
                                     })}
                                 </>
                             } else {
