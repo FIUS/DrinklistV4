@@ -49,6 +49,10 @@ const Checkout = (props: Props) => {
     const resetAdd = () => {
         setselectedUser("")
         settoCheckout([])
+        setinvoiceAmount(0)
+        setinvoiceName("")
+        setinvoices([])
+        setcashCheckboxChecked(false)
         setisAddOpen(false)
     }
 
@@ -308,7 +312,7 @@ const Checkout = (props: Props) => {
             entries.push(<CheckoutEntry prevCheckout={lastEntry} checkout={value} />);
             lastEntry = value;
         })
-        return entries
+        return entries.reverse()
     }
 
 

@@ -813,6 +813,13 @@ export const darkTheme3 = createTheme({
                     background: "rgba(0,0,0,0.5);"
                 }
             }
+        },
+        MuiAccordion: {
+            styleOverrides: {
+                root: {
+                    maxWidth: (window.innerWidth - 30) + "px"
+                }
+            }
         }
     }
 });

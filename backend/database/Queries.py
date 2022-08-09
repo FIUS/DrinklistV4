@@ -159,7 +159,6 @@ class Queries:
             transaction: Transaction = t
             output.append(transaction.to_dict())
 
-        output.reverse()
         return output
 
     def delete_transaction(self, transaction_id):
