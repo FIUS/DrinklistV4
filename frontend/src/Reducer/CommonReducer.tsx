@@ -1,6 +1,8 @@
 import { AlertColor } from "@mui/material"
 import { Drink, Member, Transaction } from "../types/ResponseTypes"
 
+const defaultAlertType: AlertColor = "success"
+
 const initialState: CommonReducerType = {
     drinks: null,
     drinkCategories: null,
@@ -13,7 +15,7 @@ const initialState: CommonReducerType = {
         duration: 4000,
         headline: undefined,
         message: "",
-        type: "success"
+        type: defaultAlertType
     }
 
 }
@@ -67,7 +69,7 @@ const reducer = (state = initialState, { type, payload }: any) => {
             newState.toast.message = payload.message;
             newState.toast.headline = payload.headline
             newState.toast.duration = payload.duration ? payload.duration : initialState.toast.duration
-            newState.toast.type = payload.type ? payload.type : initialState.toast.type
+            newState.toast.type = payload.type ? payload.type : defaultAlertType
             return newState
 
         case "CLOSE_TOAST":
