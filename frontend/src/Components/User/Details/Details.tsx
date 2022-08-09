@@ -72,6 +72,10 @@ const Details = (props: Props) => {
         }
     }, [])
 
+    const getUsername = () => {
+        return common.members?.find(value => value.id === parseInt(params.userid ? params.userid : "-1"))?.name
+    }
+
 
     const balancePaper = () => {
         const balance = common.members?.find((value) => {
@@ -176,7 +180,7 @@ const Details = (props: Props) => {
                 </div>
 
                 <div className={style.buyDrinkContainer}>
-                    <Typography variant='h4'>Ich nehme...</Typography>
+                    <Typography variant='h4'><>Hallo <b>{getUsername()}</b>!</></Typography>
                     <TextField placeholder='Suche...' value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
                     <div className={style.buyDrinkContainerInner}>
                         {common.drinkCategories?.sort((category1, category2) => category1.localeCompare(category2)).map(category => {
