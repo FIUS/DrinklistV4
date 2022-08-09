@@ -3,6 +3,7 @@ import os
 import TaskScheduler
 from flask import helpers
 from flask import request
+from flask import send_from_directory
 from flask.wrappers import Request
 from functools import wraps
 import authenticator
@@ -244,6 +245,7 @@ def undo_transaction(transaction_id):
 def get_checkout():
     return util.build_response(db.get_checkouts())
 
+
 @app.route('/api/checkout', methods=["POST"])
 @admin
 def do_checkout():
@@ -254,6 +256,12 @@ def do_checkout():
 @admin
 def get_checkout_expanded(checkout_id):
     return util.build_response(db.get_checkout_expanded(checkout_id))
+
+
+@app.route('/api/settings/backup', methods=["GET"])
+@admin
+def get_backup():
+    return send_from_directory(util.tempfile_path, util.backup_file_name)
 
 
 @app.route('/api/login/check', methods=["GET"])

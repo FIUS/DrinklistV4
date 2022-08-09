@@ -18,3 +18,13 @@ class Member(db.Model):
             "balance": self.balance,
             "hidden": self.hidden
         }
+
+    def to_dict_with_password(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "balance": self.balance,
+            "hidden": self.hidden,
+            "password": self.password.hex(),
+            "salt": self.salt
+        }

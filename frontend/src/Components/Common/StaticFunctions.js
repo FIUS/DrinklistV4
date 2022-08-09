@@ -39,12 +39,12 @@ export const doGetRequest = async (path) => {
     }
 };
 
-export const downloadPDF = async (path) => {
+export const downloadJSON = async (path, filename) => {
     return fetch(window.globalTS.DOMAIN + path, {
         method: 'GET',
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/pdf',
+            'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         },
     })
@@ -67,7 +67,7 @@ export const downloadPDF = async (path) => {
             link.href = url;
             link.setAttribute(
                 'download',
-                `BerichtArbeitsstunden.pdf`,
+                filename,
             );
 
             // Append to html link element page

@@ -29,3 +29,13 @@ class Transaction(db.Model):
             output["memberName"] = self.member.name
 
         return output
+
+    def to_dict_backup(self):
+        return {
+            "id": self.id,
+            "description": self.description,
+            "memberID": self.member_id,
+            "amount": self.amount,
+            "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "checkout_id": self.checkout_id
+        }

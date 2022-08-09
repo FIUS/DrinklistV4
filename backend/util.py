@@ -23,6 +23,9 @@ moderator_username = os.environ.get(
 moderator_password = os.environ.get(
     "MOD_PASSWORD") if os.environ.get("MOD_PASSWORD") else "unsafe"
 
+tempfile_path = "tempfiles"
+backup_file_name = "backup.json"
+
 os.environ['TZ'] = 'Europe/London'
 time.tzset()
 

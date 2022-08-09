@@ -14,3 +14,10 @@ class Favorite(db.Model):
         'drink.id'), nullable=False)
     drink = relationship(
         'database.Drink.Drink', lazy="joined")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "member_id": self.member_id,
+            "drink_id": self.drink_id,
+        }

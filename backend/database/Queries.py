@@ -1,3 +1,5 @@
+import json
+from operator import truediv
 import requests
 from authenticator import TokenManager
 import util
@@ -10,6 +12,7 @@ from database.Models import *
 from sqlalchemy import desc
 from typing import List
 import constants
+import os
 
 
 class Queries:
@@ -257,6 +260,42 @@ class Queries:
             return member.id
         else:
             return None
+
+    def backup_database(self):
+        checkouts: list[Checkout] = self.session.query(Checkout).all()
+        drinks: list[Drink] = self.session.query(Drink).all()
+        favorites: list[Favorite] = self.session.query(Favorite).all()
+        members: list[Member] = self.session.query(Member).all()
+        transactions: list[Transaction] = self.session.query(Transaction).all()
+
+        output = {}
+
+        output['checkouts'] = []
+        output['drinks'] = []
+        output['favorites'] = []
+        output['members'] = []
+        output['transactions'] = []
+
+        for c in checkouts:
+            output["checkouts"].append(c.dict())
+        for d in drinks:
+            output["drinks"].append(d.to_dict())
+        for f in favorites:
+            output["favorites"].append(f.to_dict())
+        for m in members:
+            output["members"].append(m.to_dict_with_password())
+        for t in transactions:
+            output["transactions"].append(t.to_dict_backup())
+
+        success = False
+        path = f"{util.tempfile_path}/{util.backup_file_name}"
+        os.makedirs(os.path.dirname(
+            path), exist_ok=True)
+        with open(path, 'w') as f:
+            f.write(json.dumps(output))
+            success = True
+
+        return success
 
     def create_dummy_data(self) -> None:
         hashedPassword, salt = TokenManager.hashPassword("unsafe")

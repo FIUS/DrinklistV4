@@ -5,6 +5,8 @@ log.txt
 # C extensions
 *.so
 
+tempfiles/
+
 # Distribution / packaging
 .Python
 build/
