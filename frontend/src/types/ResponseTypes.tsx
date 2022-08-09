@@ -25,5 +25,6 @@ export type Transaction = {
 export type Checkout = {
     id: number,
     date: string,
+    currentCash: number,
     transactions?: Array<Transaction>
 }

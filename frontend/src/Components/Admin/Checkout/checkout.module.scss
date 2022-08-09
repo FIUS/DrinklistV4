@@ -37,3 +37,11 @@
 .sum{
     background-color: rgba(255, 255, 255, 0.178);
 }
+
+.cashInput{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $flex-gap;
+}

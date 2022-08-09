@@ -11,7 +11,8 @@ import { Checkout } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
 
 type Props = {
-    checkout: Checkout
+    checkout: Checkout,
+    prevCheckout?: Checkout
 }
 
 const CheckoutEntry = (props: Props) => {
@@ -29,11 +30,30 @@ const CheckoutEntry = (props: Props) => {
         }
     }, [isExpanded, props.checkout.id])
 
-    const sumTransactions = () => {
+    const sumTransactionsNormal = () => {
         let sum = 0;
-        loadedCheckout?.transactions?.forEach(value => sum += value.amount)
+        loadedCheckout?.transactions?.filter((value) => value.memberID !== 1).forEach(value => sum += value.amount)
         return sum
     }
+
+    const sumTransactionsInvoices = () => {
+        let sum = 0;
+        loadedCheckout?.transactions?.filter((value) => value.memberID === 1).forEach(value => sum += value.amount)
+        return sum
+    }
+
+    const lostMoney = () => {
+        const before = props.prevCheckout ? props.prevCheckout?.currentCash : 0;
+        const after = props.checkout.currentCash;
+        const income = sumTransactionsNormal();
+        const outgoing = sumTransactionsInvoices();
+
+        const target = before + income - outgoing
+        const actual = after
+
+        return actual - target
+    }
+
 
     return (
         <Accordion expanded={isExpanded} onChange={value => {
@@ -49,7 +69,7 @@ const CheckoutEntry = (props: Props) => {
             <AccordionDetails>
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        Kasse vor Abrechnung: {sumTransactions()}€
+                        Kasse vor Abrechnung: {props.prevCheckout ? props.prevCheckout?.currentCash.toFixed(2) : (0).toFixed(2)}€
                     </Typography>
                 </div>
                 <Typography variant='overline'> Einzahlungen</Typography>
@@ -64,7 +84,7 @@ const CheckoutEntry = (props: Props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {loadedCheckout?.transactions?.map(value => {
+                            {loadedCheckout?.transactions?.filter((value) => value.memberID !== 1)?.map(value => {
                                 return <TableRow
                                     key={value.id}
                                 >
@@ -88,7 +108,7 @@ const CheckoutEntry = (props: Props) => {
 
                                 </TableCell>
                                 <TableCell className={style.sum}>
-                                    {sumTransactions()}€
+                                    {sumTransactionsNormal().toFixed(2)}€
                                 </TableCell>
                             </TableRow>
                         </TableBody>
@@ -107,7 +127,7 @@ const CheckoutEntry = (props: Props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {loadedCheckout?.transactions?.map(value => {
+                            {loadedCheckout?.transactions?.filter((value) => value.memberID === 1).map(value => {
                                 return <TableRow
                                     key={value.id}
                                 >
@@ -115,10 +135,10 @@ const CheckoutEntry = (props: Props) => {
                                         {value.id}
                                     </TableCell>
                                     <TableCell>
-                                        {value.memberName}
+                                        {value.description}
                                     </TableCell>
                                     <TableCell>
-                                        {value.amount.toFixed(2)}€
+                                        {(-value.amount).toFixed(2)}€
                                     </TableCell>
                                 </TableRow>
                             })}
@@ -131,7 +151,7 @@ const CheckoutEntry = (props: Props) => {
 
                                 </TableCell>
                                 <TableCell className={style.sum}>
-                                    {sumTransactions()}€
+                                    {(-sumTransactionsInvoices()).toFixed(2)}€
                                 </TableCell>
                             </TableRow>
                         </TableBody>
@@ -140,16 +160,13 @@ const CheckoutEntry = (props: Props) => {
                 <Spacer vertical={40} />
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        Kasse erwartet: {sumTransactions()}€
+                        Kasse nach Abrechnung: {props.checkout.currentCash}€
                     </Typography>
                     <Typography variant="h5">
-                        Kasse gezählt: {sumTransactions()}€
+                        Einnahmen: {props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0)}€
                     </Typography>
-                </div>
-                <Spacer vertical={25} />
-                <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        Schwund: {sumTransactions()}€
+                        Kasse Differenz: {lostMoney().toFixed(2)}€
                     </Typography>
                 </div>
             </AccordionDetails>

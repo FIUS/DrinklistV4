@@ -201,11 +201,33 @@ class Queries:
         return checkout.dict_expanded()
 
     def do_checkout(self, checkouts):
-        checkout: Checkout = Checkout()
+        checkout = None
+        if checkouts['newCash'] is not None:
+            checkout: Checkout = Checkout(current_cash=checkouts['newCash'])
+        else:
+            db_checkouts: Checkout = self.session.query(Checkout).all()
+            last_db_checkout_cash = None
+            if len(db_checkouts) > 0:
+                last_db_checkout_cash = db_checkouts[-1].current_cash
+            else:
+                last_db_checkout_cash = 0
+
+            sum_members = 0
+            for c in checkouts['members']:
+                sum_members += c['amount']
+
+            sum_invoice = 0
+            for c in checkouts['invoices']:
+                sum_invoice += c['amount']
+
+            last_db_checkout_cash += sum_members
+            last_db_checkout_cash -= sum_invoice
+
+            checkout: Checkout = Checkout(current_cash=last_db_checkout_cash)
         self.session.add(checkout)
         self.session.commit()
 
-        for c in checkouts:
+        for c in checkouts['members']:
             member_id = c["memberID"]
             amount = c["amount"]
 
@@ -216,7 +238,13 @@ class Queries:
             self.session.add(Transaction(
                 description="Checkout", member_id=member_id, amount=amount, checkout_id=checkout.id))
 
-            self.session.commit()
+        for c in checkouts['invoices']:
+            amount = c["amount"]
+            name = c["name"]
+            self.session.add(Transaction(
+                description=name, member_id=1, amount=amount, checkout_id=checkout.id))
+
+        self.session.commit()
 
     def checkPassword(self, name, password):
         member: Member = self.session.query(

@@ -1,7 +1,7 @@
 import style from './checkout.module.scss';
 import React, { useEffect, useState } from 'react'
 import CheckoutEntry from './CheckoutEntry';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doPostRequest, secureRandomNumber } from '../../Common/StaticFunctions';
 import { Checkout as CheckoutType, Member } from '../../../types/ResponseTypes';
 import { Autocomplete, Button, Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
 import { AddBox } from '@mui/icons-material';
@@ -22,6 +22,10 @@ const Checkout = (props: Props) => {
     const [isAddOpen, setisAddOpen] = useState(false)
     const [selectedUser, setselectedUser] = useState("")
     const [toCheckout, settoCheckout] = useState<Array<{ member: Member, amount: number }>>([])
+    const [invoices, setinvoices] = useState<Array<{ name: string, amount: number, id: number }>>([])
+    const [invoiceName, setinvoiceName] = useState("")
+    const [invoiceAmount, setinvoiceAmount] = useState(0)
+    const [countedCash, setcountedCash] = useState(0)
     const [cashCheckboxChecked, setcashCheckboxChecked] = useState(false)
 
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
@@ -58,9 +62,20 @@ const Checkout = (props: Props) => {
         return null
     }
 
+    const getNewCash = () => {
+        const oldCash = checkouts.length > 0 ? checkouts[checkouts.length - 1].currentCash : 0;
+        const inCash = toCheckout.length > 0 ? toCheckout.map(value => value.amount).reduce((last, current) => last + current) : 0
+        const outCash = invoices.length > 0 ? invoices.map(value => value.amount).reduce((last, current) => last + current) : 0
+
+        return oldCash + inCash - outCash;
+    }
+
     const addDialog = () => {
         if (isAddOpen) {
             return <>
+                <Typography variant="h5">
+                    Kasse vor Abrechnung: {checkouts.length > 0 ? checkouts[checkouts.length - 1].currentCash.toFixed(2) : 0}€
+                </Typography>
                 <Typography variant='overline'> Einzahlungen</Typography>
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
@@ -162,7 +177,8 @@ const Checkout = (props: Props) => {
                                     <TextField
                                         label='Name'
                                         variant='standard'
-                                        onChange={(value) => { setselectedUser(value.target.value) }}
+                                        value={invoiceName}
+                                        onChange={(value) => { setinvoiceName(value.target.value) }}
                                         className={style.textfield}
                                     />
                                 </TableCell>
@@ -170,19 +186,18 @@ const Checkout = (props: Props) => {
                                     <TextField
                                         label='Betrag'
                                         variant='standard'
-                                        onChange={(value) => { setselectedUser(value.target.value) }}
+                                        type='number'
+                                        value={invoiceAmount}
+                                        onChange={(value) => { setinvoiceAmount(parseFloat(value.target.value)) }}
                                         className={style.textfield}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Button
-                                        disabled={checkCanAddUser() === null}
                                         onClick={() => {
-                                            const toAdd = checkCanAddUser()
-                                            if (toAdd !== null) {
-                                                settoCheckout([...toCheckout, { member: toAdd, amount: 0 }].sort((a, b) => a.member.id - b.member.id))
-                                                setselectedUser("")
-                                            }
+                                            setinvoices([...invoices, { name: invoiceName, amount: invoiceAmount, id: secureRandomNumber() }]);
+                                            setinvoiceName("");
+                                            setinvoiceAmount(0);
                                         }
                                         }
                                     >
@@ -190,31 +205,18 @@ const Checkout = (props: Props) => {
                                     </Button>
                                 </TableCell>
                             </TableRow>
-                            {toCheckout.map((value) => {
+                            {invoices.map((value) => {
                                 return <TableRow>
                                     <TableCell component="th" scope="row">
-                                        {value.member.name}
+                                        {value.name}
                                     </TableCell>
                                     <TableCell>
-                                        {value.member.balance.toFixed(2)}€
-                                    </TableCell>
-                                    <TableCell>
-                                        <TextField
-                                            label="Betrag"
-                                            type="number"
-                                            value={toCheckout.find((member) => member.member.id === value.member.id)?.amount}
-                                            onChange={(textValue) => {
-                                                const newValue = textValue.target.value
-                                                const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
-                                                settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
-                                            }
-                                            }
-                                            className={style.textfield} />
+                                        {value.amount.toFixed(2)}€
                                     </TableCell>
                                     <TableCell>
                                         <Button
                                             onClick={() => {
-                                                settoCheckout(toCheckout.filter(checkout => checkout.member.id !== value.member.id))
+                                                setinvoices(invoices.filter(innerValue => innerValue.id !== value.id))
                                             }}
                                         >
                                             <IndeterminateCheckBoxIcon />
@@ -226,7 +228,9 @@ const Checkout = (props: Props) => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-
+                <Typography variant="h5">
+                    Kasse nach Abrechnung: {getNewCash().toFixed(2)}€
+                </Typography>
                 <FormGroup>
                     <FormControlLabel control={
                         <Checkbox checked={cashCheckboxChecked}
@@ -236,13 +240,21 @@ const Checkout = (props: Props) => {
                     />
                 </FormGroup>
                 {cashCheckboxChecked ?
-                    <TextField
-                        label='Neuer Kassenstand'
-                        variant='outlined'
-                        onChange={(value) => { setselectedUser(value.target.value) }}
-                        className={style.textfield}
-                    /> : <></>
-
+                    <>
+                        <div className={style.cashInput}>
+                            <TextField
+                                label='Neuer Kassenstand'
+                                variant='outlined'
+                                type='number'
+                                value={countedCash}
+                                onChange={(value) => { setcountedCash(parseFloat(value.target.value)) }}
+                                className={style.textfield}
+                            />
+                            <Typography variant="h5">
+                                Differenz: {countedCash - getNewCash()}€
+                            </Typography>
+                        </div>
+                    </> : <></>
                 }
                 <Button
                     disabled={
@@ -253,9 +265,17 @@ const Checkout = (props: Props) => {
                     }
                     onClick={() => {
                         if (toCheckout.find(checkout => checkout.amount === 0) === undefined) {
-                            doPostRequest("checkout", toCheckout.map(value => {
-                                return { memberID: value.member.id, amount: value.amount }
-                            })).then(value => {
+                            doPostRequest("checkout",
+                                {
+                                    members: toCheckout.map(value => {
+                                        return { memberID: value.member.id, amount: value.amount }
+                                    }),
+                                    invoices: invoices.map(value => {
+                                        return { name: value.name, amount: value.amount }
+                                    }),
+                                    newCash: cashCheckboxChecked ? countedCash : null
+                                }
+                            ).then(value => {
                                 if (value.code === 200) {
                                     resetAdd()
                                     doGetRequest("checkout").then(value => {
@@ -277,6 +297,20 @@ const Checkout = (props: Props) => {
             return <></>
         }
     }
+
+    const getCheckoutEntries = () => {
+        if (checkouts.length === 0) {
+            return []
+        }
+        const entries = [<CheckoutEntry checkout={checkouts[0]} />]
+        let lastEntry = checkouts[0]
+        checkouts.slice(1).forEach(value => {
+            entries.push(<CheckoutEntry prevCheckout={lastEntry} checkout={value} />);
+            lastEntry = value;
+        })
+        return entries
+    }
+
 
     return (
         <div className={style.container}>
@@ -301,7 +335,7 @@ const Checkout = (props: Props) => {
             </div>
             <Spacer vertical={20} />
 
-            {checkouts.map(value => <CheckoutEntry checkout={value} />)}
+            {getCheckoutEntries()}
         </div>
     )
 }
