@@ -297,6 +297,61 @@ class Queries:
 
         return success
 
+    def restore_database(self, imported_data):
+        checkouts: list[Checkout] = self.session.query(Checkout).all()
+        drinks: list[Drink] = self.session.query(Drink).all()
+        favorites: list[Favorite] = self.session.query(Favorite).all()
+        members: list[Member] = self.session.query(Member).all()
+        transactions: list[Transaction] = self.session.query(Transaction).all()
+
+        for c in checkouts:
+            self.session.delete(c)
+        for d in drinks:
+            self.session.delete(d)
+        for f in favorites:
+            self.session.delete(f)
+        for m in members:
+            self.session.delete(m)
+        for t in transactions:
+            self.session.delete(t)
+
+        for c in imported_data["checkouts"]:
+            self.session.add(
+                Checkout(
+                    id=c['id'],
+                    date=datetime.strptime(c['date'], "%Y-%m-%dT%H:%M:%SZ"),
+                    current_cash=c['currentCash']))
+        for d in imported_data["drinks"]:
+            self.session.add(Drink(
+                id=d['id'],
+                name=d['name'],
+                stock=d['stock'],
+                price=d['price'],
+                category=d['category']))
+        for f in imported_data["favorites"]:
+            self.session.add(Favorite(
+                id=f['id'],
+                member_id=f['member_id'],
+                drink_id=f['drink_id']))
+        for m in imported_data["members"]:
+            self.session.add(Member(
+                id=m['id'],
+                name=m['name'],
+                balance=m['balance'],
+                hidden=m['hidden'],
+                password=bytes.fromhex(m['password']),
+                salt=m['salt']))
+        for t in imported_data["transactions"]:
+            self.session.add(Transaction(
+                id=t['id'],
+                description=t['description'],
+                member_id=t['memberID'],
+                amount=t['amount'],
+                date=datetime.strptime(t['date'], "%Y-%m-%dT%H:%M:%SZ"),
+                checkout_id=t['checkout_id']))
+        self.session.commit()
+        return
+
     def create_dummy_data(self) -> None:
         hashedPassword, salt = TokenManager.hashPassword("unsafe")
         self.session.add(

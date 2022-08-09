@@ -8,3 +8,15 @@
     align-items: flex-start;
     gap: $flex-gap;
 }
+
+.uploadContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $flex-gap;
+}
+
+.fileInput{
+    width: 320px;
+}

@@ -19,6 +19,26 @@ export const doPostRequest = async (path, data) => {
     }
 };
 
+export const doPostRequestRawBody = async (path, body) => {
+    const resp = await fetch(window.globalTS.DOMAIN + path,
+        {
+            credentials: 'include',
+            method: "POST",
+
+            body: body
+        });
+    const status_code = resp.status
+    if (status_code === 200) {
+        const userJson = await resp.json();
+
+        return { code: status_code, content: userJson }
+    } else if (status_code === 403) {
+        return { code: status_code }
+    } else {
+        return { code: status_code }
+    }
+};
+
 export const doGetRequest = async (path) => {
     const userInput = await fetch(window.globalTS.DOMAIN + path,
         {

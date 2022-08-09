@@ -9,7 +9,7 @@ from functools import wraps
 import authenticator
 import util
 from web import *
-
+import json
 from database import Queries
 
 
@@ -262,6 +262,15 @@ def get_checkout_expanded(checkout_id):
 @admin
 def get_backup():
     return send_from_directory(util.tempfile_path, util.backup_file_name)
+
+
+@app.route('/api/settings/restore', methods=["POST"])
+@admin
+def restore_db():
+    file = request.files['file']
+    file_json = json.loads(file.stream.read().decode("utf-8"))
+    db.restore_database(file_json)
+    return util.build_response("ok")
 
 
 @app.route('/api/login/check', methods=["GET"])
