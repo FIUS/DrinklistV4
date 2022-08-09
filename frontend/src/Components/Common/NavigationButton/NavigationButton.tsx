@@ -15,7 +15,9 @@ const NavigationButton = (props: Props) => {
             <Button
                 className={style.footerButton}
                 variant='contained'
-                onClick={() => navigate(props.destination)}>
+                onClick={() => navigate(props.destination)}
+                sx={{ backgroundColor: "primary.main" }}
+            >
                 Zurück
             </Button>
         </div>

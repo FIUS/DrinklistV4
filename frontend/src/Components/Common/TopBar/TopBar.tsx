@@ -93,7 +93,7 @@ const TopBar = (props: Props) => {
                     <div style={{ display: "flex" }}>
                         {getIcon()}
 
-                        <Button size="large" color="inherit" onClick={() => navigate("/")} sx={{ display: "inline-flex" }}>
+                        <Button size="large" color="inherit" onClick={() => navigate("/")} sx={{ display: "inline-flex" }} variant="text">
                             Drinklist
                         </Button>
                     </div>
