@@ -19,7 +19,8 @@ const Settings = (props: Props) => {
             <div className={style.container}>
                 <Typography variant='h5'>Backup Drinklist</Typography>
                 <Button onClick={() => {
-                    downloadJSON("settings/backup", "backup-drinklist-" + new Date().toLocaleDateString() + ".json")
+                    const now = new Date()
+                    downloadJSON("settings/backup", "backup-drinklist-" + now.toLocaleDateString() + "-" + now.toTimeString() + ".json")
                 }}
                     variant="contained"
                 >
