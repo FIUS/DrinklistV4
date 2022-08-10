@@ -102,7 +102,7 @@ const TopBar = (props: Props) => {
                         {getIcon()}
 
                         <Button size="large" color="inherit" onClick={() => navigate("/")} sx={{ display: "inline-flex" }} variant="text">
-                            {DRINKLIST}
+                            {window.globalTS.HOME_BUTTON}
                         </Button>
                     </div>
                     <div style={{ display: "flex" }}>

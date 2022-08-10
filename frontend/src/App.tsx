@@ -25,7 +25,8 @@ declare global {
       PRIVACY_LINK: string,
       ADDITIONAL_INFORMATION: string,
       WELCOME_TEXT_0: string,
-      WELCOME_TEXT_1: string
+      WELCOME_TEXT_1: string,
+      HOME_BUTTON: string
     };
   }
 }

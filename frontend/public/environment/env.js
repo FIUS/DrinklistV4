@@ -7,5 +7,6 @@ window.globalTS = {
     "PRIVACY_LINK": "",
     "ADDITIONAL_INFORMATION": "",
     "WELCOME_TEXT_0": "Willkommen zur Drinklist",
-    "WELCOME_TEXT_1": "Bitte logge dich ein!"
+    "WELCOME_TEXT_1": "Bitte logge dich ein!",
+    "HOME_BUTTON": "Drinklist-DEV"
 };
