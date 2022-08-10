@@ -12,4 +12,7 @@ export const DIFFERENZ = "Differenz";
 export const ABRECHNUNG_HINZUGEFUEGT = "Abrechnung hinzugefügt";
 export const ABRECHNUNG_ABSCHLIESSEN = "Abrechnung abschließen";
 export const NEUE_ABRECHNUNG = "Neue Abrechnung";
-
+export const KASSE_VOR_ABRECHNUNG = "Kasse vor Abrechnung";
+export const EINZAHLUNGEN = "Einzahlungen"
+export const EINNAHMEN = "Einnahmen"
+export const KASSE_DIFFERENZ = "Kasse Differenz"

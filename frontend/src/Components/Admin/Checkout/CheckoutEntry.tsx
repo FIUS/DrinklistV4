@@ -9,6 +9,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import { doGetRequest } from '../../Common/StaticFunctions';
 import { Checkout } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
+import { EINNAHMEN, EINZAHLUNGEN, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, VALUE } from '../../Common/Internationalization/i18n';
 
 type Props = {
     checkout: Checkout,
@@ -69,18 +70,18 @@ const CheckoutEntry = (props: Props) => {
             <AccordionDetails>
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        Kasse vor Abrechnung: {props.prevCheckout ? props.prevCheckout?.currentCash.toFixed(2) : (0).toFixed(2)}€
+                        {KASSE_VOR_ABRECHNUNG}: {props.prevCheckout ? props.prevCheckout?.currentCash.toFixed(2) : (0).toFixed(2)}€
                     </Typography>
                 </div>
-                <Typography variant='overline'> Einzahlungen</Typography>
+                <Typography variant='overline'> {EINZAHLUNGEN}</Typography>
                 <Spacer vertical={10} />
                 <TableContainer component={Paper} className={style.table}>
                     <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>
                                 <TableCell className={style.searchID}>#</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Betrag</TableCell>
+                                <TableCell>{NAME}</TableCell>
+                                <TableCell>{VALUE}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -115,15 +116,15 @@ const CheckoutEntry = (props: Props) => {
                     </Table>
                 </TableContainer>
                 <Spacer vertical={30} />
-                <Typography variant='overline'> Rechnungen</Typography>
+                <Typography variant='overline'>{RECHNUNGEN}</Typography>
                 <Spacer vertical={10} />
                 <TableContainer component={Paper} className={style.table}>
                     <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>
                                 <TableCell className={style.searchID}>#</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Betrag</TableCell>
+                                <TableCell>{NAME}</TableCell>
+                                <TableCell>{VALUE}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -160,13 +161,13 @@ const CheckoutEntry = (props: Props) => {
                 <Spacer vertical={40} />
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        Kasse nach Abrechnung: {props.checkout.currentCash}€
+                        {KASSE_NACH_ABRECHNUNG}: {props.checkout.currentCash}€
                     </Typography>
                     <Typography variant="h5">
-                        Einnahmen: {props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0)}€
+                        {EINNAHMEN}: {props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0)}€
                     </Typography>
                     <Typography variant="h5">
-                        Kasse Differenz: {lostMoney().toFixed(2)}€
+                        {KASSE_DIFFERENZ}: {lostMoney().toFixed(2)}€
                     </Typography>
                 </div>
             </AccordionDetails>
