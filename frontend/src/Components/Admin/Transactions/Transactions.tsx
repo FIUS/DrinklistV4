@@ -2,6 +2,7 @@ import { Undo } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { Transaction } from '../../../types/ResponseTypes';
+import { BESCHREIBUNG, DATUM, KONTO, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WERT } from '../../Common/Internationalization/i18n';
 import Loader from '../../Common/Loader/Loader';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
@@ -84,11 +85,11 @@ const Transactions = (props: Props) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell>#</TableCell>
-                                <TableCell>Beschreibung</TableCell>
-                                <TableCell>Konto</TableCell>
-                                <TableCell>Wert</TableCell>
-                                <TableCell>Datum</TableCell>
-                                <TableCell>Rückgängig</TableCell>
+                                <TableCell>{BESCHREIBUNG}</TableCell>
+                                <TableCell>{KONTO}</TableCell>
+                                <TableCell>{WERT}</TableCell>
+                                <TableCell>{DATUM}</TableCell>
+                                <TableCell>{RUECKGAENGIG}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -99,7 +100,7 @@ const Transactions = (props: Props) => {
                             <TableCell>
                                 <TextField
                                     size='small'
-                                    label="Suche..."
+                                    label={SUCHE_DOT_DOT_DOT}
                                     value={searchDescription}
                                     onChange={(value) => {
                                         setsearchDescription(value.target.value)
@@ -109,7 +110,7 @@ const Transactions = (props: Props) => {
                             <TableCell>
                                 <TextField
                                     size='small'
-                                    label="Suche..."
+                                    label={SUCHE_DOT_DOT_DOT}
                                     value={searchName}
                                     onChange={(value) => {
                                         setsearchName(value.target.value)
@@ -122,7 +123,7 @@ const Transactions = (props: Props) => {
                             <TableCell>
                                 <TextField
                                     size='small'
-                                    label="Suche..."
+                                    label={SUCHE_DOT_DOT_DOT}
                                     value={searchDate}
                                     onChange={(value) => {
                                         setsearchDate(value.target.value)

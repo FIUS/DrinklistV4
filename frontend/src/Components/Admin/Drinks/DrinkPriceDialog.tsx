@@ -10,6 +10,8 @@ import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { Drink } from '../../../types/ResponseTypes';
 import { setDrinks } from '../../../Actions/CommonAction';
 import { useDispatch } from 'react-redux';
+import { ABBRECHEN, AKTUALISIEREN, GEBE_NEUEN_PREIS_EIN, NEUER_PREIS, PREIS_IN_EURO } from '../../Common/Internationalization/i18n';
+import { format } from 'react-string-format';
 
 type Props = {
     isOpen: boolean,
@@ -23,24 +25,24 @@ const DrinkPriceDialog = (props: Props) => {
 
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Neuer Preis</DialogTitle>
+            <DialogTitle>{NEUER_PREIS}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Gebe hier den neuen Preis für das Getränk '{props.drink.name}' ein
+                    {format(GEBE_NEUEN_PREIS_EIN, props.drink.name)}
                 </DialogContentText>
                 <TextField
                     fullWidth
                     autoFocus
                     defaultValue={price}
                     margin="dense"
-                    label='Preis in Euro'
+                    label={PREIS_IN_EURO}
                     variant='standard'
                     type='number'
                     onChange={(value) => price = parseFloat(value.target.value)}
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.close}>Abbrechen</Button>
+                <Button onClick={props.close}>{ABBRECHEN}</Button>
                 <Button onClick={() => {
                     doPostRequest("drinks/" + props.drink.id + "/price", { price: price }).then(value => {
                         if (value.code === 200) {
@@ -52,7 +54,7 @@ const DrinkPriceDialog = (props: Props) => {
                             })
                         }
                     })
-                }}>Aktualisieren</Button>
+                }}>{AKTUALISIEREN}</Button>
             </DialogActions>
         </Dialog>
     )

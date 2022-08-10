@@ -2,6 +2,7 @@ import { Button, Typography } from '@mui/material';
 import React from 'react'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import style from './topbar.module.scss';
+import { OEFFNEN } from '../Internationalization/i18n';
 
 type Props = {
     title: string,
@@ -19,7 +20,7 @@ const SettingsLink = (props: Props) => {
                 </Typography>
                 <Button onClick={() => {
                     window.open(props.link, '_blank');
-                }}>Öffnen<OpenInNewIcon />
+                }}>{OEFFNEN}<OpenInNewIcon />
                 </Button>
             </div >
         )

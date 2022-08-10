@@ -8,6 +8,7 @@ import { Add } from '@mui/icons-material';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
 import { openErrorToast, openToast, setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
+import { FLASCHENZAHL, GETRAENKENAME, GETRAENK_HINZUGEFUEGT, KATEGORIE, PREIS_IN_EURO } from '../../Common/Internationalization/i18n';
 
 type Props = {}
 
@@ -37,7 +38,7 @@ const AddDrink = (props: Props) => {
             elevation={isHovered ? 5 : 3}
         >
             <TextField
-                label='Getränkename'
+                label={GETRAENKENAME}
                 variant='standard'
                 style={{ height: "50px" }}
                 value={drinkname}
@@ -52,7 +53,7 @@ const AddDrink = (props: Props) => {
                 onChange={(event, value) => { setcategoryname(value !== null ? value : "") }}
                 renderInput={(params) =>
                     <TextField {...params}
-                        label='Kategorie'
+                        label={KATEGORIE}
                         variant='standard'
                         onChange={(value) => { setcategoryname(value.target.value) }}
                     />
@@ -64,7 +65,7 @@ const AddDrink = (props: Props) => {
                 <div className={style.smallTextFieldContainer}>
                     <TextField
                         className={style.smallTextField}
-                        placeholder='Preis in Euro'
+                        placeholder={PREIS_IN_EURO}
                         variant='standard'
                         type='number'
                         value={price}
@@ -79,7 +80,7 @@ const AddDrink = (props: Props) => {
                 <div className={style.smallTextFieldContainer}>
                     <TextField
                         className={style.smallTextField}
-                        placeholder='Flaschen-Anzahl'
+                        placeholder={FLASCHENZAHL}
                         variant='standard'
                         type='number'
                         value={stock}
@@ -103,7 +104,7 @@ const AddDrink = (props: Props) => {
                             }
                             doPostRequest("drinks/add", requestBody).then(value => {
                                 if (value.code === 200) {
-                                    dispatch(openToast({ message: "Getränk hinzugefügt" }))
+                                    dispatch(openToast({ message: GETRAENK_HINZUGEFUEGT }))
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {
                                             dispatch(setDrinks(value.content))

@@ -8,6 +8,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { doPostRequest } from '../../Common/StaticFunctions';
 import { Member } from '../../../types/ResponseTypes';
+import { ABBRECHEN, AKTUALISIEREN, NEUES_PASSWORT_FESTLEGEN, NEUES_PASSWORT_FUER_NUTZER, PASSWORT } from '../../Common/Internationalization/i18n';
+import { format } from 'react-string-format';
 
 type Props = {
     isOpen: boolean,
@@ -20,24 +22,24 @@ const PasswordDialog = (props: Props) => {
     let newPassword = ""
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Neues Passwort festlegen</DialogTitle>
+            <DialogTitle>{NEUES_PASSWORT_FESTLEGEN}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Gebe hier das neue passwort für den nutzer '{props.member.name}' ein
+                    {format(NEUES_PASSWORT_FUER_NUTZER, props.member.name)}
                 </DialogContentText>
                 <TextField
                     fullWidth
                     autoFocus
                     defaultValue={newPassword}
                     margin="dense"
-                    label='Passwort'
+                    label={PASSWORT}
                     variant='standard'
                     type='password'
                     onChange={(value) => newPassword = value.target.value}
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.close}>Abbrechen</Button>
+                <Button onClick={props.close}>{ABBRECHEN}</Button>
                 <Button onClick={() => {
                     if (newPassword === "") {
                         return
@@ -49,7 +51,7 @@ const PasswordDialog = (props: Props) => {
                         }
                     })
 
-                }}>Aktualisieren</Button>
+                }}>{AKTUALISIEREN}</Button>
             </DialogActions>
         </Dialog>
     )

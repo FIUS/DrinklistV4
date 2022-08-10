@@ -12,6 +12,8 @@ import { Drink } from '../../../types/ResponseTypes';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setDrinks } from '../../../Actions/CommonAction';
 import { useDispatch } from 'react-redux';
+import { AENDERE_FLASCHENZAHL, AUF_0_SETEN, AUF_SETZEN, ERHOEHEN, ERHOEHEN_UM, FERTIG, NEUE_VERFUEGBARKEIT, SETZEN } from '../../Common/Internationalization/i18n';
+import { format } from 'react-string-format';
 
 type Props = {
     isOpen: boolean,
@@ -25,10 +27,10 @@ const DrinkStockDialog = (props: Props) => {
     let stockIncrease = 0
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Neue Verfügbarkeit</DialogTitle>
+            <DialogTitle>{NEUE_VERFUEGBARKEIT}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Ändere hier die Anzahl der Flaschen die für '{props.drink.name}' verfügbar sind
+                    {format(AENDERE_FLASCHENZAHL, props.drink.name)}
                 </DialogContentText>
                 <Spacer vertical={15} />
                 <div className={style.stockDialog}>
@@ -43,14 +45,14 @@ const DrinkStockDialog = (props: Props) => {
                             }
                         })
                     }}>
-                        Auf 0 setzen
+                        {AUF_0_SETEN}
                     </Button>
                     <div className={style.stockDialogInner}>
                         <TextField
                             autoFocus
                             defaultValue={stock}
                             margin="dense"
-                            label='Setzen auf...'
+                            label={AUF_SETZEN}
                             variant='standard'
                             type='number'
                             fullWidth
@@ -67,7 +69,7 @@ const DrinkStockDialog = (props: Props) => {
                                 }
                             })
                         }}>
-                            Setzen
+                            {SETZEN}
                         </Button>
                     </div>
                     <div className={style.stockDialogInner}>
@@ -75,7 +77,7 @@ const DrinkStockDialog = (props: Props) => {
                             autoFocus
                             defaultValue={stockIncrease}
                             margin="dense"
-                            label='Erhöhen um...'
+                            label={ERHOEHEN_UM}
                             variant='standard'
                             type='number'
                             fullWidth
@@ -93,13 +95,13 @@ const DrinkStockDialog = (props: Props) => {
                                 }
                             })
                         }}>
-                            Erhöhen
+                            {ERHOEHEN}
                         </Button>
                     </div>
                 </div>
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.close}>Fertig</Button>
+                <Button onClick={props.close}>{FERTIG}</Button>
             </DialogActions>
         </Dialog>
     )

@@ -1,4 +1,5 @@
 import { AlertColor } from "@mui/material"
+import { ERROR_MESSAGE } from "../Components/Common/Internationalization/i18n"
 import { Drink, Member } from "../types/ResponseTypes"
 
 export const setDrinks = (drinks: Array<Member>) => {
@@ -63,5 +64,5 @@ export const closeToast = () => {
 }
 
 export const openErrorToast = () => {
-    return openToast({ message: "Ein fehler ist aufgetreten", type: "error" })
+    return openToast({ message: ERROR_MESSAGE, type: "error" })
 }

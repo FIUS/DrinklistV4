@@ -13,6 +13,7 @@ import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox
 import CloseIcon from '@mui/icons-material/Close';
 import { openErrorToast, openToast, setMembers } from '../../../Actions/CommonAction';
 import { RootState } from '../../../Reducer/reducerCombiner';
+import { ABRECHNUNG_ABSCHLIESSEN, ABRECHNUNG_HINZUGEFUEGT, DIFFERENZ, ENTFERNEN, HINZUFUEGEN, KASSE_GEZAEHLT, KASSE_NACH_ABRECHNUNG, NAME, NEUER_KASSENSTAND, NEUE_ABRECHNUNG, RECHNUNGEN, RECHNUNGS_NAME, VALUE } from '../../Common/Internationalization/i18n';
 
 type Props = {}
 
@@ -101,7 +102,7 @@ const Checkout = (props: Props) => {
                                         onChange={(event, value) => { setselectedUser(value !== null ? value : "") }}
                                         renderInput={(params) =>
                                             <TextField {...params}
-                                                label='Name'
+                                                label={NAME}
                                                 variant='standard'
                                                 onChange={(value) => { setselectedUser(value.target.value) }}
                                                 className={style.textfield}
@@ -139,7 +140,7 @@ const Checkout = (props: Props) => {
                                     </TableCell>
                                     <TableCell>
                                         <TextField
-                                            label="Betrag"
+                                            label={VALUE}
                                             type="number"
                                             value={toCheckout.find((member) => member.member.id === value.member.id)?.amount}
                                             onChange={(textValue) => {
@@ -165,21 +166,21 @@ const Checkout = (props: Props) => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Typography variant='overline'> Rechnungen</Typography>
+                <Typography variant='overline'> {RECHNUNGEN}</Typography>
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Rechnungsname</TableCell>
-                                <TableCell>Betrag</TableCell>
-                                <TableCell>Hinzufügen / <br /> Entfernen</TableCell>
+                                <TableCell>{RECHNUNGS_NAME}</TableCell>
+                                <TableCell>{VALUE}</TableCell>
+                                <TableCell>{HINZUFUEGEN} / <br /> {ENTFERNEN}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     <TextField
-                                        label='Name'
+                                        label={NAME}
                                         variant='standard'
                                         value={invoiceName}
                                         onChange={(value) => { setinvoiceName(value.target.value) }}
@@ -188,7 +189,7 @@ const Checkout = (props: Props) => {
                                 </TableCell>
                                 <TableCell>
                                     <TextField
-                                        label='Betrag'
+                                        label={VALUE}
                                         variant='standard'
                                         type='number'
                                         value={invoiceAmount}
@@ -233,21 +234,21 @@ const Checkout = (props: Props) => {
                     </Table>
                 </TableContainer>
                 <Typography variant="h5">
-                    Kasse nach Abrechnung: {getNewCash().toFixed(2)}€
+                    {KASSE_NACH_ABRECHNUNG}: {getNewCash().toFixed(2)}€
                 </Typography>
                 <FormGroup>
                     <FormControlLabel control={
                         <Checkbox checked={cashCheckboxChecked}
                             onChange={(value) => setcashCheckboxChecked(value.target.checked)} />
                     }
-                        label="Kasse nach Einzahlung gezählt"
+                        label={KASSE_GEZAEHLT}
                     />
                 </FormGroup>
                 {cashCheckboxChecked ?
                     <>
                         <div className={style.cashInput}>
                             <TextField
-                                label='Neuer Kassenstand'
+                                label={NEUER_KASSENSTAND}
                                 variant='outlined'
                                 type='number'
                                 value={countedCash}
@@ -255,7 +256,7 @@ const Checkout = (props: Props) => {
                                 className={style.textfield}
                             />
                             <Typography variant="h5">
-                                Differenz: {countedCash - getNewCash()}€
+                                {DIFFERENZ}: {countedCash - getNewCash()}€
                             </Typography>
                         </div>
                     </> : <></>
@@ -286,7 +287,7 @@ const Checkout = (props: Props) => {
                                         if (value.code === 200) {
                                             setcheckouts(value.content)
                                         }
-                                        dispatch(openToast({ message: "Abrechnung hinzugefügt" }))
+                                        dispatch(openToast({ message: ABRECHNUNG_HINZUGEFUEGT }))
                                     })
                                 } else {
                                     dispatch(openErrorToast())
@@ -295,7 +296,7 @@ const Checkout = (props: Props) => {
                         }
                     }}
                 >
-                    Abrechnung abschließen
+                    {ABRECHNUNG_ABSCHLIESSEN}
                 </Button>
 
             </>
@@ -324,7 +325,7 @@ const Checkout = (props: Props) => {
             <div className={style.newCheckoutContainer}>
                 <div className={style.newCheckoutContainerHeadline}>
                     <Typography variant="h6">
-                        Neue Abrechnung
+                        {NEUE_ABRECHNUNG}
                     </Typography>
                     <Button
                         onClick={() => {
