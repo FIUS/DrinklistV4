@@ -271,7 +271,9 @@ def get_checkout_expanded(checkout_id):
 @app.route('/api/settings/backup', methods=["GET"])
 @admin
 def get_backup():
-    return send_from_directory(util.tempfile_path, util.backup_file_name)
+    if db.backup_database():
+        return send_from_directory(util.tempfile_path, util.backup_file_name)
+    return util.build_response("Error creating file", code=500)
 
 
 @app.route('/api/settings/restore', methods=["POST"])
