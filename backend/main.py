@@ -285,6 +285,20 @@ def restore_db():
     return util.build_response("ok")
 
 
+@app.route('/api/settings/password/admin', methods=["POST"])
+@admin
+def change_admin_password():
+    db.change_member_password(request.json['password'], 1)
+    return util.build_response("ok")
+
+
+@app.route('/api/settings/password/kiosk', methods=["POST"])
+@admin
+def change_kiosk_password():
+    db.change_member_password(request.json['password'], 2)
+    return util.build_response("ok")
+
+
 @app.route('/api/login/check', methods=["GET"])
 @authenticated
 def login_Check():

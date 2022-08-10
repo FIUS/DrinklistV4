@@ -3,7 +3,9 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { openErrorToast, openToast } from '../../../Actions/CommonAction'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
+import Spacer from '../../Common/Spacer'
 import { doPostRequestRawBody, downloadJSON } from '../../Common/StaticFunctions'
+import PasswordChange from './PasswordChange'
 import style from './settings.module.scss'
 
 type Props = {}
@@ -57,6 +59,10 @@ const Settings = (props: Props) => {
                     }}
                     />
                 </div>
+                <Spacer vertical={20} />
+                <Typography variant='h5'>Passwörter ändern</Typography>
+                <PasswordChange textfielLabel='Admin-Passwort' requestPath='settings/password/admin' />
+                <PasswordChange textfielLabel='Kiosk-Passwort' requestPath='settings/password/kiosk' />
             </div>
             <NavigationButton destination='/admin' />
         </>

@@ -1,6 +1,6 @@
 @import "../../Common/variables.module.scss";
 
-.container{
+.container {
     padding: $padding;
     display: flex;
     flex-direction: column;
@@ -9,7 +9,7 @@
     gap: $flex-gap;
 }
 
-.uploadContainer{
+.uploadContainer {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -17,6 +17,15 @@
     gap: $flex-gap;
 }
 
-.fileInput{
+.fileInput {
     width: 320px;
+}
+
+.passwordRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $flex-gap;
 }

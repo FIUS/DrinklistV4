@@ -264,6 +264,14 @@ class Queries:
         else:
             return None
 
+    def change_member_password(self, password, member_id):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        hashedPassword, salt = TokenManager.hashPassword(password)
+        member.password = hashedPassword
+        member.salt = salt
+        self.session.commit()
+
     def backup_database(self):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
         drinks: list[Drink] = self.session.query(Drink).all()
