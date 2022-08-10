@@ -57,9 +57,9 @@ export const GETRAENKE = "Getränke"
 export const MITGLIEDER = "Mitglieder"
 export const TRANSAKTIONEN = "Transaktionen"
 export const EINSTELLUNGEN = "Einstellungen"
-export const
-export const
-export const
+export const PASSWORT_GEAENDERT = "Passwort geändert"
+export const PASSWORT_ZU_KURZ = "Passwort zu kurz"
+export const PASSWORD_MIN_LAENGE = "Mindestens {0} Zeichen"
 export const
 export const
 export const
