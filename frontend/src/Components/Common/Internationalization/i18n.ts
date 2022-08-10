@@ -27,7 +27,7 @@ export const NEUER_PREIS = "Neuer Preis"
 export const GEBE_NEUEN_PREIS_EIN = "Gebe hier den neuen Preis für das Getränk '{0}' ein"
 export const ABBRECHEN = "Abbrechen"
 export const AKTUALISIEREN = "Aktualisieren"
-export const
-export const
+export const KEINE_GETRAENKE = "Keine Getränke"
+export const AM_WENIGSTEN = "Am wenigsten"
 export const
 export const 

@@ -12,6 +12,7 @@ import { Typography } from '@mui/material'
 import StatisticBox from '../../Common/InfoBox/StatisticBox'
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { RootState } from '../../../Reducer/reducerCombiner'
+import { AM_WENIGSTEN, KEINE_GETRAENKE } from '../../Common/Internationalization/i18n'
 
 
 type Props = {}
@@ -38,7 +39,7 @@ const Drinks = (props: Props) => {
 
     const calcMissing = () => {
         if (common.drinks?.length === 0 || !common.drinks) {
-            return "No drinks"
+            return KEINE_GETRAENKE
         }
         let stock = common.drinks[0].stock
         let name = common.drinks[0].name
@@ -58,7 +59,7 @@ const Drinks = (props: Props) => {
                 <div className={style.topContainer}>
                     <AddDrink />
                     <StatisticBox
-                        headline='Least Stock Drink'
+                        headline={AM_WENIGSTEN}
                         icon={<ReportGmailerrorredIcon />}
                         text={calcMissing()}
                         colorCode={window.globalTS.ICON_COLOR}
