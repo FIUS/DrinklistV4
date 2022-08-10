@@ -13,10 +13,6 @@ import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
 
-declare global {
-    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
-}
-
 type Props = {}
 
 const Members = (props: Props) => {

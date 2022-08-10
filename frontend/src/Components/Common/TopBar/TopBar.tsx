@@ -21,12 +21,11 @@ import { Settings } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { RootState } from '../../../Reducer/reducerCombiner';
+import InfoIcon from '@mui/icons-material/Info';
+import About from './About';
 
 type Props = {}
 
-declare global {
-    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
-}
 
 const TopBar = (props: Props) => {
     const navigate = useNavigate();
@@ -35,6 +34,7 @@ const TopBar = (props: Props) => {
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [drawerOpen, setdrawerOpen] = useState(true)
     const [drawerVisible, setdrawerVisible] = useState(true)
+    const [aboutDialogOpen, setaboutDialogOpen] = useState(false)
 
     useEffect(() => {
         if (location.pathname.startsWith("/admin") && window.innerWidth > window.globalTS.MOBILE_THRESHOLD) {
@@ -49,9 +49,9 @@ const TopBar = (props: Props) => {
 
     const navigationButton = () => {
         if (location.pathname.startsWith("/admin")) {
-            return <Button sx={{ flexGrow: 1 }} color="inherit" onClick={() => navigate("/")}><Person /></Button>
+            return <IconButton sx={{ flexGrow: 1 }} color="inherit" onClick={() => navigate("/")}><Person /></IconButton>
         } else {
-            return <Button sx={{ flexGrow: 1 }} color="inherit" onClick={() => navigate("admin")}><SettingsOutlined /></Button>
+            return <IconButton sx={{ flexGrow: 1 }} color="inherit" onClick={() => navigate("admin")}><SettingsOutlined /></IconButton>
         }
     }
 
@@ -86,6 +86,13 @@ const TopBar = (props: Props) => {
         }
     }
 
+    const shouldDisplayAbout = () => {
+        return window.globalTS.ORGANISATION_NAME !== "" ||
+            window.globalTS.ABOUT_LINK !== "" ||
+            window.globalTS.PRIVACY_LINK !== "" ||
+            window.globalTS.ADDITIONAL_INFORMATION !== ""
+    }
+
     return (
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -98,6 +105,15 @@ const TopBar = (props: Props) => {
                         </Button>
                     </div>
                     <div style={{ display: "flex" }}>
+                        {shouldDisplayAbout() ? <IconButton
+                            color="inherit"
+                            onClick={() => {
+                                setaboutDialogOpen(true)
+                            }}
+                        >
+                            <InfoIcon />
+                        </IconButton> : <></>}
+                        <About isOpen={aboutDialogOpen} close={() => setaboutDialogOpen(false)} />
                         {navigationButton()}
                         <Spacer horizontal={20} />
                         <Button color="inherit" onClick={() => {

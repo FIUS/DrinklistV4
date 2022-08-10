@@ -3,9 +3,7 @@ import React from 'react'
 import Infobox from './Infobox'
 import style from './infobox.module.scss';
 
-declare global {
-    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
-}
+
 
 type Props = {
     headline: string,

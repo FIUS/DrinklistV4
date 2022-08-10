@@ -13,9 +13,6 @@ import StatisticBox from '../../Common/InfoBox/StatisticBox'
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { RootState } from '../../../Reducer/reducerCombiner'
 
-declare global {
-    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
-}
 
 type Props = {}
 

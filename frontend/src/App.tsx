@@ -14,6 +14,20 @@ import Routing from './Components/Routing/Routing';
 import LoginChecker from './Components/Common/LoginChecker/LoginChecker';
 import Toast from './Components/Common/Toast/Toast';
 
+declare global {
+  interface Window {
+    globalTS: {
+      DOMAIN: string,
+      MOBILE_THRESHOLD: number,
+      ICON_COLOR: string,
+      ORGANISATION_NAME: string,
+      ABOUT_LINK: string,
+      PRIVACY_LINK: string,
+      ADDITIONAL_INFORMATION: string
+    };
+  }
+}
+
 function App() {
   const [themeCookie, setthemeCookie] = useState(0)
   const store = createStore(allReducer, composeWithDevTools())

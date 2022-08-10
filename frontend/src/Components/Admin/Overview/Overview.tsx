@@ -18,9 +18,6 @@ import { Area, AreaChart, CartesianGrid, Legend, Tooltip, YAxis } from 'recharts
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
 
-declare global {
-    interface Window { globalTS: { MOBILE_THRESHOLD: number, ICON_COLOR: string }; }
-}
 
 type Props = {}
 
