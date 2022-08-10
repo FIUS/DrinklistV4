@@ -11,6 +11,8 @@ import { openErrorToast, openToast, setDrinks, setFavorites, setHistory, setMemb
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { RootState } from '../../../Reducer/reducerCombiner';
+import { format } from 'react-string-format';
+import { ABGESTRICHEN } from '../../Common/Internationalization/i18n';
 
 type Props = {
     drink: Drink,
@@ -31,7 +33,7 @@ const DrinkButton = (props: Props) => {
                         memberID: props.memberID
                     }).then(value => {
                         if (value.code === 200) {
-                            dispatch(openToast({ message: props.drink.name + " abgestrichen" }))
+                            dispatch(openToast({ message: format(ABGESTRICHEN, props.drink.name) }))
                             doGetRequest("drinks").then((value) => {
                                 if (value.code === 200) {
                                     dispatch(setDrinks(value.content))
