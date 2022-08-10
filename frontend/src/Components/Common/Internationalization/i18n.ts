@@ -41,13 +41,13 @@ export const GUTHABEN_HINZUFUEGEN = "Guthaben hinzufügen"
 export const MENGE_EINZUZAHLENDES_GELD = "Gebe hier die Menge an einzuzahlendem Geld für '{0}' ein"
 export const AKTUELL = "Aktuell"
 export const NEU = "Neu"
-export const
-export const
-export const
-export const
-export const
-export const
-export const
-export const
+export const BUDGET = "Budget"
+export const BENUTZER_ZAHL = "Benutzer Anzahl"
+export const VERSTECKTE_NUTZER = "Versteckte Nutzer"
+export const KONTO = "Konto"
+export const MODIFIZIEREN = "Modifizieren"
+export const GELD = "Geld"
+export const PASSWORT = "Passwort"
+export const SUCHE_DOT_DOT_DOT = "Suche..."
 export const
 export const

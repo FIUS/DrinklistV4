@@ -12,6 +12,7 @@ import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
+import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MODIFIZIEREN, NAME, PASSWORT, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 
 type Props = {}
 
@@ -59,17 +60,17 @@ const Members = (props: Props) => {
         <>
             <div className={style.statisticBoxes}>
                 <StatisticBox
-                    headline='Total Budget'
+                    headline={BUDGET}
                     text={calcBudget().toFixed(2) + "€"}
                     icon={<Money />}
                     colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
-                    headline='Total Users'
+                    headline={BENUTZER_ZAHL}
                     text={common.members ? common.members.length.toString() : "0"}
                     icon={<Person />}
                     colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
-                    headline='Hidden User'
+                    headline={VERSTECKTE_NUTZER}
                     text={calcHiddenUsers().toString()}
                     icon={< VisibilityOff />}
                     colorCode={window.globalTS.ICON_COLOR} />
@@ -81,9 +82,9 @@ const Members = (props: Props) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={style.searchID}>#</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Konto</TableCell>
-                                <TableCell>Modifizieren</TableCell>
+                                <TableCell>{NAME}</TableCell>
+                                <TableCell>{KONTO}</TableCell>
+                                <TableCell>{MODIFIZIEREN}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -95,7 +96,7 @@ const Members = (props: Props) => {
                                 <TableCell component="th" scope="row">
                                     <TextField
                                         variant='standard'
-                                        label="Name"
+                                        label={NAME}
                                         value={name}
                                         onChange={(value) => {
                                             setname(value.target.value)
@@ -107,7 +108,7 @@ const Members = (props: Props) => {
                                     <TextField
                                         type="number"
                                         variant='standard'
-                                        label="Geld"
+                                        label={GELDLD}
                                         value={balance}
                                         onChange={(value) => {
                                             if (parseFloat(value.target.value)) {
@@ -122,7 +123,7 @@ const Members = (props: Props) => {
                                         <TextField
                                             type="password"
                                             variant='standard'
-                                            label="Passwort"
+                                            label={PASSWORT}
                                             value={password}
                                             onChange={(value) => {
                                                 setpassword(value.target.value)
@@ -161,7 +162,7 @@ const Members = (props: Props) => {
                                 <TableCell>
                                     <TextField
                                         variant='outlined'
-                                        label="Suche..."
+                                        label={SUCHE_DOT_DOT_DOT}
                                         value={searchID}
                                         onChange={(value) => {
                                             setsearchID(value.target.value)
@@ -174,7 +175,7 @@ const Members = (props: Props) => {
                                 <TableCell>
                                     <TextField
                                         variant='outlined'
-                                        label="Suche..."
+                                        label={SUCHE_DOT_DOT_DOT}
                                         value={searchName}
                                         onChange={(value) => {
                                             setsearchName(value.target.value)
