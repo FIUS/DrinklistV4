@@ -49,5 +49,5 @@ export const MODIFIZIEREN = "Modifizieren"
 export const GELD = "Geld"
 export const PASSWORT = "Passwort"
 export const SUCHE_DOT_DOT_DOT = "Suche..."
-export const
-export const
+export const NEUES_PASSWORT_FESTLEGEN = "Neues Passwort festlegen"
+export const NEUES_PASSWORT_FUER_NUTZER = "Gebe hier das neue passwort für den nutzer '{0}' ein"
