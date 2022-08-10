@@ -2,6 +2,7 @@ import { Button, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { openErrorToast, openToast } from '../../../Actions/CommonAction'
+import { ADMIN_PW, BACKUP_ERFOLG, BACKUP_UPLOADING, DOWNLOAD_BACKUP, EINGESPIELT, KIOSK_PW, PASSWORT_AENDERN, UPLOAD, UPLOAD_BACKUP } from '../../Common/Internationalization/i18n'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { doPostRequestRawBody, downloadJSON } from '../../Common/StaticFunctions'
@@ -26,7 +27,7 @@ const Settings = (props: Props) => {
                 }}
                     variant="contained"
                 >
-                    Download Backup
+                    {DOWNLOAD_BACKUP}
                 </Button>
                 <div className={style.uploadContainer}>
                     <Button disabled={isUploading}
@@ -34,13 +35,13 @@ const Settings = (props: Props) => {
                             const formData = new FormData();
                             if (file != null) {
                                 setisUploading(true)
-                                dispatch(openToast({ message: "Backup wird hochgeladen und eingespielt", headline: "Upload", type: "info" }))
+                                dispatch(openToast({ message: BACKUP_UPLOADING, headline: UPLOAD, type: "info" }))
 
                                 formData.append('file', file)
                                 doPostRequestRawBody("settings/restore", formData).then((value) => {
                                     setisUploading(false)
                                     if (value.code === 200) {
-                                        dispatch(openToast({ message: "Backup wurde erfolgreich eingespielt", type: "success", headline: "Eingespielt", duration: 8000 }))
+                                        dispatch(openToast({ message: BACKUP_ERFOLG, type: "success", headline: EINGESPIELT, duration: 8000 }))
                                     } else {
                                         dispatch(openErrorToast())
                                     }
@@ -49,7 +50,7 @@ const Settings = (props: Props) => {
                         }}
                         variant="contained"
                     >
-                        Upload Backup
+                        {UPLOAD_BACKUP}
                     </Button>
                     <input className={style.fileInput} type="file" name="file" onChange={(value) => {
 
@@ -60,9 +61,9 @@ const Settings = (props: Props) => {
                     />
                 </div>
                 <Spacer vertical={20} />
-                <Typography variant='h5'>Passwörter ändern</Typography>
-                <PasswordChange textfielLabel='Admin-Passwort' requestPath='settings/password/admin' />
-                <PasswordChange textfielLabel='Kiosk-Passwort' requestPath='settings/password/kiosk' />
+                <Typography variant='h5'>{PASSWORT_AENDERN}</Typography>
+                <PasswordChange textfielLabel={ADMIN_PW} requestPath='settings/password/admin' />
+                <PasswordChange textfielLabel={KIOSK_PW} requestPath='settings/password/kiosk' />
             </div>
             <NavigationButton destination='/admin' />
         </>

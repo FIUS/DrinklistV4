@@ -60,13 +60,13 @@ export const EINSTELLUNGEN = "Einstellungen"
 export const PASSWORT_GEAENDERT = "Passwort geändert"
 export const PASSWORT_ZU_KURZ = "Passwort zu kurz"
 export const PASSWORD_MIN_LAENGE = "Mindestens {0} Zeichen"
-export const
-export const
-export const
-export const
-export const
-export const
-export const
-export const
-export const
+export const DOWNLOAD_BACKUP = "Download Backup"
+export const BACKUP_UPLOADING = "Backup wird hochgeladen und eingespielt"
+export const UPLOAD = "Upload"
+export const BACKUP_ERFOLG = "Backup wurde erfolgreich eingespielt"
+export const EINGESPIELT = "Eingespielt"
+export const UPLOAD_BACKUP = "Upload Backup"
+export const PASSWORT_AENDERN = "Passwörter ändern"
+export const ADMIN_PW = "Admin-Passwort"
+export const KIOSK_PW = "Kiosk-Passwort"
 export const
