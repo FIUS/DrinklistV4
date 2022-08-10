@@ -16,3 +16,18 @@ export const KASSE_VOR_ABRECHNUNG = "Kasse vor Abrechnung";
 export const EINZAHLUNGEN = "Einzahlungen"
 export const EINNAHMEN = "Einnahmen"
 export const KASSE_DIFFERENZ = "Kasse Differenz"
+export const NO_USERS = "Keine Nutzer"
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const 
