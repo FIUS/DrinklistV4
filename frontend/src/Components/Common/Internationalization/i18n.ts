@@ -82,7 +82,7 @@ export const GETREANKELISTE = "Getränkeliste"
 export const IMPRESSUM = "Impressum"
 export const DATENSCHUTZ = "Datenschutz"
 export const OK = "OK"
-export const
+export const OEFFNEN = "Öffnen"
 export const
 export const
 export const
