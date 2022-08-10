@@ -372,7 +372,7 @@ class Queries:
 
             for user in resp.json():
                 self.add_user(user["name"], user["balance"]/100,
-                              "unsafe", hidden=True if user["hidden"] == 1 else False)
+                              util.standard_user_password, hidden=True if user["hidden"] == 1 else False)
                 print("User", user["name"], "imported")
 
             print("-->", len(resp.json()), "users imported")

@@ -22,6 +22,8 @@ moderator_username = os.environ.get(
     "MOD_USERNAME") if os.environ.get("MOD_USERNAME") else "moderator"
 moderator_password = os.environ.get(
     "MOD_PASSWORD") if os.environ.get("MOD_PASSWORD") else "unsafe"
+standard_user_password = os.environ.get(
+    "USER_PASSWORD") if os.environ.get("USER_PASSWORD") else "unsafe"
 undo_timelimit = int(os.environ.get(
     "UNDO_TIMELIMIT")) if os.environ.get("UNDO_TIMELIMIT") else 1
 
