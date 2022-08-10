@@ -2,6 +2,7 @@ import { Button } from '@mui/material'
 import React from 'react'
 import style from './navigationbutton.module.scss'
 import { useNavigate } from 'react-router-dom';
+import { ZURUECK } from '../Internationalization/i18n';
 
 type Props = {
     destination: string
@@ -18,7 +19,7 @@ const NavigationButton = (props: Props) => {
                 onClick={() => navigate(props.destination)}
                 sx={{ backgroundColor: "primary.main" }}
             >
-                Zurück
+                {ZURUECK}
             </Button>
         </div>
     )

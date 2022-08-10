@@ -76,7 +76,7 @@ export const RUECKGAENGIG = "Rückgängig"
 export const FALSCHES_PASSWORT = "Falsches Passwort oder Benutzernname"
 export const FEHLER = "Fehler"
 export const LOGIN = "Login"
-export const
+export const ZURUECK = "Zurück"
 export const
 export const
 export const
