@@ -17,12 +17,12 @@ export const EINZAHLUNGEN = "Einzahlungen"
 export const EINNAHMEN = "Einnahmen"
 export const KASSE_DIFFERENZ = "Kasse Differenz"
 export const NO_USERS = "Keine Nutzer"
-export const
-export const
-export const
-export const
-export const
-export const
+export const MEISTE_SCHULDEN = "Meiste Schulden"
+export const GETRAENKENAME = "Getränkename"
+export const KATEGORIE = "Kategorie"
+export const PREIS_IN_EURO = "Preis in Euro"
+export const FLASCHENZAHL = "Flaschen-Anzahl"
+export const GETRAENK_HINZUGEFUEGT = "Getränk hinzugefügt"
 export const
 export const
 export const
