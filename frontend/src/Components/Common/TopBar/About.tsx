@@ -9,6 +9,7 @@ import { Typography } from '@mui/material';
 import style from './topbar.module.scss';
 import SettingsLink from './SettingsLink';
 import { DATENSCHUTZ, GETREANKELISTE, IMPRESSUM, IMPRESSUM_DATENSCHUTZ, OK } from '../Internationalization/i18n';
+import Buildnumber from '../../../BuildNumber.json'
 
 type Props = {
     isOpen: boolean,
@@ -34,6 +35,9 @@ const About = (props: Props) => {
                         {window.globalTS.ADDITIONAL_INFORMATION !== "" ? <Typography>
                             {window.globalTS.ADDITIONAL_INFORMATION}
                         </Typography> : <></>}
+                        <Typography variant="overline">
+                            Build: {Buildnumber}
+                        </Typography>
                     </div>
                 </DialogContentText>
             </DialogContent>
