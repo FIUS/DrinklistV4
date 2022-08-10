@@ -23,6 +23,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
+import { ABRECHNUNGEN, DRINKLIST, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
 
 type Props = {}
 
@@ -101,7 +102,7 @@ const TopBar = (props: Props) => {
                         {getIcon()}
 
                         <Button size="large" color="inherit" onClick={() => navigate("/")} sx={{ display: "inline-flex" }} variant="text">
-                            Drinklist
+                            {DRINKLIST}
                         </Button>
                     </div>
                     <div style={{ display: "flex" }}>
@@ -144,7 +145,7 @@ const TopBar = (props: Props) => {
                                     <ListItemIcon>
                                         <Person />
                                     </ListItemIcon>
-                                    <ListItemText primary="Nutzer Dashboard" />
+                                    <ListItemText primary={NUTZER_DASHBOARD} />
                                 </ListItemButton>
                             </ListItem>
 
@@ -156,7 +157,7 @@ const TopBar = (props: Props) => {
                                     <ListItemIcon>
                                         <SportsBarIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Getränke" />
+                                    <ListItemText primary={GETRAENKE} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
@@ -164,7 +165,7 @@ const TopBar = (props: Props) => {
                                     <ListItemIcon>
                                         <PersonIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Mitglieder" />
+                                    <ListItemText primary={MITGLIEDER} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
@@ -172,7 +173,7 @@ const TopBar = (props: Props) => {
                                     <ListItemIcon>
                                         <ReceiptLongIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Transaktionen" />
+                                    <ListItemText primary={TRANSAKTIONEN} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
@@ -180,7 +181,7 @@ const TopBar = (props: Props) => {
                                     <ListItemIcon>
                                         <AccountBalanceIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Abrechnungen" />
+                                    <ListItemText primary={ABRECHNUNGEN} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
@@ -188,7 +189,7 @@ const TopBar = (props: Props) => {
                                     <ListItemIcon>
                                         <Settings />
                                     </ListItemIcon>
-                                    <ListItemText primary="Einstellungen" />
+                                    <ListItemText primary={EINSTELLUNGEN} />
                                 </ListItemButton>
                             </ListItem>
 

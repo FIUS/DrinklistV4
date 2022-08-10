@@ -83,9 +83,9 @@ export const IMPRESSUM = "Impressum"
 export const DATENSCHUTZ = "Datenschutz"
 export const OK = "OK"
 export const OEFFNEN = "Öffnen"
-export const
-export const
-export const
+export const DRINKLIST = "Drinklist"
+export const NUTZER_DASHBOARD = "Nutzer Dashboard"
+export const ABRECHNUNGEN = "Abrechnungen"
 export const
 export const
 export const
