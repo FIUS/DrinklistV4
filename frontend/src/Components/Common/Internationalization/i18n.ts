@@ -29,5 +29,25 @@ export const ABBRECHEN = "Abbrechen"
 export const AKTUALISIEREN = "Aktualisieren"
 export const KEINE_GETRAENKE = "Keine Getränke"
 export const AM_WENIGSTEN = "Am wenigsten"
+export const NEUE_VERFUEGBARKEIT = "Neue Verfügbarkeit"
+export const AENDERE_FLASCHENZAHL = "Ändere hier die Anzahl der Flaschen die für '{0}' verfügbar sind"
+export const AUF_0_SETEN = "Auf 0 setzen"
+export const AUF_SETZEN = "Setzen auf..."
+export const SETZEN = "Setzen"
+export const ERHOEHEN_UM = "Erhöhen um..."
+export const ERHOEHEN = "Erhöhen"
+export const FERTIG = "Fertig"
 export const
-export const 
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
