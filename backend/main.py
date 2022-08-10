@@ -13,7 +13,7 @@ import json
 from database import Queries
 from flask_restx import Resource, Api
 
-api = Api(app)
+api = Api(app, doc='/docu/')
 token_manager = authenticator.TokenManager()
 
 db = Queries.Queries(sql_database)
