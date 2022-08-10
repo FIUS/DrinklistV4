@@ -108,7 +108,7 @@ const Members = (props: Props) => {
                                     <TextField
                                         type="number"
                                         variant='standard'
-                                        label={GELDLD}
+                                        label={GELD}
                                         value={balance}
                                         onChange={(value) => {
                                             if (parseFloat(value.target.value)) {
