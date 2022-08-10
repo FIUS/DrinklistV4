@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { openToast } from '../../../Actions/CommonAction';
+import { FALSCHES_PASSWORT, FEHLER, LOGIN, NAME, PASSWORT } from '../Internationalization/i18n';
 import Spacer from '../Spacer';
 import { doPostRequest } from '../StaticFunctions';
 import style from './login.module.scss'
@@ -24,19 +25,19 @@ const Login = (props: Props) => {
 
                 navigate(notNullSeachParam)
             } else {
-                dispatch(openToast({ message: "Falsches Passwort oder Benutzernname", type: "error", headline: "Fehler" }))
+                dispatch(openToast({ message: FALSCHES_PASSWORT, type: "error", headline: FEHLER }))
             }
         })
     }
 
     return (
         <div className={style.outterContainer}>
-            <Typography variant="h3">Willkommen zur Drinklist</Typography>
-            <Typography variant="h4">Bitte logge dich ein!</Typography>
+            <Typography variant="h3">{window.globalTS.WELCOME_TEXT_0}</Typography>
+            <Typography variant="h4">{window.globalTS.WELCOME_TEXT_1}</Typography>
             <Spacer vertical={40} />
             <TextField
                 className={style.textfield}
-                label="Name"
+                label={NAME}
                 value={username}
                 onChange={(value) => { setusername(value.target.value) }}
             />
@@ -46,7 +47,7 @@ const Login = (props: Props) => {
                 <FormControl className={style.form}>
                     <TextField
                         fullWidth
-                        label="Passwort"
+                        label={PASSWORT}
                         type="password"
                         value={password}
                         onChange={(value) => { setpassword(value.target.value) }}
@@ -61,7 +62,7 @@ const Login = (props: Props) => {
                     login()
                 }}
             >
-                Login
+                {LOGIN}
             </Button>
         </div>
     )

@@ -73,9 +73,9 @@ export const BESCHREIBUNG = "Beschreibung"
 export const WERT = "Wert"
 export const DATUM = "Datum"
 export const RUECKGAENGIG = "Rückgängig"
-export const
-export const
-export const
+export const FALSCHES_PASSWORT = "Falsches Passwort oder Benutzernname"
+export const FEHLER = "Fehler"
+export const LOGIN = "Login"
 export const
 export const
 export const

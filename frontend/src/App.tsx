@@ -23,7 +23,9 @@ declare global {
       ORGANISATION_NAME: string,
       ABOUT_LINK: string,
       PRIVACY_LINK: string,
-      ADDITIONAL_INFORMATION: string
+      ADDITIONAL_INFORMATION: string,
+      WELCOME_TEXT_0: string,
+      WELCOME_TEXT_1: string
     };
   }
 }
