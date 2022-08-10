@@ -23,10 +23,10 @@ export const KATEGORIE = "Kategorie"
 export const PREIS_IN_EURO = "Preis in Euro"
 export const FLASCHENZAHL = "Flaschen-Anzahl"
 export const GETRAENK_HINZUGEFUEGT = "Getränk hinzugefügt"
-export const
-export const
-export const
-export const
+export const NEUER_PREIS = "Neuer Preis"
+export const GEBE_NEUEN_PREIS_EIN = "Gebe hier den neuen Preis für das Getränk '{0}' ein"
+export const ABBRECHEN = "Abbrechen"
+export const AKTUALISIEREN = "Aktualisieren"
 export const
 export const
 export const
