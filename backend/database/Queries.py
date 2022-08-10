@@ -356,11 +356,13 @@ class Queries:
         return
 
     def create_dummy_data(self) -> None:
-        hashedPassword, salt = TokenManager.hashPassword("unsafe")
+        hashedPassword, salt = TokenManager.hashPassword(util.admin_password)
         self.session.add(
-            Member(name="admin", password=hashedPassword, salt=salt))
+            Member(name=util.admin_username, password=hashedPassword, salt=salt))
+        hashedPassword, salt = TokenManager.hashPassword(
+            util.moderator_password)
         self.session.add(
-            Member(name="moderator", password=hashedPassword, salt=salt))
+            Member(name=util.moderator_username, password=hashedPassword, salt=salt))
 
         self.session.commit()
 
