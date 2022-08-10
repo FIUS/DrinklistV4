@@ -86,7 +86,7 @@ export const OEFFNEN = "Öffnen"
 export const DRINKLIST = "Drinklist"
 export const NUTZER_DASHBOARD = "Nutzer Dashboard"
 export const ABRECHNUNGEN = "Abrechnungen"
-export const
+export const FAVORITEN = "Favoriten"
 export const
 export const
 export const
