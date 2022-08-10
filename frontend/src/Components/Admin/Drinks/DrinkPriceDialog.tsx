@@ -44,7 +44,7 @@ const DrinkPriceDialog = (props: Props) => {
             <DialogActions>
                 <Button onClick={props.close}>{ABBRECHEN}</Button>
                 <Button onClick={() => {
-                    doPostRequest("drinks/" + props.drink.id + "/price", { price: price }).then(value => {
+                    doPostRequest("drinks/" + props.drink.id + "/price", { amount: price }).then(value => {
                         if (value.code === 200) {
                             props.close()
                             doGetRequest("drinks").then((value) => {
