@@ -17,6 +17,7 @@ import Infobox from '../../Common/InfoBox/Infobox';
 import { Area, AreaChart, CartesianGrid, Legend, Tooltip, YAxis } from 'recharts';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
+import { BENUTZER_ZAHL, BUDGET, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 
 
 type Props = {}
@@ -66,27 +67,27 @@ const Overview = (props: Props) => {
         <>
             <div className={style.overview}>
                 <StatisticBox
-                    headline='Total Budget'
+                    headline={BUDGET}
                     text={calcBudget().toFixed(2) + "€"}
                     icon={<Money />}
                     colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
-                    headline='Total Users'
+                    headline={BENUTZER_ZAHL}
                     text={common.members ? common.members.length.toString() : "0"}
                     icon={<Person />}
                     colorCode={window.globalTS.ICON_COLOR} />
                 <StatisticBox
-                    headline='Hidden User'
+                    headline={VERSTECKTE_NUTZER}
                     text={calcHiddenUsers().toString()}
                     icon={< VisibilityOff />}
                     colorCode={window.globalTS.ICON_COLOR} />
                 <TopDepter members={common.members} />
-                <Infobox headline='Money distribution' >
+                <Infobox headline={GELD_VERTEILUNG} >
                     <AreaChart width={window.innerWidth / 3} height={200} data={common.members?.sort(
                         (m1, m2) => m1.balance - m2.balance).map(
                             (value) => {
                                 return {
-                                    Balances: value.balance
+                                    Guthaben: value.balance
                                 }
                             }
                         )
@@ -95,7 +96,7 @@ const Overview = (props: Props) => {
                         <YAxis unit="€" />
                         <Tooltip />
                         <Legend />
-                        <Area type="monotone" dataKey="Balances" stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
+                        <Area type="monotone" dataKey="Guthaben" stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
                     </AreaChart >
                 </Infobox>
             </div>
@@ -108,7 +109,7 @@ const Overview = (props: Props) => {
                 >
                     <SportsBarIcon sx={buttonSize} />
                     <Spacer horizontal={10} />
-                    <Typography variant={headingType}>Getränke</Typography>
+                    <Typography variant={headingType}>{GETRAENKE}</Typography>
 
                 </Button>
                 <Button
@@ -119,7 +120,7 @@ const Overview = (props: Props) => {
                 >
                     <PersonIcon sx={buttonSize} />
                     <Spacer horizontal={10} />
-                    <Typography variant={headingType}>Mitglieder</Typography>
+                    <Typography variant={headingType}>{MITGLIEDER}</Typography>
                 </Button>
                 <Button
                     size="large"
@@ -129,7 +130,7 @@ const Overview = (props: Props) => {
                 >
                     <ReceiptLongIcon sx={buttonSize} />
                     <Spacer horizontal={10} />
-                    <Typography variant={headingType}>Transaktionen</Typography>
+                    <Typography variant={headingType}>{TRANSAKTIONEN}</Typography>
                 </Button>
                 <Button
                     size="large"
@@ -139,7 +140,7 @@ const Overview = (props: Props) => {
                 >
                     <Settings sx={buttonSize} />
                     <Spacer horizontal={10} />
-                    <Typography variant={headingType}>Einstellungen</Typography>
+                    <Typography variant={headingType}>{EINSTELLUNGEN}</Typography>
                 </Button>
             </div>
         </>
