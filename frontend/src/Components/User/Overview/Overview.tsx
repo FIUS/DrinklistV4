@@ -7,6 +7,7 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doGetRequest } from '../../Common/StaticFunctions';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
 import { RootState } from '../../../Reducer/reducerCombiner';
+import { NAME, WER_BIST_DU } from '../../Common/Internationalization/i18n';
 
 type Props = {}
 
@@ -38,12 +39,12 @@ const Overview = (props: Props) => {
     return (
         <div className={style.outterContainer}>
             <div className={style.headline}>
-                <Typography variant='h4'>Wer bist du?</Typography>
+                <Typography variant='h4'>{WER_BIST_DU}</Typography>
             </div>
 
             <TextField
                 className={style.input}
-                placeholder="Name"
+                placeholder={NAME}
                 type="search"
                 value={searchfield}
                 onChange={

@@ -95,7 +95,7 @@ export const WENDE_DICH_AN_ADMIN_RUECKGAENGIG = "Bitte wende dich an den Geträn
 export const ZEITLIMIT_ABGELAUFEN = "Zeitlimit abgelaufen"
 export const HALLO = "Hallo"
 export const ABGESTRICHEN = "{0} abgestrichen"
-export const
+export const WER_BIST_DU = "Wer bist du?"
 export const
 export const
 export const
