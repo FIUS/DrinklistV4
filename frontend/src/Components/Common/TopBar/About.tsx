@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Typography } from '@mui/material';
 import style from './topbar.module.scss';
 import SettingsLink from './SettingsLink';
+import { DATENSCHUTZ, GETREANKELISTE, IMPRESSUM, IMPRESSUM_DATENSCHUTZ, OK } from '../Internationalization/i18n';
 
 type Props = {
     isOpen: boolean,
@@ -18,17 +19,17 @@ const About = (props: Props) => {
 
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Impressum/Datenschutz</DialogTitle>
+            <DialogTitle>{IMPRESSUM_DATENSCHUTZ}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <div className={style.aboutDialogContainer}>
                         {window.globalTS.ORGANISATION_NAME !== "" ? <div className={style.aboutDialogRow}>
-                            <Typography variant="overline">Getränkeliste </Typography>
+                            <Typography variant="overline">{GETREANKELISTE} </Typography>
                             <Typography variant="h5">{window.globalTS.ORGANISATION_NAME}</Typography>
                         </div> : <></>}
                         <div>
-                            <SettingsLink title='Impressum' link={window.globalTS.ABOUT_LINK} />
-                            <SettingsLink title='Datenschutz' link={window.globalTS.PRIVACY_LINK} />
+                            <SettingsLink title={IMPRESSUM} link={window.globalTS.ABOUT_LINK} />
+                            <SettingsLink title={DATENSCHUTZ} link={window.globalTS.PRIVACY_LINK} />
                         </div>
                         {window.globalTS.ADDITIONAL_INFORMATION !== "" ? <Typography>
                             {window.globalTS.ADDITIONAL_INFORMATION}
@@ -37,7 +38,7 @@ const About = (props: Props) => {
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.close}>OK</Button>
+                <Button onClick={props.close}>{OK}</Button>
             </DialogActions>
         </Dialog>
     )

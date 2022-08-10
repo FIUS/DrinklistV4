@@ -77,11 +77,11 @@ export const FALSCHES_PASSWORT = "Falsches Passwort oder Benutzernname"
 export const FEHLER = "Fehler"
 export const LOGIN = "Login"
 export const ZURUECK = "Zurück"
-export const
-export const
-export const
-export const
-export const
+export const IMPRESSUM_DATENSCHUTZ = "Impressum/Datenschutz"
+export const GETREANKELISTE = "Getränkeliste"
+export const IMPRESSUM = "Impressum"
+export const DATENSCHUTZ = "Datenschutz"
+export const OK = "OK"
 export const
 export const
 export const
