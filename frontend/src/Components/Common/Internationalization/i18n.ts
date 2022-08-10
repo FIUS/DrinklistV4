@@ -69,4 +69,25 @@ export const UPLOAD_BACKUP = "Upload Backup"
 export const PASSWORT_AENDERN = "Passwörter ändern"
 export const ADMIN_PW = "Admin-Passwort"
 export const KIOSK_PW = "Kiosk-Passwort"
+export const BESCHREIBUNG = "Beschreibung"
+export const WERT = "Wert"
+export const DATUM = "Datum"
+export const RUECKGAENGIG = "Rückgängig"
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
+export const
 export const
