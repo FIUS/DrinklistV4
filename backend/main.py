@@ -86,7 +86,7 @@ class get_user_favorites(Resource):
 
 
 model_password = api.model('Password', {
-    'password': fields.String
+    'password': fields.String(required=True)
 })
 
 
@@ -95,12 +95,6 @@ class change_user_password(Resource):
     @admin
     @api.doc(body=model_password)
     def post(self, member_id):
-        """
-        Input:
-        {
-            password:<new password>
-        }
-        """
         db.change_user_password(member_id, request.json["password"])
         return util.build_response("Password changed")
 
@@ -114,7 +108,7 @@ class toggle_user_visibility(Resource):
 
 
 model_amount = api.model('Amount', {
-    'amount': fields.Float
+    'amount': fields.Float(required=True)
 })
 
 
@@ -123,12 +117,6 @@ class user_deposit(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, member_id):
-        """
-        Input:
-        {
-            amount:<amount>
-        }
-        """
         db.deposit_user(member_id, float(request.json["amount"]))
         return util.build_response("Money added")
 
@@ -142,9 +130,9 @@ class delete_user(Resource):
 
 
 model = api.model('Add User', {
-    'name': fields.String,
-    'money': fields.Float,
-    'password': fields.String,
+    'name': fields.String(description='Name of the new user', required=True),
+    'money': fields.Float(description='Initial balance of the user', required=True),
+    'password': fields.String(description='Initial password of user', required=True),
 })
 
 
@@ -153,14 +141,6 @@ class add_user(Resource):
     @admin
     @api.doc(body=model)
     def post(self):
-        """
-        Input:
-        {
-            name:<name>,
-            money:<money>,
-            password:<password>
-        }
-        """
         db.add_user(request.json["name"],
                     request.json["money"], request.json["password"])
         return util.build_response("User added")
@@ -185,12 +165,6 @@ class set_drink_price(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, drink_id):
-        """
-        Input:
-        {
-            amount:<price>
-        }
-        """
         db.change_drink_price(drink_id, request.json["price"])
         return util.build_response("Price changed")
 
@@ -200,12 +174,6 @@ class set_drink_stock(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, drink_id):
-        """
-        Input:
-        {
-            amount:<new stock>
-        }
-        """
         db.change_drink_stock(drink_id, request.json["stock"])
         return util.build_response("Stock changed")
 
@@ -215,12 +183,6 @@ class set_drink_stock_increase(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, drink_id):
-        """
-        Input:
-        {
-            amount:<amount to increase>
-        }
-        """
         db.change_drink_stock(
             drink_id, request.json["stock"], is_increase=True)
         return util.build_response("Stock changed")
@@ -247,23 +209,14 @@ class add_drink(Resource):
     @admin
     @api.doc(body=model)
     def post(self):
-        """
-        Input:
-        {
-            name:<name>,
-            price:<price in euro>,
-            stock:<stock>,
-            category?:<category>
-        }
-        """
         db.add_drink(request.json["name"],
                      request.json["price"], request.json["stock"], request.json["category"] if "category" in request.json else None)
         return util.build_response("Drink added")
 
 
 buy_drink_model = api.model('Drink Buy', {
-    'drinkID': fields.Integer,
-    'memberID': fields.Integer
+    'drinkID': fields.Integer(description='ID of the Drink that will be bought', required=True),
+    'memberID': fields.Integer(description='ID of the user that buy the drink', required=True)
 })
 
 
@@ -272,17 +225,6 @@ class buy_drink(Resource):
     @authenticated
     @api.doc(body=buy_drink_model)
     def post(self):
-        """
-        :param body_params: List of JSON schema of body parameters.
-        """
-        parser = reqparse.RequestParser()
-        parser.add_argument('drinkID', type=int,
-                            help='Rate cannot be converted')
-        parser.add_argument('memberID', type=int,
-                            help='Rate cannot44554 be converted')
-        args = parser.parse_args()
-
-        print(args)
         status = db.buy_drink(
             request.json["memberID"], request.json["drinkID"])
         if status == None:
@@ -330,7 +272,7 @@ invoice_model = api.model('Invoice-Checkout', {
 })
 
 model = api.model('Do-Checkout', {
-    'newCash': fields.Float(required=False),
+    'newCash': fields.Float(description='The value that what was counted after the checkout', required=False),
     'members': fields.Nested(member_model, as_list=True),
     'invoices': fields.Nested(invoice_model, as_list=True)
 })
@@ -407,8 +349,8 @@ class login_Check_Admin(Resource):
 
 
 model = api.model('Login', {
-    'name': fields.String,
-    'password': fields.String
+    'name': fields.String(description='Name of the user that wants to log in', required=True),
+    'password': fields.String(description='Password of the user that wants to log in', required=True)
 })
 
 
@@ -416,13 +358,6 @@ model = api.model('Login', {
 class login(Resource):
     @api.doc(body=model)
     def post(self):
-        """
-        Input:
-        {
-            name:<name>,
-            password:<password>
-        }
-        """
         post_data = request.json
         name = post_data["name"]
         password = post_data["password"]
