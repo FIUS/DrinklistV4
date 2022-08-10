@@ -14,6 +14,8 @@ import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import style from './exchangedialog.module.scss';
 import { setMembers } from '../../../Actions/CommonAction';
 import { useDispatch } from 'react-redux';
+import { ABBRECHEN, AKTUALISIEREN, AKTUELL, GUTHABEN_HINZUFUEGEN, MENGE_EINZUZAHLENDES_GELD, NEU } from '../../Common/Internationalization/i18n';
+import { format } from 'react-string-format';
 
 type Props = {
     isOpen: boolean,
@@ -27,15 +29,15 @@ const ExchangeDialog = (props: Props) => {
 
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Guthaben hinzufügen</DialogTitle>
+            <DialogTitle>{GUTHABEN_HINZUFUEGEN}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Gebe hier die Menge an einzuzahlendem Geld für '{props.member.name}' ein
+                    {format(MENGE_EINZUZAHLENDES_GELD, props.member.name)}
                 </DialogContentText>
                 <Spacer vertical={20} />
                 <div className={style.outter}>
                     <div className={style.inner}>
-                        <Typography variant='h4'>Aktuell</Typography>
+                        <Typography variant='h4'>{AKTUELL}</Typography>
                         <Typography variant='h3'>{props.member.balance.toFixed(2)}€</Typography>
                     </div>
                     <div className={style.inner}>
@@ -60,7 +62,7 @@ const ExchangeDialog = (props: Props) => {
                         <ArrowRightAltIcon className={style.arrow} />
                     </div>
                     <div className={style.inner}>
-                        <Typography variant='h4'>Neu</Typography>
+                        <Typography variant='h4'>{NEU}</Typography>
                         <Typography variant='h3'>{(props.member.balance + amount).toFixed(2)}€</Typography>
                     </div>
                 </div>
@@ -69,7 +71,7 @@ const ExchangeDialog = (props: Props) => {
 
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.close}>Abbrechen</Button>
+                <Button onClick={props.close}>{ABBRECHEN}</Button>
                 <Button onClick={() => {
                     if (amount === 0) {
                         return
@@ -88,7 +90,7 @@ const ExchangeDialog = (props: Props) => {
                     })
 
 
-                }}>Aktualisieren</Button>
+                }}>{AKTUALISIEREN}</Button>
             </DialogActions>
         </Dialog>
     )

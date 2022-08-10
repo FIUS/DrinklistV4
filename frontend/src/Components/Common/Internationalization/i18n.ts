@@ -37,10 +37,10 @@ export const SETZEN = "Setzen"
 export const ERHOEHEN_UM = "Erhöhen um..."
 export const ERHOEHEN = "Erhöhen"
 export const FERTIG = "Fertig"
-export const
-export const
-export const
-export const
+export const GUTHABEN_HINZUFUEGEN = "Guthaben hinzufügen"
+export const MENGE_EINZUZAHLENDES_GELD = "Gebe hier die Menge an einzuzahlendem Geld für '{0}' ein"
+export const AKTUELL = "Aktuell"
+export const NEU = "Neu"
 export const
 export const
 export const
