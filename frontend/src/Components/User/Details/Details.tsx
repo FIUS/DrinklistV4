@@ -13,7 +13,8 @@ import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { format } from 'react-string-format';
 const historyLocationThreshold = 1650;
 
 type Props = {}
@@ -84,7 +85,7 @@ const Details = (props: Props) => {
         const balanceNotNull = balance !== undefined ? balance : 0
         if (balanceNotNull > 0) {
             return <Paper className={style.balanceTop} >
-                <Typography variant='h3'>Kontostand:</Typography>
+                <Typography variant='h3'>{KONTOSTAND}:</Typography>
                 <Typography variant='h2' color="limegreen">
                     {common.members?.find((value) => {
                         return value.id === parseInt(params.userid ? params.userid : "")
@@ -93,7 +94,7 @@ const Details = (props: Props) => {
             </Paper>
         } else {
             return <Paper className={style.balanceTop}>
-                <Typography variant='h3'>Kontostand:</Typography>
+                <Typography variant='h3'>{KONTOSTAND}:</Typography>
                 <Typography variant='h2' color="darkred">
                     {common.members?.find((value) => {
                         return value.id === parseInt(params.userid ? params.userid : "")
@@ -111,16 +112,16 @@ const Details = (props: Props) => {
 
 
     const history = <div className={style.historyContainer}>
-        <Typography variant='h4'>History</Typography>
+        <Typography variant='h4'>{HISTORY}</Typography>
 
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Beschreibung</TableCell>
-                        <TableCell>Betrag</TableCell>
-                        <TableCell>Datum</TableCell>
-                        {shouldAddUndoColumn() ? <TableCell >Rückgängig</TableCell> : <></>}
+                        <TableCell>{BESCHREIBUNG}</TableCell>
+                        <TableCell>{BETRAG}</TableCell>
+                        <TableCell>{DATUM}</TableCell>
+                        {shouldAddUndoColumn() ? <TableCell >{RUECKGAENGIG}</TableCell> : <></>}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -138,7 +139,7 @@ const Details = (props: Props) => {
                                     <Button onClick={() => {
                                         doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
                                             if (innerValue.code === 200) {
-                                                dispatch(openToast({ message: value.description + " nicht mehr abgestrichen" }))
+                                                dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, value.description) }))
                                                 doGetRequest("users/" + params.userid + "/history").then((value) => {
                                                     if (value.code === 200) {
                                                         dispatch(setHistory(value.content))
@@ -146,8 +147,8 @@ const Details = (props: Props) => {
                                                 })
                                             } else if (innerValue.code === 412) {
                                                 dispatch(openToast({
-                                                    message: "Bitte wende dich an den Getränkelisten verwalter um dies rückgängig zu machen",
-                                                    headline: "Zeitlimit abgelaufen",
+                                                    message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
+                                                    headline: ZEITLIMIT_ABGELAUFEN,
                                                     duration: 10000,
                                                     type: "error"
                                                 }))
@@ -180,8 +181,8 @@ const Details = (props: Props) => {
                 </div>
 
                 <div className={style.buyDrinkContainer}>
-                    <Typography variant='h4'><>Hallo <b>{getUsername()}</b>!</></Typography>
-                    <TextField placeholder='Suche...' value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
+                    <Typography variant='h4'><>{HALLO} <b>{getUsername()}</b>!</></Typography>
+                    <TextField placeholder={SUCHE_DOT_DOT_DOT} value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
                     <div className={style.buyDrinkContainerInner}>
                         {common.drinkCategories?.sort((category1, category2) => category1.localeCompare(category2)).map(category => {
                             const drinks = common.drinks?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).filter(value => {

@@ -87,6 +87,17 @@ export const DRINKLIST = "Drinklist"
 export const NUTZER_DASHBOARD = "Nutzer Dashboard"
 export const ABRECHNUNGEN = "Abrechnungen"
 export const FAVORITEN = "Favoriten"
+export const KONTOSTAND = "Kontostand"
+export const HISTORY = "History"
+export const BETRAG = "Betrag"
+export const NICHT_MEHR_ABGESTRICHEN = "{0} nicht mehr abgestrichen"
+export const WENDE_DICH_AN_ADMIN_RUECKGAENGIG = "Bitte wende dich an den Getränkelisten verwalter um dies rückgängig zu machen"
+export const ZEITLIMIT_ABGELAUFEN = "Zeitlimit abgelaufen"
+export const HALLO = "Hallo"
+export const
+export const
+export const
+export const
 export const
 export const
 export const
