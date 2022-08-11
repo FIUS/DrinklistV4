@@ -35,7 +35,7 @@ const DrinkStockDialog = (props: Props) => {
                 <Spacer vertical={15} />
                 <div className={style.stockDialog}>
                     <Button variant='outlined' onClick={() => {
-                        doPostRequest("drinks/" + props.drink.id + "/stock", { stock: 0 }).then(value => {
+                        doPostRequest("drinks/" + props.drink.id + "/stock", { amount: 0 }).then(value => {
                             if (value.code === 200) {
                                 doGetRequest("drinks").then((value) => {
                                     if (value.code === 200) {
@@ -59,7 +59,7 @@ const DrinkStockDialog = (props: Props) => {
                             onChange={(value) => { stock = parseInt(value.target.value) }}
                         />
                         <Button variant='outlined' onClick={() => {
-                            doPostRequest("drinks/" + props.drink.id + "/stock", { stock: stock }).then(value => {
+                            doPostRequest("drinks/" + props.drink.id + "/stock", { amount: stock }).then(value => {
                                 if (value.code === 200) {
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {
@@ -84,7 +84,7 @@ const DrinkStockDialog = (props: Props) => {
                             onChange={(value) => { stockIncrease = parseInt(value.target.value) }}
                         />
                         <Button variant='outlined' onClick={() => {
-                            doPostRequest("drinks/" + props.drink.id + "/stock/increase", { stock: stockIncrease }).then(value => {
+                            doPostRequest("drinks/" + props.drink.id + "/stock/increase", { amount: stockIncrease }).then(value => {
                                 if (value.code === 200) {
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {

@@ -6,3 +6,4 @@ flask_sqlalchemy
 psycopg2
 waitress
 requests
+flask-restx
