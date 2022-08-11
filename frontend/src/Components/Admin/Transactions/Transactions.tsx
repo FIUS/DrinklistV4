@@ -6,7 +6,7 @@ import { BESCHREIBUNG, DATUM, KONTO, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WERT } fro
 import Loader from '../../Common/Loader/Loader';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
 import style from './transactions.module.scss';
 
 type Props = {}
@@ -52,7 +52,7 @@ const Transactions = (props: Props) => {
                         {value.amount.toFixed(2)}€
                     </TableCell>
                     <TableCell>
-                        {value.date}
+                        {dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}
                     </TableCell>
                     <TableCell>
                         <Button onClick={(s_value) => {

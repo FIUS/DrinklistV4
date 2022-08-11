@@ -7,7 +7,7 @@ import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
 import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
@@ -134,7 +134,7 @@ const Details = (props: Props) => {
                                     {value.description}
                                 </TableCell>
                                 <TableCell>{value.amount.toFixed(2)}€</TableCell>
-                                <TableCell>{new Date(value.date).toISOString()}</TableCell>
+                                <TableCell>{dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}</TableCell>
                                 {value.revertable ? <TableCell className={style.deleteContainer}>
                                     <Button onClick={() => {
                                         doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
