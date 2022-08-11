@@ -33,6 +33,14 @@ const Overview = (props: Props) => {
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
 
     useEffect(() => {
+        doGetRequest("transactions/limit/100").then((value) => {
+            if (value.code === 200) {
+                settransactions(value.content)
+            }
+        })
+    }, [])
+
+    useEffect(() => {
         if (common.drinks === null || common.members === null || common.drinkCategories === null) {
             doGetRequest("drinks").then((value) => {
                 if (value.code === 200) {
