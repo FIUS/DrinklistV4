@@ -204,7 +204,7 @@ class set_drink_price(Resource):
         """
         Set the price of a drink
         """
-        db.change_drink_price(drink_id, request.json["price"])
+        db.change_drink_price(drink_id, request.json["amount"])
         return util.build_response("Price changed")
 
 
@@ -216,7 +216,7 @@ class set_drink_stock(Resource):
         """
         Set the current stock of a drink
         """
-        db.change_drink_stock(drink_id, request.json["stock"])
+        db.change_drink_stock(drink_id, request.json["amount"])
         return util.build_response("Stock changed")
 
 
@@ -229,7 +229,7 @@ class set_drink_stock_increase(Resource):
         Increase the current stock of a drink
         """
         db.change_drink_stock(
-            drink_id, request.json["stock"], is_increase=True)
+            drink_id, request.json["amount"], is_increase=True)
         return util.build_response("Stock changed")
 
 
