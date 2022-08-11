@@ -14,6 +14,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { openErrorToast, openToast, setMembers } from '../../../Actions/CommonAction';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { ABRECHNUNG_ABSCHLIESSEN, ABRECHNUNG_HINZUGEFUEGT, DIFFERENZ, ENTFERNEN, HINZUFUEGEN, KASSE_GEZAEHLT, KASSE_NACH_ABRECHNUNG, NAME, NEUER_KASSENSTAND, NEUE_ABRECHNUNG, RECHNUNGEN, RECHNUNGS_NAME, VALUE } from '../../Common/Internationalization/i18n';
+import NavigationButton from '../../Common/NavigationButton/NavigationButton';
 
 type Props = {}
 
@@ -321,30 +322,34 @@ const Checkout = (props: Props) => {
 
 
     return (
-        <div className={style.container}>
-            <div className={style.newCheckoutContainer}>
-                <div className={style.newCheckoutContainerHeadline}>
-                    <Typography variant="h6">
-                        {NEUE_ABRECHNUNG}
-                    </Typography>
-                    <Button
-                        onClick={() => {
-                            if (isAddOpen) {
-                                resetAdd();
-                            } else {
-                                setisAddOpen(true)
-                            }
-                        }}
-                    >
-                        {isAddOpen ? <CloseIcon /> : <AddBox />}
-                    </Button>
+        <>
+            <div className={style.container}>
+                <div className={style.newCheckoutContainer}>
+                    <div className={style.newCheckoutContainerHeadline}>
+                        <Typography variant="h6">
+                            {NEUE_ABRECHNUNG}
+                        </Typography>
+                        <Button
+                            onClick={() => {
+                                if (isAddOpen) {
+                                    resetAdd();
+                                } else {
+                                    setisAddOpen(true)
+                                }
+                            }}
+                        >
+                            {isAddOpen ? <CloseIcon /> : <AddBox />}
+                        </Button>
+                    </div>
+                    {addDialog()}
                 </div>
-                {addDialog()}
-            </div>
-            <Spacer vertical={20} />
+                <Spacer vertical={20} />
 
-            {getCheckoutEntries()}
-        </div>
+                {getCheckoutEntries()}
+            </div>
+            <Spacer vertical={50} />
+            <NavigationButton destination='/admin' />
+        </>
     )
 }
 
