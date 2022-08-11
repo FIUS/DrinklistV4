@@ -14,10 +14,12 @@ const Login = (props: Props) => {
     const [searchParams,] = useSearchParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [disableLoginButton, setdisableLoginButton] = useState(false)
     const [username, setusername] = useState("")
     const [password, setpassword] = useState("")
 
     const login = () => {
+        setdisableLoginButton(true)
         doPostRequest("login", { name: username, password: password }).then((value) => {
             if (value.code === 200) {
                 const searchParam = searchParams.get("originalPath")
@@ -27,6 +29,7 @@ const Login = (props: Props) => {
             } else {
                 dispatch(openToast({ message: FALSCHES_PASSWORT, type: "error", headline: FEHLER }))
             }
+            setdisableLoginButton(false)
         })
     }
     return (
@@ -60,6 +63,7 @@ const Login = (props: Props) => {
                 onClick={() => {
                     login()
                 }}
+                disabled={disableLoginButton}
             >
                 {LOGIN}
             </Button>
