@@ -337,25 +337,25 @@ class Queries:
         for t in transactions:
             self.session.delete(t)
 
-        for c in sorted(imported_data["checkouts"], lambda x: x['id']):
+        for c in sorted(imported_data["checkouts"], key=lambda x: x['id']):
             self.session.add(
                 Checkout(
                     id=c['id'],
                     date=datetime.strptime(c['date'], "%Y-%m-%dT%H:%M:%SZ"),
                     current_cash=c['currentCash']))
-        for d in sorted(imported_data["drinks"], lambda x: x['id']):
+        for d in sorted(imported_data["drinks"], key=lambda x: x['id']):
             self.session.add(Drink(
                 id=d['id'],
                 name=d['name'],
                 stock=d['stock'],
                 price=d['price'],
                 category=d['category']))
-        for f in sorted(imported_data["favorites"], lambda x: x['id']):
+        for f in sorted(imported_data["favorites"], key=lambda x: x['id']):
             self.session.add(Favorite(
                 id=f['id'],
                 member_id=f['member_id'],
                 drink_id=f['drink_id']))
-        for m in sorted(imported_data["members"], lambda x: x['id']):
+        for m in sorted(imported_data["members"], key=lambda x: x['id']):
             self.session.add(Member(
                 id=m['id'],
                 name=m['name'],
@@ -363,7 +363,7 @@ class Queries:
                 hidden=m['hidden'],
                 password=bytes.fromhex(m['password']),
                 salt=m['salt']))
-        for t in sorted(imported_data["transactions"], lambda x: x['id']):
+        for t in sorted(imported_data["transactions"], key=lambda x: x['id']):
             self.session.add(Transaction(
                 id=t['id'],
                 description=t['description'],
