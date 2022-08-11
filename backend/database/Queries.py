@@ -389,7 +389,7 @@ class Queries:
 
             # Import Users
             resp = requests.get(f"https://{util.old_domain}/api/users",
-                                headers={"x-auth-token": util.token}, timeout=3)
+                                headers={"x-auth-token": util.token}, timeout=10)
 
             for user in resp.json():
                 self.add_user(user["name"], user["balance"]/100,
@@ -401,7 +401,7 @@ class Queries:
 
             # Import Drinks
             resp = requests.get(f"https://{util.old_domain}/api/beverages",
-                                headers={"x-auth-token": util.token}, timeout=3)
+                                headers={"x-auth-token": util.token}, timeout=10)
 
             for drink in resp.json():
                 self.add_drink(
@@ -416,7 +416,7 @@ class Queries:
             transactions = []
             for user in users:
                 resp = requests.get(f"https://{util.old_domain}/api/orders/{user['name']}",
-                                    headers={"x-auth-token": util.token}, timeout=3)
+                                    headers={"x-auth-token": util.token}, timeout=10)
 
                 for transaction in resp.json():
                     date = datetime.strptime(
