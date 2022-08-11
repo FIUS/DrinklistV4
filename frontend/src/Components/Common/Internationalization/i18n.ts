@@ -20,7 +20,6 @@ export const DATENSCHUTZ = "Datenschutz";
 export const DATUM = "Datum";
 export const DIFFERENZ = "Differenz";
 export const DOWNLOAD_BACKUP = "Download Backup";
-export const DRINKLIST = "Drinklist";
 export const EINGESPIELT = "Eingespielt";
 export const EINNAHMEN = "Einnahmen";
 export const EINSTELLUNGEN = "Einstellungen";

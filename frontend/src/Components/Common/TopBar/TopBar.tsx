@@ -23,7 +23,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
-import { ABRECHNUNGEN, DRINKLIST, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
+import { ABRECHNUNGEN, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
 
 type Props = {}
 
