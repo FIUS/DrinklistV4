@@ -122,6 +122,8 @@ const AddDrink = (props: Props) => {
                                     dispatch(openErrorToast())
                                 }
                             })
+                        } else {
+                            dispatch(openToast({ message: "Bitte Name eintragen", type: "error" }))
                         }
                     }}
                 >
