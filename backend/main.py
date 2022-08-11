@@ -52,6 +52,9 @@ def admin(fn):
 class GET_USERS(Resource):
     @authenticated
     def get(self):
+        """
+        Gets all users
+        """
         return util.build_response(db.get_users())
 
 
@@ -59,6 +62,9 @@ class GET_USERS(Resource):
 class get_user_favorites(Resource):
     @authenticated
     def get(self, member_id):
+        """
+        Get favorite drinks of a user
+        """
         return util.build_response(db.get_user_favorites(member_id))
 
 
@@ -66,6 +72,9 @@ class get_user_favorites(Resource):
 class get_user_history(Resource):
     @authenticated
     def get(self, member_id):
+        """
+        Get history of a user
+        """
         return util.build_response(db.get_user_history(member_id))
 
 
@@ -73,6 +82,9 @@ class get_user_history(Resource):
 class add_user_favorite(Resource):
     @authenticated
     def post(self, member_id, drink_id):
+        """
+        Add favorite drink of a user
+        """
         db.add_user_favorite(member_id, drink_id)
         return util.build_response("Added favorite")
 
@@ -81,6 +93,9 @@ class add_user_favorite(Resource):
 class get_user_favorites(Resource):
     @authenticated
     def post(self, member_id, drink_id):
+        """
+        Remove favorite drink of a user
+        """
         db.remove_user_favorite(member_id, drink_id)
         return util.build_response("Removed favorite")
 
@@ -95,6 +110,9 @@ class change_user_password(Resource):
     @admin
     @api.doc(body=model_password)
     def post(self, member_id):
+        """
+        Change the password of a user
+        """
         db.change_user_password(member_id, request.json["password"])
         return util.build_response("Password changed")
 
@@ -103,6 +121,9 @@ class change_user_password(Resource):
 class toggle_user_visibility(Resource):
     @admin
     def post(self, member_id):
+        """
+        Toggle the visibility for the dashboard of a user
+        """
         db.change_user_visibility(member_id)
         return util.build_response("Changed visibility")
 
@@ -117,6 +138,9 @@ class user_deposit(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, member_id):
+        """
+        Deposit money for a user
+        """
         db.deposit_user(member_id, float(request.json["amount"]))
         return util.build_response("Money added")
 
@@ -125,6 +149,9 @@ class user_deposit(Resource):
 class delete_user(Resource):
     @admin
     def post(self, member_id):
+        """
+        Delete a user
+        """
         db.delete_user(member_id)
         return util.build_response("User deleted")
 
@@ -141,6 +168,9 @@ class add_user(Resource):
     @admin
     @api.doc(body=model)
     def post(self):
+        """
+        Add a user
+        """
         db.add_user(request.json["name"],
                     request.json["money"], request.json["password"])
         return util.build_response("User added")
@@ -150,13 +180,19 @@ class add_user(Resource):
 class get_drinks(Resource):
     @authenticated
     def get(self):
+        """
+        Get all drinks
+        """
         return util.build_response(db.get_drinks())
 
 
 @api.route('/api/drinks/categories')
-class get_user_favorites(Resource):
+class get_user_categories(Resource):
     @authenticated
     def get(self):
+        """
+        Get all categories
+        """
         return util.build_response(db.get_drink_categories())
 
 
@@ -165,6 +201,9 @@ class set_drink_price(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, drink_id):
+        """
+        Set the price of a drink
+        """
         db.change_drink_price(drink_id, request.json["price"])
         return util.build_response("Price changed")
 
@@ -174,6 +213,9 @@ class set_drink_stock(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, drink_id):
+        """
+        Set the current stock of a drink
+        """
         db.change_drink_stock(drink_id, request.json["stock"])
         return util.build_response("Stock changed")
 
@@ -183,6 +225,9 @@ class set_drink_stock_increase(Resource):
     @admin
     @api.doc(body=model_amount)
     def post(self, drink_id):
+        """
+        Increase the current stock of a drink
+        """
         db.change_drink_stock(
             drink_id, request.json["stock"], is_increase=True)
         return util.build_response("Stock changed")
@@ -192,6 +237,9 @@ class set_drink_stock_increase(Resource):
 class delete_drink(Resource):
     @admin
     def post(self, drink_id):
+        """
+        Delete a drink
+        """
         db.delete_drink(drink_id)
         return util.build_response("Drink deleted")
 
@@ -209,6 +257,9 @@ class add_drink(Resource):
     @admin
     @api.doc(body=model)
     def post(self):
+        """
+        Add a drink
+        """
         db.add_drink(request.json["name"],
                      request.json["price"], request.json["stock"], request.json["category"] if "category" in request.json else None)
         return util.build_response("Drink added")
@@ -225,6 +276,9 @@ class buy_drink(Resource):
     @authenticated
     @api.doc(body=buy_drink_model)
     def post(self):
+        """
+        Buy a drink
+        """
         status = db.buy_drink(
             request.json["memberID"], request.json["drinkID"])
         if status == None:
@@ -237,6 +291,9 @@ class buy_drink(Resource):
 class get_transactions(Resource):
     @authenticated
     def get(self):
+        """
+        Get all transactions
+        """
         return util.build_response(db.get_transactions())
 
 
@@ -244,6 +301,9 @@ class get_transactions(Resource):
 class get_transactions_limited(Resource):
     @authenticated
     def get(self, limit):
+        """
+        Get the lastest x transactions
+        """
         return util.build_response(db.get_transactions(limit))
 
 
@@ -251,6 +311,9 @@ class get_transactions_limited(Resource):
 class undo_transaction(Resource):
     @authenticated
     def post(self, transaction_id):
+        """
+        Undo the given transaction
+        """
         if not is_admin():
             transaction_date = datetime.strptime(db.get_transaction(transaction_id)[
                 'date'], "%Y-%m-%dT%H:%M:%SZ")
@@ -283,10 +346,16 @@ class do_checkout(Resource):
     @admin
     @api.doc(body=model)
     def post(self):
+        """
+        Create a checkout
+        """
         return util.build_response(db.do_checkout(request.json))
 
     @admin
     def get(self):
+        """
+        Get all checkouts
+        """
         return util.build_response(db.get_checkouts())
 
 
@@ -294,6 +363,9 @@ class do_checkout(Resource):
 class get_checkout_expanded(Resource):
     @admin
     def get(self, checkout_id):
+        """
+        Get the extended infos of a checkout
+        """
         return util.build_response(db.get_checkout_expanded(checkout_id))
 
 
@@ -301,6 +373,9 @@ class get_checkout_expanded(Resource):
 class get_backup(Resource):
     @admin
     def get(self):
+        """
+        Get a json backup of the database
+        """
         if db.backup_database():
             return send_from_directory(util.tempfile_path, util.backup_file_name)
         return util.build_response("Error creating file", code=500)
@@ -310,6 +385,9 @@ class get_backup(Resource):
 class restore_db(Resource):
     @admin
     def post(self):
+        """
+        Restore from a json backup
+        """
         file = request.files['file']
         file_json = json.loads(file.stream.read().decode("utf-8"))
         db.restore_database(file_json)
@@ -321,6 +399,9 @@ class change_admin_password(Resource):
     @admin
     @api.doc(body=model_password)
     def post(self):
+        """
+        Change the admin password
+        """
         db.change_member_password(request.json['password'], 1)
         return util.build_response("ok")
 
@@ -330,6 +411,9 @@ class change_kiosk_password(Resource):
     @admin
     @api.doc(body=model_password)
     def post(self):
+        """
+        change the kiosk user password
+        """
         db.change_member_password(request.json['password'], 2)
         return util.build_response("ok")
 
@@ -338,6 +422,9 @@ class change_kiosk_password(Resource):
 class login_Check(Resource):
     @authenticated
     def get(self):
+        """
+        Check if your login token is valid
+        """
         return util.build_response("OK")
 
 
@@ -345,6 +432,9 @@ class login_Check(Resource):
 class login_Check_Admin(Resource):
     @admin
     def get(self):
+        """
+        Check if your token is a valid admin token
+        """
         return util.build_response("OK")
 
 
@@ -358,6 +448,9 @@ model = api.model('Login', {
 class login(Resource):
     @api.doc(body=model)
     def post(self):
+        """
+        Get the memberID and token for using the api
+        """
         post_data = request.json
         name = post_data["name"]
         password = post_data["password"]
@@ -374,6 +467,9 @@ class login(Resource):
 class logout(Resource):
     @authenticated
     def post(self):
+        """
+        Invalidates the current token
+        """
         token_manager.delete_token(request.cookies.get('token'))
         util.log("Logout", f"MemberID: {request.cookies.get('memberID')}")
         return util.build_response("OK")
