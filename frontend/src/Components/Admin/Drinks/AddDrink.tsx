@@ -5,7 +5,7 @@ import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Spacer from '../../Common/Spacer';
 import { Add } from '@mui/icons-material';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
 import { openErrorToast, openToast, setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
 import { FLASCHENZAHL, GETRAENKENAME, GETRAENK_HINZUGEFUEGT, KATEGORIE, PREIS_IN_EURO } from '../../Common/Internationalization/i18n';
@@ -102,7 +102,7 @@ const AddDrink = (props: Props) => {
                             } else {
                                 requestBody = { name: drinkname, price: price, stock: stock }
                             }
-                            doPostRequest("drinks/add", requestBody).then(value => {
+                            doRequest("PUT", "drinks/add", requestBody).then(value => {
                                 if (value.code === 200) {
                                     dispatch(openToast({ message: GETRAENK_HINZUGEFUEGT }))
                                     doGetRequest("drinks").then((value) => {

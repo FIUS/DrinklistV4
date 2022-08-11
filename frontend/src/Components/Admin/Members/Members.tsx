@@ -6,7 +6,7 @@ import Spacer from '../../Common/Spacer';
 import style from './member.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions';
 import { setMembers } from '../../../Actions/CommonAction';
 import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
@@ -213,7 +213,7 @@ const Members = (props: Props) => {
                                             <VisibilityOff />
                                         </Button>
                                         <Button onClick={() => {
-                                            doPostRequest("users/" + value.id + "/delete", "").then((s_value) => {
+                                            doRequest("DELETE", "users/" + value.id + "/delete", "").then((s_value) => {
                                                 if (s_value.code === 200) {
                                                     doGetRequest("users").then((t_value) => {
                                                         if (t_value.code === 200) {

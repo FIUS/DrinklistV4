@@ -85,7 +85,7 @@ class get_user_history(Resource):
 @api.route('/users/<int:member_id>/favorites/add/<int:drink_id>')
 class add_user_favorite(Resource):
     @authenticated
-    def post(self, member_id, drink_id):
+    def put(self, member_id, drink_id):
         """
         Add favorite drink of a user
         """
@@ -96,7 +96,7 @@ class add_user_favorite(Resource):
 @api.route('/users/<int:member_id>/favorites/remove/<int:drink_id>')
 class get_user_favorites(Resource):
     @authenticated
-    def post(self, member_id, drink_id):
+    def delete(self, member_id, drink_id):
         """
         Remove favorite drink of a user
         """
@@ -152,7 +152,7 @@ class user_deposit(Resource):
 @api.route('/users/<int:member_id>/delete')
 class delete_user(Resource):
     @admin
-    def post(self, member_id):
+    def delete(self, member_id):
         """
         Delete a user
         """
@@ -240,7 +240,7 @@ class set_drink_stock_increase(Resource):
 @api.route('/drinks/<int:drink_id>/delete')
 class delete_drink(Resource):
     @admin
-    def post(self, drink_id):
+    def delete(self, drink_id):
         """
         Delete a drink
         """
@@ -260,7 +260,7 @@ model = api.model('Add-Drink', {
 class add_drink(Resource):
     @admin
     @api.doc(body=model)
-    def post(self):
+    def put(self):
         """
         Add a drink
         """
@@ -349,7 +349,7 @@ model = api.model('Do-Checkout', {
 class do_checkout(Resource):
     @admin
     @api.doc(body=model)
-    def post(self):
+    def put(self):
         """
         Create a checkout
         """

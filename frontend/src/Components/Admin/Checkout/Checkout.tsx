@@ -1,7 +1,7 @@
 import style from './checkout.module.scss';
 import React, { useEffect, useState } from 'react'
 import CheckoutEntry from './CheckoutEntry';
-import { doGetRequest, doPostRequest, secureRandomNumber } from '../../Common/StaticFunctions';
+import { doGetRequest, doRequest, secureRandomNumber } from '../../Common/StaticFunctions';
 import { Checkout as CheckoutType, Member } from '../../../types/ResponseTypes';
 import { Autocomplete, Button, Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
 import { AddBox } from '@mui/icons-material';
@@ -270,7 +270,7 @@ const Checkout = (props: Props) => {
                     }
                     onClick={() => {
                         if (toCheckout.find(checkout => checkout.amount === 0) === undefined) {
-                            doPostRequest("checkout",
+                            doRequest("PUT", "checkout",
                                 {
                                     members: toCheckout.map(value => {
                                         return { memberID: value.member.id, amount: value.amount }

@@ -8,7 +8,7 @@ import Spacer from '../../Common/Spacer';
 import DrinkPriceDialog from './DrinkPriceDialog';
 import DrinkStockDialog from './DrinkStockDialog';
 import { Drink as DrinkType } from '../../../types/ResponseTypes';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
 import { setDrinks } from '../../../Actions/CommonAction';
 
@@ -44,7 +44,7 @@ const Drink = (props: Props) => {
                     <Inventory2OutlinedIcon />
                 </Button>
                 <Button onClick={() => {
-                    doPostRequest("drinks/" + props.drink.id + "/delete", "").then(value => {
+                    doRequest("DELETE", "drinks/" + props.drink.id + "/delete", "").then(value => {
                         if (value.code === 200) {
                             doGetRequest("drinks").then((value) => {
                                 if (value.code === 200) {
@@ -66,7 +66,7 @@ const Drink = (props: Props) => {
                 isOpen={stockDialogOpen}
                 close={() => setstockDialogOpen(false)}
                 drink={props.drink} />
-        </Paper>
+        </Paper >
     )
 }
 

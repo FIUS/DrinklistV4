@@ -6,7 +6,7 @@ import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Spacer from '../../Common/Spacer';
 import { Drink } from '../../../types/ResponseTypes';
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions';
 import { openErrorToast, openToast, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
@@ -78,10 +78,12 @@ const DrinkButton = (props: Props) => {
                 onChange={
                     (value) => {
                         let url = "add"
+                        let method = "PUT"
                         if (common.favorites?.includes(props.drink.id)) {
                             url = "remove"
+                            method = "DELETE"
                         }
-                        doPostRequest("users/" + props.memberID + "/favorites/" + url + "/" + props.drink.id, "").then(value => {
+                        doRequest(method, "users/" + props.memberID + "/favorites/" + url + "/" + props.drink.id, "").then(value => {
                             if (value.code === 200) {
                                 doGetRequest("users/" + props.memberID + "/favorites").then((value) => {
                                     if (value.code === 200) {
