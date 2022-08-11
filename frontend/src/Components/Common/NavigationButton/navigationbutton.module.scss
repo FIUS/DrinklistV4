@@ -1,14 +1,14 @@
 @import "../../Common/variables.module.scss";
 
-.footer{
+.footer {
     position: fixed;
     bottom: 0;
     display: flex;
     justify-content: space-around;
     width: 100%;
-    padding: calc($padding/2);
+    padding: $padding;
 }
 
-.footerButton{
+.footerButton {
     width: 100%;
 }
