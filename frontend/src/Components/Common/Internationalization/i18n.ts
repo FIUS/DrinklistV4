@@ -60,6 +60,7 @@ export const KEINE_GETRAENKE = "Keine Getränke";
 export const KIOSK_PW = "Kiosk-Passwort";
 export const KONTO = "Konto";
 export const KONTOSTAND = "Kontostand";
+export const LETZE_100_KAEUFE = "Letze 100 Käufe";
 export const LOGIN = "Login";
 export const MEISTE_SCHULDEN = "Meiste Schulden";
 export const MENGE_EINZUZAHLENDES_GELD = "Gebe hier die Menge an einzuzahlendem Geld für '{0}' ein";
