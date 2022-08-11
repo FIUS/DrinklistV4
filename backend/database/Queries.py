@@ -30,9 +30,10 @@ class Queries:
         output = []
         for m in members:
             member: Member = m
-            output.append(member.to_dict())
+            if member.id > 2:
+                output.append(member.to_dict())
 
-        return output[2:]
+        return output
 
     def get_user_favorites(self, member_id):
         favorites = self.session.query(

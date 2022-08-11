@@ -67,8 +67,8 @@ const Drinks = (props: Props) => {
                     />
                 </div>
                 <div className={style.drinksContainer}>
-                    {common.drinkCategories?.map(category => {
-                        const drinks = common.drinks?.filter(value => {
+                    {common.drinkCategories?.sort((value1, value2) => value1.localeCompare(value2)).map(category => {
+                        const drinks = common.drinks?.sort((value1, value2) => value1.name.localeCompare(value2.name))?.filter(value => {
                             return value.category === category
                         });
 
