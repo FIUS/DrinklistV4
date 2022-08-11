@@ -340,24 +340,20 @@ class Queries:
         for c in sorted(imported_data["checkouts"], key=lambda x: x['id']):
             self.session.add(
                 Checkout(
-                    id=c['id'],
                     date=datetime.strptime(c['date'], "%Y-%m-%dT%H:%M:%SZ"),
                     current_cash=c['currentCash']))
         for d in sorted(imported_data["drinks"], key=lambda x: x['id']):
             self.session.add(Drink(
-                id=d['id'],
                 name=d['name'],
                 stock=d['stock'],
                 price=d['price'],
                 category=d['category']))
         for f in sorted(imported_data["favorites"], key=lambda x: x['id']):
             self.session.add(Favorite(
-                id=f['id'],
                 member_id=f['member_id'],
                 drink_id=f['drink_id']))
         for m in sorted(imported_data["members"], key=lambda x: x['id']):
             self.session.add(Member(
-                id=m['id'],
                 name=m['name'],
                 balance=m['balance'],
                 hidden=m['hidden'],
@@ -365,7 +361,6 @@ class Queries:
                 salt=m['salt']))
         for t in sorted(imported_data["transactions"], key=lambda x: x['id']):
             self.session.add(Transaction(
-                id=t['id'],
                 description=t['description'],
                 member_id=t['memberID'],
                 amount=t['amount'],
