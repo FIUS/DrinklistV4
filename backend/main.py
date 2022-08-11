@@ -14,8 +14,12 @@ import json
 from database import Queries
 from flask_restx import fields, Resource, Api
 from flask_restx import reqparse
+import flask
 
-api = Api(app, doc='/docu/')
+api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
+api = Api(api_bp, doc='/docu/')
+app.register_blueprint(api_bp)
+
 token_manager = authenticator.TokenManager()
 
 db = Queries.Queries(sql_database)
@@ -48,7 +52,7 @@ def admin(fn):
     return wrapper
 
 
-@api.route('/api/users')
+@api.route('/users')
 class GET_USERS(Resource):
     @authenticated
     def get(self):
@@ -58,7 +62,7 @@ class GET_USERS(Resource):
         return util.build_response(db.get_users())
 
 
-@api.route('/api/users/<int:member_id>/favorites')
+@api.route('/users/<int:member_id>/favorites')
 class get_user_favorites(Resource):
     @authenticated
     def get(self, member_id):
@@ -68,7 +72,7 @@ class get_user_favorites(Resource):
         return util.build_response(db.get_user_favorites(member_id))
 
 
-@api.route('/api/users/<int:member_id>/history')
+@api.route('/users/<int:member_id>/history')
 class get_user_history(Resource):
     @authenticated
     def get(self, member_id):
@@ -78,7 +82,7 @@ class get_user_history(Resource):
         return util.build_response(db.get_user_history(member_id))
 
 
-@api.route('/api/users/<int:member_id>/favorites/add/<int:drink_id>')
+@api.route('/users/<int:member_id>/favorites/add/<int:drink_id>')
 class add_user_favorite(Resource):
     @authenticated
     def post(self, member_id, drink_id):
@@ -89,7 +93,7 @@ class add_user_favorite(Resource):
         return util.build_response("Added favorite")
 
 
-@api.route('/api/users/<int:member_id>/favorites/remove/<int:drink_id>')
+@api.route('/users/<int:member_id>/favorites/remove/<int:drink_id>')
 class get_user_favorites(Resource):
     @authenticated
     def post(self, member_id, drink_id):
@@ -105,7 +109,7 @@ model_password = api.model('Password', {
 })
 
 
-@api.route('/api/users/<int:member_id>/password')
+@api.route('/users/<int:member_id>/password')
 class change_user_password(Resource):
     @admin
     @api.doc(body=model_password)
@@ -117,7 +121,7 @@ class change_user_password(Resource):
         return util.build_response("Password changed")
 
 
-@api.route('/api/users/<int:member_id>/visibility/toggle')
+@api.route('/users/<int:member_id>/visibility/toggle')
 class toggle_user_visibility(Resource):
     @admin
     def post(self, member_id):
@@ -133,7 +137,7 @@ model_amount = api.model('Amount', {
 })
 
 
-@api.route('/api/users/<int:member_id>/deposit')
+@api.route('/users/<int:member_id>/deposit')
 class user_deposit(Resource):
     @admin
     @api.doc(body=model_amount)
@@ -145,7 +149,7 @@ class user_deposit(Resource):
         return util.build_response("Money added")
 
 
-@api.route('/api/users/<int:member_id>/delete')
+@api.route('/users/<int:member_id>/delete')
 class delete_user(Resource):
     @admin
     def post(self, member_id):
@@ -163,7 +167,7 @@ model = api.model('Add User', {
 })
 
 
-@api.route('/api/users/add')
+@api.route('/users/add')
 class add_user(Resource):
     @admin
     @api.doc(body=model)
@@ -176,7 +180,7 @@ class add_user(Resource):
         return util.build_response("User added")
 
 
-@api.route('/api/drinks')
+@api.route('/drinks')
 class get_drinks(Resource):
     @authenticated
     def get(self):
@@ -186,7 +190,7 @@ class get_drinks(Resource):
         return util.build_response(db.get_drinks())
 
 
-@api.route('/api/drinks/categories')
+@api.route('/drinks/categories')
 class get_user_categories(Resource):
     @authenticated
     def get(self):
@@ -196,7 +200,7 @@ class get_user_categories(Resource):
         return util.build_response(db.get_drink_categories())
 
 
-@api.route('/api/drinks/<int:drink_id>/price')
+@api.route('/drinks/<int:drink_id>/price')
 class set_drink_price(Resource):
     @admin
     @api.doc(body=model_amount)
@@ -208,7 +212,7 @@ class set_drink_price(Resource):
         return util.build_response("Price changed")
 
 
-@api.route('/api/drinks/<int:drink_id>/stock')
+@api.route('/drinks/<int:drink_id>/stock')
 class set_drink_stock(Resource):
     @admin
     @api.doc(body=model_amount)
@@ -220,7 +224,7 @@ class set_drink_stock(Resource):
         return util.build_response("Stock changed")
 
 
-@api.route('/api/drinks/<int:drink_id>/stock/increase')
+@api.route('/drinks/<int:drink_id>/stock/increase')
 class set_drink_stock_increase(Resource):
     @admin
     @api.doc(body=model_amount)
@@ -233,7 +237,7 @@ class set_drink_stock_increase(Resource):
         return util.build_response("Stock changed")
 
 
-@api.route('/api/drinks/<int:drink_id>/delete')
+@api.route('/drinks/<int:drink_id>/delete')
 class delete_drink(Resource):
     @admin
     def post(self, drink_id):
@@ -252,7 +256,7 @@ model = api.model('Add-Drink', {
 })
 
 
-@api.route('/api/drinks/add')
+@api.route('/drinks/add')
 class add_drink(Resource):
     @admin
     @api.doc(body=model)
@@ -271,7 +275,7 @@ buy_drink_model = api.model('Drink Buy', {
 })
 
 
-@api.route('/api/drinks/buy')
+@api.route('/drinks/buy')
 class buy_drink(Resource):
     @authenticated
     @api.doc(body=buy_drink_model)
@@ -287,7 +291,7 @@ class buy_drink(Resource):
             return util.build_response(status, code=400)
 
 
-@api.route('/api/transactions')
+@api.route('/transactions')
 class get_transactions(Resource):
     @authenticated
     def get(self):
@@ -297,7 +301,7 @@ class get_transactions(Resource):
         return util.build_response(db.get_transactions())
 
 
-@api.route('/api/transactions/limit/<int:limit>')
+@api.route('/transactions/limit/<int:limit>')
 class get_transactions_limited(Resource):
     @authenticated
     def get(self, limit):
@@ -307,7 +311,7 @@ class get_transactions_limited(Resource):
         return util.build_response(db.get_transactions(limit))
 
 
-@api.route('/api/transactions/<int:transaction_id>/undo')
+@api.route('/transactions/<int:transaction_id>/undo')
 class undo_transaction(Resource):
     @authenticated
     def post(self, transaction_id):
@@ -341,7 +345,7 @@ model = api.model('Do-Checkout', {
 })
 
 
-@api.route('/api/checkout')
+@api.route('/checkout')
 class do_checkout(Resource):
     @admin
     @api.doc(body=model)
@@ -359,7 +363,7 @@ class do_checkout(Resource):
         return util.build_response(db.get_checkouts())
 
 
-@api.route('/api/checkout/<int:checkout_id>')
+@api.route('/checkout/<int:checkout_id>')
 class get_checkout_expanded(Resource):
     @admin
     def get(self, checkout_id):
@@ -369,7 +373,7 @@ class get_checkout_expanded(Resource):
         return util.build_response(db.get_checkout_expanded(checkout_id))
 
 
-@api.route('/api/settings/backup')
+@api.route('/settings/backup')
 class get_backup(Resource):
     @admin
     def get(self):
@@ -381,7 +385,7 @@ class get_backup(Resource):
         return util.build_response("Error creating file", code=500)
 
 
-@api.route('/api/settings/restore')
+@api.route('/settings/restore')
 class restore_db(Resource):
     @admin
     def post(self):
@@ -394,7 +398,7 @@ class restore_db(Resource):
         return util.build_response("ok")
 
 
-@api.route('/api/settings/password/admin')
+@api.route('/settings/password/admin')
 class change_admin_password(Resource):
     @admin
     @api.doc(body=model_password)
@@ -406,7 +410,7 @@ class change_admin_password(Resource):
         return util.build_response("ok")
 
 
-@api.route('/api/settings/password/kiosk')
+@api.route('/settings/password/kiosk')
 class change_kiosk_password(Resource):
     @admin
     @api.doc(body=model_password)
@@ -418,7 +422,7 @@ class change_kiosk_password(Resource):
         return util.build_response("ok")
 
 
-@api.route('/api/login/check')
+@api.route('/login/check')
 class login_Check(Resource):
     @authenticated
     def get(self):
@@ -428,7 +432,7 @@ class login_Check(Resource):
         return util.build_response("OK")
 
 
-@api.route('/api/login/admin/check')
+@api.route('/login/admin/check')
 class login_Check_Admin(Resource):
     @admin
     def get(self):
@@ -444,7 +448,7 @@ model = api.model('Login', {
 })
 
 
-@api.route('/api/login')
+@api.route('/login')
 class login(Resource):
     @api.doc(body=model)
     def post(self):
@@ -463,7 +467,7 @@ class login(Resource):
         return util.build_response("Unauthorized", code=403)
 
 
-@api.route('/api/logout')
+@api.route('/logout')
 class logout(Resource):
     @authenticated
     def post(self):
