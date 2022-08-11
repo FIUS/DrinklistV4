@@ -388,7 +388,7 @@ class Queries:
         if util.token is not None and util.old_domain is not None:
 
             # Import Users
-            resp = requests.get(f"{util.old_domain}/api/users",
+            resp = requests.get(f"https://{util.old_domain}/api/users",
                                 headers={"x-auth-token": util.token}, timeout=10)
 
             for user in resp.json():
@@ -400,7 +400,7 @@ class Queries:
             print()
 
             # Import Drinks
-            resp = requests.get(f"{util.old_domain}/api/beverages",
+            resp = requests.get(f"https://{util.old_domain}/api/beverages",
                                 headers={"x-auth-token": util.token}, timeout=10)
 
             for drink in resp.json():
@@ -415,7 +415,7 @@ class Queries:
             users = self.get_users()
             transactions = []
             for user in users:
-                resp = requests.get(f"{util.old_domain}/api/orders/{user['name']}",
+                resp = requests.get(f"https://{util.old_domain}/api/orders/{user['name']}",
                                     headers={"x-auth-token": util.token}, timeout=10)
 
                 for transaction in resp.json():
