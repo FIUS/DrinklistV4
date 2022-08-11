@@ -337,35 +337,25 @@ class Queries:
         for t in transactions:
             self.session.delete(t)
 
-        sorted_checkouts = sorted(
-            imported_data["checkouts"], key=lambda x: x['id'])
-        sorted_drinks = sorted(imported_data["drinks"], key=lambda x: x['id'])
-        sorted_favorites = sorted(
-            imported_data["favorites"], key=lambda x: x['id'])
-        sorted_members = sorted(
-            imported_data["members"], key=lambda x: x['id'])
-        sorted_transactions = sorted(
-            imported_data["transactions"], key=lambda x: x['id'])
-
-        for c in sorted_checkouts:
+        for c in imported_data["checkouts"]:
             self.session.add(
                 Checkout(
                     id=c['id'],
                     date=datetime.strptime(c['date'], "%Y-%m-%dT%H:%M:%SZ"),
                     current_cash=c['currentCash']))
-        for d in sorted_drinks:
+        for d in imported_data["drinks"]:
             self.session.add(Drink(
                 id=d['id'],
                 name=d['name'],
                 stock=d['stock'],
                 price=d['price'],
                 category=d['category']))
-        for f in sorted_favorites:
+        for f in imported_data["favorites"]:
             self.session.add(Favorite(
                 id=f['id'],
                 member_id=f['member_id'],
                 drink_id=f['drink_id']))
-        for m in sorted_members:
+        for m in imported_data["members"]:
             self.session.add(Member(
                 id=m['id'],
                 name=m['name'],
@@ -373,7 +363,7 @@ class Queries:
                 hidden=m['hidden'],
                 password=bytes.fromhex(m['password']),
                 salt=m['salt']))
-        for t in sorted_transactions:
+        for t in imported_data["transactions"]:
             self.session.add(Transaction(
                 id=t['id'],
                 description=t['description'],
@@ -382,87 +372,6 @@ class Queries:
                 date=datetime.strptime(t['date'], "%Y-%m-%dT%H:%M:%SZ"),
                 checkout_id=t['checkout_id']))
         self.session.commit()
-
-        last_key = int(sorted_checkouts[-1]['id']) + \
-            4 if len(sorted_checkouts) > 0 else 4
-        for i in range(last_key):
-            try:
-                x = Checkout(date=datetime.now(), current_cash=0)
-                self.session.add(x)
-                self.session.commit()
-                self.session.delete(x)
-                self.session.commit()
-            except:
-                print("Skipping", i)
-        print("Imported", "Checkouts")
-
-        last_key = int(sorted_drinks[-1]['id'])+4 + \
-            4 if len(sorted_drinks) > 0 else 4
-        for i in range(last_key):
-            try:
-                x = Drink(
-                    name="",
-                    stock=0,
-                    price=0,
-                    category="")
-                self.session.add(x)
-                self.session.commit()
-                self.session.delete(x)
-                self.session.commit()
-            except:
-                print("Skipping", i)
-        print("Imported", "Drinks")
-
-        last_key = int(sorted_favorites[-1]['id'])+4 + \
-            4 if len(sorted_favorites) > 0 else 4
-        for i in range(last_key):
-            try:
-                x = Favorite(
-                    member_id=0,
-                    drink_id=0)
-                self.session.add(x)
-                self.session.commit()
-                self.session.delete(x)
-                self.session.commit()
-            except:
-                print("Skipping", i)
-        print("Imported", "Favorites")
-
-        last_key = int(sorted_transactions[-1]['id'])+4 + \
-            4 if len(sorted_transactions) > 0 else 4
-        for i in range(last_key):
-            try:
-                x = Transaction(
-                    description="",
-                    member_id=0,
-                    amount=0,
-                    date=datetime.now(),
-                    checkout_id=0)
-                self.session.add(x)
-                self.session.commit()
-                self.session.delete(x)
-                self.session.commit()
-            except:
-                print("Skipping", i)
-        print("Imported", "Transactions")
-
-        last_key = int(sorted_members[-1]['id'])+4 + \
-            4 if len(sorted_members) > 0 else 4
-        for i in range(last_key):
-            try:
-                x = Member(
-                    name="",
-                    balance=0,
-                    hidden=True,
-                    password=bytes.fromhex("00"),
-                    salt="")
-                self.session.add(x)
-                self.session.commit()
-                self.session.delete(x)
-                self.session.commit()
-            except Exception as e:
-                print("Skipping", i)
-        print("Imported", "Members")
 
         return
 
