@@ -94,7 +94,9 @@ const Overview = (props: Props) => {
             const a = new Date(value1.date).valueOf();
             const b = new Date(value2.date).valueOf();
             return a - b;
-        }).map((value) => { return { date: dateToString(value.date), "Anzahl Transaktionen": value['Anzahl Transaktionen'] } })
+        }).map((value) => {
+            return { date: dateToString(value.date), "Anzahl Transaktionen": value['Anzahl Transaktionen'] }
+        })
         return sortedList
     }
 
