@@ -17,7 +17,7 @@ from flask_restx import reqparse
 import flask
 
 api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
-api = Api(api_bp, doc='/docu/')
+api = Api(api_bp, doc='/docu/', base_url='/api')
 app.register_blueprint(api_bp)
 
 token_manager = authenticator.TokenManager()
@@ -454,6 +454,8 @@ class login(Resource):
     def post(self):
         """
         Get the memberID and token for using the api
+
+        The <b>memberID</b> and <b>token</b> have to be send with every request as cookies
         """
         post_data = request.json
         name = post_data["name"]
