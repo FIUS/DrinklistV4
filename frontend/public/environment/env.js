@@ -1,3 +1,5 @@
+const drinklistName = "Drinklist-DEV";
+
 window.globalTS = {
     "DOMAIN": "http://127.0.0.1:5000/api/",
     "MOBILE_THRESHOLD": 1200,
@@ -7,6 +9,7 @@ window.globalTS = {
     "PRIVACY_LINK": "",
     "ADDITIONAL_INFORMATION": "",
     "WELCOME_TEXT_0": "Willkommen zur Drinklist",
+    "WELCOME_TEXT_0_ADMIN": drinklistName + " Admin-Interface",
     "WELCOME_TEXT_1": "Bitte logge dich ein!",
-    "HOME_BUTTON": "Drinklist-DEV"
+    "HOME_BUTTON": drinklistName
 };

@@ -29,10 +29,9 @@ const Login = (props: Props) => {
             }
         })
     }
-
     return (
         <div className={style.outterContainer}>
-            <Typography variant="h3">{window.globalTS.WELCOME_TEXT_0}</Typography>
+            <Typography variant="h3">{!searchParams.get("originalPath")?.includes("admin") ? window.globalTS.WELCOME_TEXT_0 : window.globalTS.WELCOME_TEXT_0_ADMIN}</Typography>
             <Typography variant="h4">{window.globalTS.WELCOME_TEXT_1}</Typography>
             <Spacer vertical={40} />
             <TextField
