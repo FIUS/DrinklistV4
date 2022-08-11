@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { Drink } from '../../../types/ResponseTypes';
 import { useDispatch, useSelector } from 'react-redux';
-import { FERTIG, GETRAENKENAME, KATEGORIE } from '../../Common/Internationalization/i18n';
+import { AENDERN, FERTIG, GETRAENKENAME, GETRAENK_BEARBEITEN, GETRAENK_BEARBEITEN_BESCHREIBUNG, KATEGORIE, KATEGORIE_GEAENDERT, NAME_GEAENDERT } from '../../Common/Internationalization/i18n';
 import { format } from 'react-string-format';
 import { Autocomplete } from '@mui/material';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
@@ -34,10 +34,10 @@ const DrinkEditDialog = (props: Props) => {
 
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>Getränk Bearbeiten</DialogTitle>
+            <DialogTitle>{GETRAENK_BEARBEITEN}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Ändere den Namen oder Kategorie des Getränks '{props.drink.name}'
+                    {format(GETRAENK_BEARBEITEN_BESCHREIBUNG, props.drink.name)}
                 </DialogContentText>
                 <Spacer vertical={30} />
                 <div className={style.editDrinkContainer}>
@@ -52,7 +52,7 @@ const DrinkEditDialog = (props: Props) => {
                         <Button onClick={() =>
                             doPostRequest(format("drinks/{0}/name", props.drink.id), { name: name }).then(value => {
                                 if (value.code === 200) {
-                                    dispatch(openToast({ message: "Name geändert" }))
+                                    dispatch(openToast({ message: NAME_GEAENDERT }))
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {
                                             dispatch(setDrinks(value.content))
@@ -65,7 +65,7 @@ const DrinkEditDialog = (props: Props) => {
                             })
 
                         } variant="contained">
-                            Ändern
+                            {AENDERN}
                         </Button>
                     </div>
                     <div className={style.editDrinkRow}>
@@ -86,7 +86,7 @@ const DrinkEditDialog = (props: Props) => {
                         <Button onClick={() =>
                             doPostRequest(format("drinks/{0}/category", props.drink.id), { category: category }).then(value => {
                                 if (value.code === 200) {
-                                    dispatch(openToast({ message: "Category geändert" }))
+                                    dispatch(openToast({ message: KATEGORIE_GEAENDERT }))
                                     doGetRequest("drinks").then((value) => {
                                         if (value.code === 200) {
                                             dispatch(setDrinks(value.content))
@@ -103,7 +103,7 @@ const DrinkEditDialog = (props: Props) => {
                                 }
                             })
                         } variant="contained">
-                            Ändern
+                            {AENDERN}
                         </Button>
                     </div>
                 </div>
