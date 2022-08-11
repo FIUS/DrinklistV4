@@ -108,6 +108,16 @@ class Queries:
             drink.stock += stock
         self.session.commit()
 
+    def change_drink_name(self, drink_id, name):
+        drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
+        drink.name = name
+        self.session.commit()
+
+    def change_drink_category(self, drink_id, category):
+        drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
+        drink.category = category
+        self.session.commit()
+
     def delete_drink(self, drink_id):
         drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
         self.session.delete(drink)

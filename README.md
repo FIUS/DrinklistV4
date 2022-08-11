@@ -35,6 +35,9 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
 * `UNDO_TIMELIMIT`
   * The time a user can undo transactions in minutes
   * Defaults to: `1`
+* `DEFAULT_DRINK_CATEGORY`
+  * The category name of drinks for which no category is provided
+  * Defaults to: `Getränk`
 
 ### Importing from old Drinklist
 * `X_AUTH_TOKEN`

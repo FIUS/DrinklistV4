@@ -224,6 +224,43 @@ class set_drink_stock(Resource):
         return util.build_response("Stock changed")
 
 
+model = api.model('Drink-Name', {
+    'name': fields.String(description='Name of the drink', required=True),
+})
+
+
+@api.route('/drinks/<int:drink_id>/name')
+class set_drink_name(Resource):
+    @admin
+    @api.doc(body=model)
+    def post(self, drink_id):
+        """
+        Set the name of a drink
+        """
+        if request.json["name"] == "":
+            return util.build_response("Can not be empty", code=406)
+        db.change_drink_name(drink_id, request.json["name"])
+        return util.build_response("Name changed")
+
+
+model = api.model('Drink-Category', {
+    'category': fields.String(description='Category of the drink', required=True),
+})
+
+
+@api.route('/drinks/<int:drink_id>/category')
+class set_drink_category(Resource):
+    @admin
+    @api.doc(body=model)
+    def post(self, drink_id):
+        """
+        Set the category of a drink
+        """
+        db.change_drink_category(
+            drink_id, request.json["category"] if request.json["category"] != "" else util.default_drink_category)
+        return util.build_response("Category changed")
+
+
 @api.route('/drinks/<int:drink_id>/stock/increase')
 class set_drink_stock_increase(Resource):
     @admin

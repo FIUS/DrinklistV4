@@ -26,6 +26,8 @@ standard_user_password = os.environ.get(
     "USER_PASSWORD") if os.environ.get("USER_PASSWORD") else "unsafe"
 undo_timelimit = int(os.environ.get(
     "UNDO_TIMELIMIT")) if os.environ.get("UNDO_TIMELIMIT") else 1
+default_drink_category = int(os.environ.get(
+    "DEFAULT_DRINK_CATEGORY")) if os.environ.get("DEFAULT_DRINK_CATEGORY") else "Getränk"
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
