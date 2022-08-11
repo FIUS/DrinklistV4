@@ -1,4 +1,4 @@
-import { Button, Paper, Typography } from '@mui/material'
+import { Button, Paper } from '@mui/material'
 import React, { useState } from 'react';
 import style from './drinks.module.scss';
 import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
@@ -11,6 +11,7 @@ import { Drink as DrinkType } from '../../../types/ResponseTypes';
 import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
 import { setDrinks } from '../../../Actions/CommonAction';
+import DrinkEditDialog from './DrinkEditDialog';
 
 type Props = {
     drink: DrinkType
@@ -20,6 +21,8 @@ const Drink = (props: Props) => {
     const [isHovered, setisHovered] = useState(false)
     const [priceDialogOpen, setpriceDialogOpen] = useState(false)
     const [stockDialogOpen, setstockDialogOpen] = useState(false)
+    const [drinkEditOpen, setdrinkEditOpen] = useState(false)
+
     const dispatch = useDispatch()
 
     return (
@@ -29,9 +32,14 @@ const Drink = (props: Props) => {
             onMouseLeave={() => setisHovered(false)}
             elevation={isHovered ? 3 : 1}
         >
-            <Typography variant="h6">
+            <Button onClick={() => setdrinkEditOpen(true)} sx={{ color: "text.primary" }}>
                 {props.drink.name}
-            </Typography>
+            </Button>
+            <DrinkEditDialog
+                isOpen={drinkEditOpen}
+                close={() => setdrinkEditOpen(false)}
+                drink={props.drink}
+            />
             <div className={style.buttonsContainer} >
                 <Button onClick={() => setpriceDialogOpen(true)}>
                     {props.drink.price.toFixed(2)}€
