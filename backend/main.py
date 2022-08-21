@@ -156,8 +156,11 @@ class delete_user(Resource):
         """
         Delete a user
         """
-        db.delete_user(member_id)
-        return util.build_response("User deleted")
+        if member_id > 2:
+            db.delete_user(member_id)
+            return util.build_response("User deleted")
+        else:
+            return util.build_response("Admin and moderator cannot be deleted", code=412)
 
 
 model = api.model('Add User', {
