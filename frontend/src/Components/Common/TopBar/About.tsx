@@ -33,8 +33,6 @@ const About = (props: Props) => {
         })
     }, [props.isOpen])
 
-    console.log(releaseTag)
-
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
             <DialogTitle>{IMPRESSUM_DATENSCHUTZ}</DialogTitle>
