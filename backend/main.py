@@ -479,7 +479,7 @@ class webhook_releases(Resource):
             return util.build_response("ok")
 
         else:
-            return util.build_response("release is draft", code=412)
+            return util.build_response("release is a draft", code=412)
 
     @api.doc()
     def get(self):
