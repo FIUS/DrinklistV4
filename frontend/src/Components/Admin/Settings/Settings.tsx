@@ -6,7 +6,7 @@ import { ADMIN_PW, ALTE_DATEN_UEBERSCHRIEBEN, BACKUP_ERFOLG, BACKUP_UPLOADING, D
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { doPostRequestRawBody, downloadJSON } from '../../Common/StaticFunctions'
-import WarningPopup from '../Common/WarningPopup/WarningPopup'
+import WarningPopup from '../../Common/WarningPopup/WarningPopup'
 import PasswordChange from './PasswordChange'
 import style from './settings.module.scss'
 

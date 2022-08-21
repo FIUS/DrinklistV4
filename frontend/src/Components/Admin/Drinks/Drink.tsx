@@ -12,7 +12,7 @@ import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
 import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
 import DrinkEditDialog from './DrinkEditDialog';
-import WarningPopup from '../Common/WarningPopup/WarningPopup';
+import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 import { GETRAENK_LOESCHEN, SICHER_X_LOESCHEN } from '../../Common/Internationalization/i18n';
 

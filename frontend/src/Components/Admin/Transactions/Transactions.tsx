@@ -8,7 +8,7 @@ import Loader from '../../Common/Loader/Loader';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
 import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
-import WarningPopup from '../Common/WarningPopup/WarningPopup';
+import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import style from './transactions.module.scss';
 
 type Props = {}

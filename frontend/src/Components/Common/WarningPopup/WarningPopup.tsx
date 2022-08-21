@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 import React from 'react'
-import { ABBRECHEN, JA, NEIN, OK, WARNUNG } from '../../../Common/Internationalization/i18n'
+import { ABBRECHEN, JA, NEIN, OK, WARNUNG } from '../Internationalization/i18n'
 import style from './warningpopup.module.scss'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 

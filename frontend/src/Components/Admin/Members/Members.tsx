@@ -13,7 +13,7 @@ import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, PASSWORT, SICHER_X_LOESCHEN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
-import WarningPopup from '../Common/WarningPopup/WarningPopup';
+import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 
 type Props = {}
