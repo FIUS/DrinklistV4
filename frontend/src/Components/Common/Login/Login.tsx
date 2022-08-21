@@ -36,17 +36,17 @@ const Login = (props: Props) => {
         <div className={style.outterContainer}>
             <Typography variant="h3">{!searchParams.get("originalPath")?.includes("admin") ? window.globalTS.WELCOME_TEXT_0 : window.globalTS.WELCOME_TEXT_0_ADMIN}</Typography>
             <Typography variant="h4">{window.globalTS.WELCOME_TEXT_1}</Typography>
-            <Spacer vertical={40} />
-            <TextField
-                className={style.textfield}
-                label={NAME}
-                value={username}
-                onChange={(value) => { setusername(value.target.value) }}
-            />
-
-            <Spacer vertical={30} />
             <form className={style.textfield} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); login() }}>
                 <FormControl className={style.form}>
+                    <Spacer vertical={40} />
+                    <TextField
+                        fullWidth
+                        label={NAME}
+                        value={username}
+                        onChange={(value) => { setusername(value.target.value) }}
+                    />
+
+                    <Spacer vertical={30} />
                     <TextField
                         fullWidth
                         label={PASSWORT}
@@ -54,19 +54,20 @@ const Login = (props: Props) => {
                         value={password}
                         onChange={(value) => { setpassword(value.target.value) }}
                     />
+                    <Spacer vertical={40} />
+                    <Button
+                        size='large'
+                        variant='contained'
+                        onClick={() => {
+                            login()
+                        }}
+                        disabled={disableLoginButton}
+                        type='submit'
+                    >
+                        {LOGIN}
+                    </Button>
                 </FormControl>
             </form>
-            <Spacer vertical={40} />
-            <Button
-                size='large'
-                variant='contained'
-                onClick={() => {
-                    login()
-                }}
-                disabled={disableLoginButton}
-            >
-                {LOGIN}
-            </Button>
         </div>
     )
 }
