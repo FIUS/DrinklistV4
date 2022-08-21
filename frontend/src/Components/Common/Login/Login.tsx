@@ -45,7 +45,7 @@ const Login = (props: Props) => {
             />
 
             <Spacer vertical={30} />
-            <form className={style.textfield} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); console.log("slsdlf"); login() }}>
+            <form className={style.textfield} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); login() }}>
                 <FormControl className={style.form}>
                     <TextField
                         fullWidth
