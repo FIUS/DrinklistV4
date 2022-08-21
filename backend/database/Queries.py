@@ -321,9 +321,11 @@ class Queries:
 
     def set_current_release(self, release_data):
         release_tag = self.session.query(
-            KeyValue).filter_by(key="release_tag").filter()
+            KeyValue).filter_by(key="release_tag").first()
         release_message = self.session.query(
-            KeyValue).filter_by(key="release_message").filter()
+            KeyValue).filter_by(key="release_message").first()
+        open_issues = self.session.query(
+            KeyValue).filter_by(key="open_issues").first()
 
         if release_tag == None:
             self.session.add(KeyValue(key="release_tag",
@@ -336,6 +338,12 @@ class Queries:
                              value=release_data['release_message']))
         else:
             release_message.value = release_data['release_message']
+
+        if open_issues == None:
+            self.session.add(KeyValue(key="open_issues",
+                             value=release_data['open_issues']))
+        else:
+            open_issues.value = release_data['open_issues']
 
         self.session.commit()
 

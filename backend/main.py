@@ -469,8 +469,12 @@ class webhook_releases(Resource):
         """
         receive release informations
         """
-        print(request.json)
-        # db.set_current_release(request.json[''])
+        tag_name = request.json['release']['tag_name']
+        tag_description = request.json['release']['name']
+        open_issues = request.json['repository']['open_issues']
+
+        db.set_current_release(
+            {"release_tag": tag_name, "release_message": tag_description, "open_issues": open_issues})
         return util.build_response("ok")
 
 
