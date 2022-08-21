@@ -464,7 +464,6 @@ class change_kiosk_password(Resource):
 
 @api.route('/webhooks/releases')
 class webhook_releases(Resource):
-    @admin
     @api.doc()
     def post(self):
         """
