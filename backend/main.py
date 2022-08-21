@@ -462,6 +462,17 @@ class change_kiosk_password(Resource):
         return util.build_response("ok")
 
 
+@api.route('/webhooks/releases')
+class webhook_releases(Resource):
+    @admin
+    @api.doc()
+    def post(self):
+        """
+        receive release informations
+        """
+        return util.build_response("ok")
+
+
 @api.route('/login/check')
 class login_Check(Resource):
     @authenticated
