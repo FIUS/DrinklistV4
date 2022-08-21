@@ -19,7 +19,7 @@ const Transactions = (props: Props) => {
     const [transactionsLoaded, settransactionsLoaded] = useState(false)
 
     useEffect(() => {
-        doGetRequest("transactions/limit/1000").then((value) => {
+        doGetRequest("transactions/limit/" + window.globalTS.TRANSACTION_LIMIT).then((value) => {
             if (value.code === 200) {
                 settransactions(value.content)
                 settransactionsLoaded(true)
@@ -58,7 +58,7 @@ const Transactions = (props: Props) => {
                         <Button onClick={(s_value) => {
                             doPostRequest("transactions/" + value.id + "/undo", "").then(t_value => {
                                 if (t_value.code === 200) {
-                                    doGetRequest("transactions").then((value) => {
+                                    doGetRequest("transactions​/limit​/" + window.globalTS.TRANSACTION_LIMIT).then((value) => {
                                         if (value.code === 200) {
                                             settransactions(value.content)
                                         }
