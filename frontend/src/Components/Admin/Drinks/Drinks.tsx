@@ -14,7 +14,6 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { AM_WENIGSTEN, KEINE_GETRAENKE } from '../../Common/Internationalization/i18n'
 
-
 type Props = {}
 
 const Drinks = (props: Props) => {

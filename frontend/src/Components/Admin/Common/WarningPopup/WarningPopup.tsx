@@ -6,7 +6,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 type Props = {
     isOpen: boolean,
-    close: () => void,
+    close: (state: boolean) => void,
     title: string,
     text: string,
     yes?: () => void,
@@ -25,10 +25,38 @@ const WarningPopup = (props: Props) => {
                 </DialogContentText>
             </DialogContent>
             <DialogActions className={style.actions}>
-                {props.yes ? <Button onClick={props.close}>{JA}</Button> : <></>}
-                {props.ok ? <Button onClick={props.close}>{OK}</Button> : <></>}
-                {props.no ? <Button onClick={props.close}>{NEIN}</Button> : <></>}
-                {props.abort ? <Button onClick={props.close}>{ABBRECHEN}</Button> : <></>}
+                {props.yes ? <Button onClick={() => {
+                    props.close(false);
+                    if (props.yes !== undefined) {
+                        props.yes()
+                    }
+                }}>
+                    {JA}
+                </Button> : <></>}
+                {props.ok ? <Button onClick={() => {
+                    props.close(false);
+                    if (props.ok !== undefined) {
+                        props.ok()
+                    }
+                }}>
+                    {OK}
+                </Button> : <></>}
+                {props.no ? <Button onClick={() => {
+                    props.close(false);
+                    if (props.no !== undefined) {
+                        props.no()
+                    }
+                }}>
+                    {NEIN}
+                </Button> : <></>}
+                {props.abort ? <Button onClick={() => {
+                    props.close(false);
+                    if (props.abort !== undefined) {
+                        props.abort()
+                    }
+                }}>
+                    {ABBRECHEN}
+                </Button> : <></>}
             </DialogActions>
         </Dialog>
     )

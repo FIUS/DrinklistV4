@@ -104,3 +104,6 @@ export const ZURUECK = "Zurück";
 export const NEIN = "Nein";
 export const JA = "Ja";
 export const WARNUNG = "Warnung";
+export const GETRAENK_LOESCHEN = "Getränk wird gelöscht!";
+export const SICHER_X_LOESCHEN = "Bist du dir sicher, dass du '{0}' löschen möchtest?";
+export const MEMBER_LOESCHEN = "Benutzer wird gelöscht!";

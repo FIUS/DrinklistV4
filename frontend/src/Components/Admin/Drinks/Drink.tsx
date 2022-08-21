@@ -12,6 +12,9 @@ import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
 import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
 import DrinkEditDialog from './DrinkEditDialog';
+import WarningPopup from '../Common/WarningPopup/WarningPopup';
+import { format } from 'react-string-format';
+import { GETRAENK_LOESCHEN, SICHER_X_LOESCHEN } from '../../Common/Internationalization/i18n';
 
 type Props = {
     drink: DrinkType
@@ -22,7 +25,7 @@ const Drink = (props: Props) => {
     const [priceDialogOpen, setpriceDialogOpen] = useState(false)
     const [stockDialogOpen, setstockDialogOpen] = useState(false)
     const [drinkEditOpen, setdrinkEditOpen] = useState(false)
-
+    const [warningDialog, setwarningDialog] = useState(false)
     const dispatch = useDispatch()
 
     return (
@@ -51,29 +54,37 @@ const Drink = (props: Props) => {
                     <Spacer horizontal={5} />
                     <Inventory2OutlinedIcon />
                 </Button>
-                <Button onClick={() => {
-                    doRequest("DELETE", "drinks/" + props.drink.id + "/delete", "").then(value => {
-                        if (value.code === 200) {
-                            doGetRequest("drinks").then((value) => {
-                                if (value.code === 200) {
-                                    dispatch(setDrinks(value.content))
-
-                                    if (!(value.content as Array<DrinkType>).find(drink => drink.category === props.drink.category)) {
-                                        doGetRequest("drinks/categories").then((value) => {
-                                            if (value.code === 200) {
-                                                dispatch(setDrinkCategories(value.content))
-                                            }
-                                        })
-                                    }
-                                }
-                            })
-                        }
-
-
-                    })
-                }}>
+                <Button onClick={() => { setwarningDialog(true) }}>
                     <DeleteOutlineOutlinedIcon />
                 </Button>
+                <WarningPopup
+                    title={GETRAENK_LOESCHEN}
+                    text={format(SICHER_X_LOESCHEN, props.drink.name)}
+                    isOpen={warningDialog}
+                    close={setwarningDialog}
+                    yes={() => {
+                        doRequest("DELETE", "drinks/" + props.drink.id + "/delete", "").then(value => {
+                            if (value.code === 200) {
+                                doGetRequest("drinks").then((value) => {
+                                    if (value.code === 200) {
+                                        dispatch(setDrinks(value.content))
+
+                                        if (!(value.content as Array<DrinkType>).find(drink => drink.category === props.drink.category)) {
+                                            doGetRequest("drinks/categories").then((value) => {
+                                                if (value.code === 200) {
+                                                    dispatch(setDrinkCategories(value.content))
+                                                }
+                                            })
+                                        }
+                                    }
+                                })
+                            }
+
+
+                        })
+                    }}
+                    no={() => { }}
+                />
             </div>
             <DrinkPriceDialog
                 isOpen={priceDialogOpen}

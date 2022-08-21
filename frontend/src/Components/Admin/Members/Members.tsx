@@ -12,7 +12,9 @@ import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MODIFIZIEREN, NAME, PASSWORT, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, PASSWORT, SICHER_X_LOESCHEN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import WarningPopup from '../Common/WarningPopup/WarningPopup';
+import { format } from 'react-string-format';
 
 type Props = {}
 
@@ -25,6 +27,8 @@ const Members = (props: Props) => {
     const [password, setpassword] = useState("")
     const [searchName, setsearchName] = useState("")
     const [searchID, setsearchID] = useState("")
+    const [deleteDialogOpen, setdeleteDialogOpen] = useState(false)
+    const [userToDelete, setuserToDelete] = useState<{ name: string, id: number }>({ name: "", id: -1 })
 
     useEffect(() => {
 
@@ -213,18 +217,12 @@ const Members = (props: Props) => {
                                             <VisibilityOff />
                                         </Button>
                                         <Button onClick={() => {
-                                            doRequest("DELETE", "users/" + value.id + "/delete", "").then((s_value) => {
-                                                if (s_value.code === 200) {
-                                                    doGetRequest("users").then((t_value) => {
-                                                        if (t_value.code === 200) {
-                                                            dispatch(setMembers(t_value.content))
-                                                        }
-                                                    })
-                                                }
-                                            })
+                                            setuserToDelete({ name: value.name, id: value.id })
+                                            setdeleteDialogOpen(true)
                                         }}>
                                             <Delete />
                                         </Button>
+
                                     </TableCell>
 
 
@@ -234,7 +232,24 @@ const Members = (props: Props) => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-
+                <WarningPopup
+                    title={MEMBER_LOESCHEN}
+                    text={format(SICHER_X_LOESCHEN, userToDelete.name)}
+                    isOpen={deleteDialogOpen}
+                    close={setdeleteDialogOpen}
+                    yes={() => {
+                        doRequest("DELETE", "users/" + userToDelete.id + "/delete", "").then((s_value) => {
+                            if (s_value.code === 200) {
+                                doGetRequest("users").then((t_value) => {
+                                    if (t_value.code === 200) {
+                                        dispatch(setMembers(t_value.content))
+                                    }
+                                })
+                            }
+                        })
+                    }}
+                    no={() => { }}
+                />
             </div>
             <Spacer vertical={50} />
             <NavigationButton destination='/admin' />
