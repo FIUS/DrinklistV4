@@ -472,10 +472,14 @@ class webhook_releases(Resource):
         tag_name = request.json['release']['tag_name']
         tag_description = request.json['release']['name']
         open_issues = request.json['repository']['open_issues']
+        is_draft = request.json['release']['draft']
+        if not is_draft:
+            db.set_current_release(
+                {"release_tag": tag_name, "release_message": tag_description, "open_issues": open_issues})
+            return util.build_response("ok")
 
-        db.set_current_release(
-            {"release_tag": tag_name, "release_message": tag_description, "open_issues": open_issues})
-        return util.build_response("ok")
+        else:
+            return util.build_response("release is draft", code=412)
 
     @api.doc()
     def get(self):
