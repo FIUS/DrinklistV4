@@ -101,3 +101,6 @@ export const WER_BIST_DU = "Wer bist du?";
 export const WERT = "Wert";
 export const ZEITLIMIT_ABGELAUFEN = "Zeitlimit abgelaufen";
 export const ZURUECK = "Zurück";
+export const NEIN = "Nein";
+export const JA = "Ja";
+export const WARNUNG = "Warnung";
