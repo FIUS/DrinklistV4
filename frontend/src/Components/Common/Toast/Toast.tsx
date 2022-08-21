@@ -20,6 +20,7 @@ const Toast = (props: Props) => {
             onClose={() => {
                 dispatch(closeToast())
             }}
+            className={style.snackbar}
         >
             <div className={style.container}>
                 <Alert

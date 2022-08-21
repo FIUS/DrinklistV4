@@ -2,10 +2,11 @@ import { Button, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { openErrorToast, openToast } from '../../../Actions/CommonAction'
-import { ADMIN_PW, BACKUP_ERFOLG, BACKUP_UPLOADING, DOWNLOAD_BACKUP, EINGESPIELT, KIOSK_PW, PASSWORT_AENDERN, UPLOAD, UPLOAD_BACKUP } from '../../Common/Internationalization/i18n'
+import { ADMIN_PW, ALTE_DATEN_UEBERSCHRIEBEN, BACKUP_ERFOLG, BACKUP_UPLOADING, DOWNLOAD_BACKUP, EINGESPIELT, KEINE_DATEI, KIOSK_PW, KONNTE_NICHT_EINSPIELEN, PASSWORT_AENDERN, SICHER_ALTE_DATEN_UEBERSCHRIEBEN, UPLOAD, UPLOAD_BACKUP } from '../../Common/Internationalization/i18n'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { doPostRequestRawBody, downloadJSON } from '../../Common/StaticFunctions'
+import WarningPopup from '../Common/WarningPopup/WarningPopup'
 import PasswordChange from './PasswordChange'
 import style from './settings.module.scss'
 
@@ -14,6 +15,7 @@ type Props = {}
 const Settings = (props: Props) => {
     const [file, setfile] = useState<any>(null)
     const [isUploading, setisUploading] = useState(false)
+    const [warningBackupOpen, setwarningBackupOpen] = useState(false)
 
     const dispatch = useDispatch()
 
@@ -32,21 +34,7 @@ const Settings = (props: Props) => {
                 <div className={style.uploadContainer}>
                     <Button disabled={isUploading}
                         onClick={() => {
-                            const formData = new FormData();
-                            if (file != null) {
-                                setisUploading(true)
-                                dispatch(openToast({ message: BACKUP_UPLOADING, headline: UPLOAD, type: "info" }))
-
-                                formData.append('file', file)
-                                doPostRequestRawBody("settings/restore", formData).then((value) => {
-                                    setisUploading(false)
-                                    if (value.code === 200) {
-                                        dispatch(openToast({ message: BACKUP_ERFOLG, type: "success", headline: EINGESPIELT, duration: 8000 }))
-                                    } else {
-                                        dispatch(openErrorToast())
-                                    }
-                                })
-                            }
+                            setwarningBackupOpen(true)
                         }}
                         variant="contained"
                     >
@@ -64,6 +52,32 @@ const Settings = (props: Props) => {
                 <Typography variant='h5'>{PASSWORT_AENDERN}</Typography>
                 <PasswordChange textfielLabel={ADMIN_PW} requestPath='settings/password/admin' />
                 <PasswordChange textfielLabel={KIOSK_PW} requestPath='settings/password/kiosk' />
+                <WarningPopup
+                    title={ALTE_DATEN_UEBERSCHRIEBEN}
+                    text={SICHER_ALTE_DATEN_UEBERSCHRIEBEN}
+                    isOpen={warningBackupOpen}
+                    close={setwarningBackupOpen}
+                    yes={() => {
+                        const formData = new FormData();
+                        if (file != null) {
+                            setisUploading(true)
+                            dispatch(openToast({ message: BACKUP_UPLOADING, headline: UPLOAD, type: "info" }))
+
+                            formData.append('file', file)
+                            doPostRequestRawBody("settings/restore", formData).then((value) => {
+                                setisUploading(false)
+                                if (value.code === 200) {
+                                    dispatch(openToast({ message: BACKUP_ERFOLG, type: "success", headline: EINGESPIELT, duration: 8000 }))
+                                } else {
+                                    dispatch(openErrorToast())
+                                }
+                            })
+                        } else {
+                            dispatch(openToast({ headline: KONNTE_NICHT_EINSPIELEN, message: KEINE_DATEI, type: "error", duration: 5000 }))
+                        }
+                    }}
+                    no={() => { }}
+                />
             </div>
             <NavigationButton destination='/admin' />
         </>

@@ -109,3 +109,8 @@ export const SICHER_X_LOESCHEN = "Bist du dir sicher, dass du '{0}' löschen mö
 export const MEMBER_LOESCHEN = "Benutzer wird gelöscht!";
 export const TRANSAKTION_RUECKGAENIG = "Benutzer wird rückgängig gemacht!";
 export const SICHER_TRANSAKTION_RUECKGAENIG = "Bist du dir sicher, dass du '{0}' von '{1}' vom {2} rückgängig machen möchtest?";
+
+export const ALTE_DATEN_UEBERSCHRIEBEN = "Alte Daten werden überschrieben! Backup einspielen?";
+export const SICHER_ALTE_DATEN_UEBERSCHRIEBEN = "Das Hochladen eines Backups löscht alle aktuellen Daten und spielt den Stand des Backups ein. Alle Daten die nicht im Backup vorhanden sind, gehen verloren";
+export const KEINE_DATEI = "Keine Datei ausgewählt";
+export const KONNTE_NICHT_EINSPIELEN = "Konnte Backup nicht einspielen";
