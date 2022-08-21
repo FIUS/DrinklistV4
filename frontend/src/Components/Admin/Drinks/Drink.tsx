@@ -10,7 +10,7 @@ import DrinkStockDialog from './DrinkStockDialog';
 import { Drink as DrinkType } from '../../../types/ResponseTypes';
 import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { useDispatch } from 'react-redux';
-import { setDrinks } from '../../../Actions/CommonAction';
+import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction';
 import DrinkEditDialog from './DrinkEditDialog';
 
 type Props = {
@@ -57,9 +57,19 @@ const Drink = (props: Props) => {
                             doGetRequest("drinks").then((value) => {
                                 if (value.code === 200) {
                                     dispatch(setDrinks(value.content))
+
+                                    if (!(value.content as Array<DrinkType>).find(drink => drink.category === props.drink.category)) {
+                                        doGetRequest("drinks/categories").then((value) => {
+                                            if (value.code === 200) {
+                                                dispatch(setDrinkCategories(value.content))
+                                            }
+                                        })
+                                    }
                                 }
                             })
                         }
+
+
                     })
                 }}>
                     <DeleteOutlineOutlinedIcon />
