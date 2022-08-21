@@ -114,3 +114,7 @@ export const ALTE_DATEN_UEBERSCHRIEBEN = "Alte Daten werden überschrieben! Back
 export const SICHER_ALTE_DATEN_UEBERSCHRIEBEN = "Das Hochladen eines Backups löscht alle aktuellen Daten und spielt den Stand des Backups ein. Alle Daten die nicht im Backup vorhanden sind, gehen verloren";
 export const KEINE_DATEI = "Keine Datei ausgewählt";
 export const KONNTE_NICHT_EINSPIELEN = "Konnte Backup nicht einspielen";
+
+export const AKTUELLES_RELEASE = "Aktuelles Release: {0} ({1})";
+export const OFFENE_ISSUES = "Offene Issues: {0}";
+export const BUILD_NUMBER = "Build: {0}";

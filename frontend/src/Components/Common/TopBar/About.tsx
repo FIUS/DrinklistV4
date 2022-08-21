@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Typography } from '@mui/material';
 import style from './topbar.module.scss';
 import SettingsLink from './SettingsLink';
-import { DATENSCHUTZ, GETREANKELISTE, IMPRESSUM, IMPRESSUM_DATENSCHUTZ, OK } from '../Internationalization/i18n';
+import { AKTUELLES_RELEASE, BUILD_NUMBER, DATENSCHUTZ, GETREANKELISTE, IMPRESSUM, IMPRESSUM_DATENSCHUTZ, OFFENE_ISSUES, OK } from '../Internationalization/i18n';
 import Buildnumber from '../../../BuildNumber.json'
 import { doGetRequest } from '../StaticFunctions';
 import { format } from 'react-string-format';
@@ -51,13 +51,13 @@ const About = (props: Props) => {
                             {window.globalTS.ADDITIONAL_INFORMATION}
                         </Typography> : <></>}
                         {releaseName !== null && releaseTag !== null ? <Typography variant="overline">
-                            {format("Aktuelles Release: {0} ({1})", releaseTag, releaseName)}
+                            {format(AKTUELLES_RELEASE, releaseTag, releaseName)}
                         </Typography> : <></>}
                         {openIssues !== null ? <Typography variant="overline">
-                            {format("Offene Issues: {0}", openIssues)}
+                            {format(OFFENE_ISSUES, openIssues)}
                         </Typography> : <></>}
                         {window.globalTS.ADDITIONAL_INFORMATION !== "" ? <Typography variant="overline">
-                            {format("Build: {0}", Buildnumber)}
+                            {format(BUILD_NUMBER, Buildnumber)}
                         </Typography> : <></>}
                     </div>
                 </DialogContentText>
