@@ -470,6 +470,8 @@ class webhook_releases(Resource):
         """
         receive release informations
         """
+        print(request.json)
+        # db.set_current_release(request.json[''])
         return util.build_response("ok")
 
 

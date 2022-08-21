@@ -319,6 +319,26 @@ class Queries:
 
         return success
 
+    def set_current_release(self, release_data):
+        release_tag = self.session.query(
+            KeyValue).filter_by(key="release_tag").filter()
+        release_message = self.session.query(
+            KeyValue).filter_by(key="release_message").filter()
+
+        if release_tag == None:
+            self.session.add(KeyValue(key="release_tag",
+                             value=release_data['release_tag']))
+        else:
+            release_tag.value = release_data['release_tag']
+
+        if release_message == None:
+            self.session.add(KeyValue(key="release_message",
+                             value=release_data['release_message']))
+        else:
+            release_message.value = release_data['release_message']
+
+        self.session.commit()
+
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
         drinks: list[Drink] = self.session.query(Drink).all()
