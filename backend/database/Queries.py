@@ -347,6 +347,22 @@ class Queries:
 
         self.session.commit()
 
+    def get_repo_information(self):
+        release_tag = self.session.query(
+            KeyValue).filter_by(key="release_tag").first()
+        if release_tag is not None:
+            release_tag = release_tag.value
+        release_message = self.session.query(
+            KeyValue).filter_by(key="release_message").first()
+        if release_message is not None:
+            release_message = release_message.value
+        open_issues = self.session.query(
+            KeyValue).filter_by(key="open_issues").first()
+        if open_issues is not None:
+            open_issues = int(open_issues.value)
+
+        return {"releaseTag": release_tag, "releaseMessage": release_message, "openIssues": open_issues}
+
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
         drinks: list[Drink] = self.session.query(Drink).all()

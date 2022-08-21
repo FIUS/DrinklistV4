@@ -477,6 +477,13 @@ class webhook_releases(Resource):
             {"release_tag": tag_name, "release_message": tag_description, "open_issues": open_issues})
         return util.build_response("ok")
 
+    @api.doc()
+    def get(self):
+        """
+        get release informations
+        """
+        return util.build_response(db.get_repo_information())
+
 
 @api.route('/login/check')
 class login_Check(Resource):

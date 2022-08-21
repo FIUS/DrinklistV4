@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -10,6 +10,8 @@ import style from './topbar.module.scss';
 import SettingsLink from './SettingsLink';
 import { DATENSCHUTZ, GETREANKELISTE, IMPRESSUM, IMPRESSUM_DATENSCHUTZ, OK } from '../Internationalization/i18n';
 import Buildnumber from '../../../BuildNumber.json'
+import { doGetRequest } from '../StaticFunctions';
+import { format } from 'react-string-format';
 
 type Props = {
     isOpen: boolean,
@@ -17,6 +19,21 @@ type Props = {
 }
 
 const About = (props: Props) => {
+    const [openIssues, setopenIssues] = useState(null)
+    const [releaseTag, setreleaseTag] = useState(null)
+    const [releaseName, setreleaseName] = useState(null)
+
+    useEffect(() => {
+        doGetRequest("webhooks/releases").then(value => {
+            if (value.code === 200) {
+                setreleaseTag(value.content.releaseTag)
+                setreleaseName(value.content.releaseMessage)
+                setopenIssues(value.content.openIssues)
+            }
+        })
+    }, [props.isOpen])
+
+    console.log(releaseTag)
 
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
@@ -35,9 +52,15 @@ const About = (props: Props) => {
                         {window.globalTS.ADDITIONAL_INFORMATION !== "" ? <Typography>
                             {window.globalTS.ADDITIONAL_INFORMATION}
                         </Typography> : <></>}
-                        <Typography variant="overline">
-                            Build: {Buildnumber}
-                        </Typography>
+                        {releaseName !== null && releaseTag !== null ? <Typography variant="overline">
+                            {format("Aktuelles Release: {0} ({1})", releaseTag, releaseName)}
+                        </Typography> : <></>}
+                        {openIssues !== null ? <Typography variant="overline">
+                            {format("Offene Issues: {0}", openIssues)}
+                        </Typography> : <></>}
+                        {window.globalTS.ADDITIONAL_INFORMATION !== "" ? <Typography variant="overline">
+                            {format("Build: {0}", Buildnumber)}
+                        </Typography> : <></>}
                     </div>
                 </DialogContentText>
             </DialogContent>
