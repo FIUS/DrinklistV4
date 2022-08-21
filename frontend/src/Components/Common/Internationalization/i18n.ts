@@ -107,3 +107,5 @@ export const WARNUNG = "Warnung";
 export const GETRAENK_LOESCHEN = "Getränk wird gelöscht!";
 export const SICHER_X_LOESCHEN = "Bist du dir sicher, dass du '{0}' löschen möchtest?";
 export const MEMBER_LOESCHEN = "Benutzer wird gelöscht!";
+export const TRANSAKTION_RUECKGAENIG = "Benutzer wird rückgängig gemacht!";
+export const SICHER_TRANSAKTION_RUECKGAENIG = "Bist du dir sicher, dass du '{0}' von '{1}' vom {2} rückgängig machen möchtest?";

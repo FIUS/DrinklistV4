@@ -1,12 +1,14 @@
 import { Undo } from '@mui/icons-material';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
+import { format } from 'react-string-format';
 import { Transaction } from '../../../types/ResponseTypes';
-import { BESCHREIBUNG, DATUM, KONTO, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WERT } from '../../Common/Internationalization/i18n';
+import { BESCHREIBUNG, DATUM, KONTO, RUECKGAENGIG, SICHER_TRANSAKTION_RUECKGAENIG, SUCHE_DOT_DOT_DOT, TRANSAKTION_RUECKGAENIG, WERT } from '../../Common/Internationalization/i18n';
 import Loader from '../../Common/Loader/Loader';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
 import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
+import WarningPopup from '../Common/WarningPopup/WarningPopup';
 import style from './transactions.module.scss';
 
 type Props = {}
@@ -17,6 +19,8 @@ const Transactions = (props: Props) => {
     const [searchName, setsearchName] = useState("")
     const [searchDate, setsearchDate] = useState("")
     const [transactionsLoaded, settransactionsLoaded] = useState(false)
+    const [warningOpen, setwarningOpen] = useState(false)
+    const [transactionToDelete, settransactionToDelete] = useState<{ id: number, name: string, by: string, date: string }>({ id: -1, name: "", by: "", date: "" })
 
     useEffect(() => {
         doGetRequest("transactions/limit/" + window.globalTS.TRANSACTION_LIMIT).then((value) => {
@@ -37,7 +41,7 @@ const Transactions = (props: Props) => {
 
     const transactionRows = () => {
         if (transactionsLoaded) {
-            return filteredTransactions.map((value) => {
+            return <>{filteredTransactions.map((value) => {
                 return <TableRow
                     key={value.id}
                 >
@@ -56,21 +60,40 @@ const Transactions = (props: Props) => {
                     </TableCell>
                     <TableCell>
                         <Button onClick={(s_value) => {
-                            doPostRequest("transactions/" + value.id + "/undo", "").then(t_value => {
-                                if (t_value.code === 200) {
-                                    doGetRequest("transactions​/limit​/" + window.globalTS.TRANSACTION_LIMIT).then((value) => {
-                                        if (value.code === 200) {
-                                            settransactions(value.content)
-                                        }
-                                    })
+                            settransactionToDelete(
+                                {
+                                    id: value.id,
+                                    name: value.description,
+                                    by: value.memberName !== undefined ? value.memberName : "???",
+                                    date: format("{0} - {1}", dateToString(new Date(value.date)), timeToString(new Date(value.date)))
                                 }
-                            })
+                            )
+                            setwarningOpen(true)
                         }}>
                             <Undo />
                         </Button>
                     </TableCell>
                 </TableRow>
-            })
+            })}
+                <WarningPopup
+                    title={TRANSAKTION_RUECKGAENIG}
+                    text={format(SICHER_TRANSAKTION_RUECKGAENIG, transactionToDelete.name, transactionToDelete.by, transactionToDelete.date)}
+                    isOpen={warningOpen}
+                    close={setwarningOpen}
+                    yes={() => {
+                        doPostRequest("transactions/" + transactionToDelete.id + "/undo", "").then(t_value => {
+                            if (t_value.code === 200) {
+                                doGetRequest("transactions/limit/" + window.globalTS.TRANSACTION_LIMIT).then((value) => {
+                                    if (value.code === 200) {
+                                        settransactions(value.content)
+                                    }
+                                })
+                            }
+                        })
+                    }}
+                    no={() => { }}
+                />
+            </>
         } else {
             return <>
             </>
