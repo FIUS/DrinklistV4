@@ -41,8 +41,8 @@ const MemberNameEditDialog = (props: Props) => {
                     {format(AENDERE_NAME_ODER_ALIAS, props.member.name)}
                 </DialogContentText>
                 <Spacer vertical={30} />
-                <div className={style.editDrinkContainer}>
-                    <div className={style.editDrinkRow}>
+                <div className={style.editMemberContainer}>
+                    <div className={style.editMemberRow}>
                         <TextField
                             fullWidth
                             label={NUTZERNAME_AENDERN}
@@ -78,7 +78,7 @@ const MemberNameEditDialog = (props: Props) => {
                             {AENDERN}
                         </Button>
                     </div>
-                    <div className={style.editDrinkRow}>
+                    <div className={style.editMemberRow}>
                         <TextField
                             fullWidth
                             label={ALIAS_AENDERN}
