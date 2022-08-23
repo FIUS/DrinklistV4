@@ -1,5 +1,5 @@
 import { AddBox, Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
@@ -12,7 +12,7 @@ import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, PASSWORT, SICHER_X_LOESCHEN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, NUTZER_LEOSCHEN, PASSWORT, SICHER_X_LOESCHEN, SICHTBARKEIT_AENDERN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 import MemberNameEditDialog from './MemberNameEditDialog';
@@ -215,25 +215,29 @@ const Members = (props: Props) => {
                                     <TableCell>{value.balance.toFixed(2)}€</TableCell>
                                     <TableCell>
                                         <DialogManager member={value} />
-                                        <Button onClick={() => {
-                                            doPostRequest("users/" + value.id + "/visibility/toggle", "").then((s_value) => {
-                                                if (s_value.code === 200) {
-                                                    doGetRequest("users").then((t_value) => {
-                                                        if (t_value.code === 200) {
-                                                            dispatch(setMembers(t_value.content))
-                                                        }
-                                                    })
-                                                }
-                                            })
-                                        }}>
-                                            <VisibilityOff />
-                                        </Button>
-                                        <Button onClick={() => {
-                                            setuserToDelete({ name: value.name, id: value.id })
-                                            setdeleteDialogOpen(true)
-                                        }}>
-                                            <Delete />
-                                        </Button>
+                                        <Tooltip title={SICHTBARKEIT_AENDERN}>
+                                            <Button onClick={() => {
+                                                doPostRequest("users/" + value.id + "/visibility/toggle", "").then((s_value) => {
+                                                    if (s_value.code === 200) {
+                                                        doGetRequest("users").then((t_value) => {
+                                                            if (t_value.code === 200) {
+                                                                dispatch(setMembers(t_value.content))
+                                                            }
+                                                        })
+                                                    }
+                                                })
+                                            }}>
+                                                <VisibilityOff />
+                                            </Button>
+                                        </Tooltip>
+                                        <Tooltip title={NUTZER_LEOSCHEN}>
+                                            <Button onClick={() => {
+                                                setuserToDelete({ name: value.name, id: value.id })
+                                                setdeleteDialogOpen(true)
+                                            }}>
+                                                <Delete />
+                                            </Button>
+                                        </Tooltip>
 
                                     </TableCell>
 
