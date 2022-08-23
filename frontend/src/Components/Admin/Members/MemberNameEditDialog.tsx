@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { Drink, Member } from '../../../types/ResponseTypes';
 import { useDispatch, useSelector } from 'react-redux';
-import { AENDERN, ALIAS_AENDERN, ALIAS_GEAENDERT, FERTIG, GETRAENK_BEARBEITEN, GETRAENK_BEARBEITEN_BESCHREIBUNG, NAME_GEAENDERT, NUTZERNAME_AENDERN, NUTZERNAME_NICHT_GEAENDERT, NUTZERNAME_NICHT_LEER } from '../../Common/Internationalization/i18n';
+import { AENDERE_NAME_ODER_ALIAS, AENDERN, ALIAS_AENDERN, ALIAS_GEAENDERT, FERTIG, GETRAENK_BEARBEITEN, GETRAENK_BEARBEITEN_BESCHREIBUNG, NAME_GEAENDERT, NUTZERNAME_AENDERN, NUTZERNAME_NICHT_GEAENDERT, NUTZERNAME_NICHT_LEER, NUTZER_AENDERN } from '../../Common/Internationalization/i18n';
 import { format } from 'react-string-format';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { RootState } from '../../../Reducer/reducerCombiner';
@@ -38,10 +38,10 @@ const MemberNameEditDialog = (props: Props) => {
 
     return (
         <Dialog open={props.isOpen} onClose={props.close}>
-            <DialogTitle>{GETRAENK_BEARBEITEN}</DialogTitle>
+            <DialogTitle>{NUTZER_AENDERN}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    {format(GETRAENK_BEARBEITEN_BESCHREIBUNG, props.member.name)}
+                    {format(AENDERE_NAME_ODER_ALIAS, props.member.name)}
                 </DialogContentText>
                 <Spacer vertical={30} />
                 <div className={style.editDrinkContainer}>
