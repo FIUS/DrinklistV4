@@ -149,6 +149,40 @@ class user_deposit(Resource):
         return util.build_response("Money added")
 
 
+model = api.model('Alias', {
+    'alias': fields.String(required=True)
+})
+
+
+@api.route('/users/<int:member_id>/alias')
+class user_deposit(Resource):
+    @admin
+    @api.doc(body=model)
+    def post(self, member_id):
+        """
+        Set the alias of a user
+        """
+        db.change_user_alias(member_id, str(request.json["alias"]))
+        return util.build_response("Alias changed")
+
+
+model = api.model('Name', {
+    'name': fields.String(required=True)
+})
+
+
+@api.route('/users/<int:member_id>/name')
+class user_deposit(Resource):
+    @admin
+    @api.doc(body=model)
+    def post(self, member_id):
+        """
+        Set the username of a user
+        """
+        db.change_user_name(member_id, str(request.json["name"]))
+        return util.build_response("Name changed")
+
+
 @api.route('/users/<int:member_id>/delete')
 class delete_user(Resource):
     @admin

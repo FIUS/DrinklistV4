@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 class Member(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     name = sql.Column(sql.String(100), nullable=False, unique=True)
+    alias = sql.Column(sql.String(100), nullable=False, default="")
     balance = sql.Column(sql.Float, default=0, nullable=True)
     hidden = sql.Column(sql.Boolean, nullable=False, default=False)
     password = sql.Column(sql.LargeBinary(length=128), nullable=False)

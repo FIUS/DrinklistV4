@@ -1,5 +1,6 @@
 import json
 from operator import truediv
+from unicodedata import name
 import requests
 from authenticator import TokenManager
 import util
@@ -281,6 +282,18 @@ class Queries:
         hashedPassword, salt = TokenManager.hashPassword(password)
         member.password = hashedPassword
         member.salt = salt
+        self.session.commit()
+
+    def change_user_alias(self, alias, member_id):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        member.alias = alias
+        self.session.commit()
+
+    def change_user_name(self, name, member_id):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        member.name = name
         self.session.commit()
 
     def backup_database(self):
