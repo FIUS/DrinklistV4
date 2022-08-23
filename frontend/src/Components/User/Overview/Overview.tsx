@@ -53,7 +53,12 @@ const Overview = (props: Props) => {
             />
 
             <div className={style.buttonArea}>
-                {common.members?.sort((value1, value2) => value1.name.localeCompare(value2.name))?.map(value => {
+                {common.members?.sort((value1, value2) => {
+                    const name1 = value1.alias !== "" ? value1.alias : value1.name
+                    const name2 = value2.alias !== "" ? value2.alias : value2.name
+                    return name1.localeCompare(name2)
+                }
+                )?.map(value => {
                     if (!value.hidden) {
                         return <Grow in={searchfield === "" || value.name.toLowerCase().includes(searchfield.toLowerCase())} key={value.id} unmountOnExit>
                             <div style={{ width: "100%" }}>
