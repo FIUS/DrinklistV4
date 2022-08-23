@@ -15,7 +15,8 @@ import { RootState } from '../../../Reducer/reducerCombiner';
 import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, NUTZER_LEOSCHEN, PASSWORT, SICHER_X_LOESCHEN, SICHTBARKEIT_AENDERN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
-
+import MemberNameEditDialog from './MemberNameEditDialog';
+import { Member } from '../../../types/ResponseTypes';
 type Props = {}
 
 const Members = (props: Props) => {
@@ -29,6 +30,8 @@ const Members = (props: Props) => {
     const [searchID, setsearchID] = useState("")
     const [deleteDialogOpen, setdeleteDialogOpen] = useState(false)
     const [userToDelete, setuserToDelete] = useState<{ name: string, id: number }>({ name: "", id: -1 })
+    const [memberChangeOpen, setmemberChangeOpen] = useState(false)
+    const [memberToChange, setmemberToChange] = useState<Member | null>(null)
 
     useEffect(() => {
 
@@ -198,7 +201,16 @@ const Members = (props: Props) => {
                                 >
                                     <TableCell>{value.id}</TableCell>
                                     <TableCell component="th" scope="row">
-                                        {value.name}
+                                        <Button
+                                            sx={{ color: "text.primary", textTransform: "none" }}
+                                            onClick={() => {
+                                                setmemberToChange(value)
+                                                setmemberChangeOpen(true)
+                                            }}
+                                        >
+                                            {value.alias !== "" ? format("{0} ({1})", value.name, value.alias) : value.name}
+                                        </Button>
+
                                     </TableCell>
                                     <TableCell>{value.balance.toFixed(2)}€</TableCell>
                                     <TableCell>
@@ -253,6 +265,17 @@ const Members = (props: Props) => {
                         })
                     }}
                     no={() => { }}
+                />
+                <MemberNameEditDialog
+                    isOpen={memberChangeOpen}
+                    close={() => setmemberChangeOpen(false)}
+                    member={memberToChange ? memberToChange : {
+                        id: 0,
+                        name: "",
+                        balance: 0,
+                        hidden: true,
+                        alias: ""
+                    }}
                 />
             </div>
             <Spacer vertical={50} />

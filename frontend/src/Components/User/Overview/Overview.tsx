@@ -57,7 +57,7 @@ const Overview = (props: Props) => {
                     if (!value.hidden) {
                         return <Grow in={searchfield === "" || value.name.toLowerCase().includes(searchfield.toLowerCase())} key={value.id} unmountOnExit>
                             <div style={{ width: "100%" }}>
-                                <UserButton key={value.id} name={value.name} id={value.id} />
+                                <UserButton key={value.id} name={value.alias === "" ? value.name : value.alias} id={value.id} />
                             </div>
                         </Grow>
                     }
