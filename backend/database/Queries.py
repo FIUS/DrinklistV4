@@ -284,15 +284,17 @@ class Queries:
         member.salt = salt
         self.session.commit()
 
-    def change_user_alias(self, alias, member_id):
+    def change_user_alias(self, member_id, alias):
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
         member.alias = alias
         self.session.commit()
 
-    def change_user_name(self, name, member_id):
+    def change_user_name(self, member_id, name):
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
+        print(member_id)
+        print(name)
         member.name = name
         self.session.commit()
 

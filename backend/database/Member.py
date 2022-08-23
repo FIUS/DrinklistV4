@@ -1,6 +1,7 @@
 import sqlalchemy as sql
 from web import sql_database as db
 from sqlalchemy.orm import relationship
+import util
 
 
 class Member(db.Model):
@@ -17,7 +18,8 @@ class Member(db.Model):
             "id": self.id,
             "name": self.name,
             "balance": self.balance,
-            "hidden": self.hidden
+            "hidden": self.hidden,
+            "alias": self.alias if util.use_alias else ""
         }
 
     def to_dict_with_password(self):

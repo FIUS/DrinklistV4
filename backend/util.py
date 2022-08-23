@@ -7,8 +7,8 @@ cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
     60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
 domain = os.environ.get("DOMAIN") if os.environ.get(
     "DOMAIN") else "127.0.0.1:3000"
-logging_enabled = True if os.environ.get(
-    "DEBUG") else False
+logging_enabled = os.environ.get(
+    "DEBUG") == "true" if os.environ.get("DEBUG") else False
 
 token = os.environ.get("X_AUTH_TOKEN")
 old_domain = os.environ.get("OLD_DOMAIN")
@@ -28,6 +28,8 @@ undo_timelimit = int(os.environ.get(
     "UNDO_TIMELIMIT")) if os.environ.get("UNDO_TIMELIMIT") else 1
 default_drink_category = int(os.environ.get(
     "DEFAULT_DRINK_CATEGORY")) if os.environ.get("DEFAULT_DRINK_CATEGORY") else "Getränk"
+use_alias = os.environ.get(
+    "USE_ALIAS") == "true" if os.environ.get("USE_ALIAS") else True
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"

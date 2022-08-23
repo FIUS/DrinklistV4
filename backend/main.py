@@ -179,6 +179,8 @@ class user_deposit(Resource):
         """
         Set the username of a user
         """
+        if str(request.json["name"]) == "":
+            return util.build_response("Name cannot be empty", code=412)
         db.change_user_name(member_id, str(request.json["name"]))
         return util.build_response("Name changed")
 

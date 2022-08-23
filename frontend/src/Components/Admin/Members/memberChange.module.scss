@@ -1,0 +1,90 @@
+@import "../../Common/variables.module.scss";
+
+.drinksContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+}
+
+.drinksContainerInner {
+    @extend .drinksContainer;
+    margin-top: $padding;
+    width: 100%;
+}
+
+.drinkPaper {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    min-height: 60px;
+    width: fit-content;
+    min-width: 300px;
+    padding: $padding;
+    @media screen and (max-width: $PHONE_SIZE_THRESHOLD) {
+        width: 100%;
+    }
+}
+
+.addDrinkPaper {
+    @extend .drinkPaper;
+}
+
+.smallTextFieldContainer {
+    display: flex;
+    align-items: center;
+}
+
+.buttonsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+}
+
+.drinksOutterContainer {
+    padding: $padding;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+}
+
+.smallTextField {
+    width: 150px;
+}
+
+.stockDialog {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.stockDialogInner {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: $flex-gap;
+}
+
+.topContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $flex-gap;
+}
+
+.editDrinkRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: $flex-gap;
+}
+
+.editDrinkContainer {
+    display: flex;
+    flex-direction: column;
+    gap: $flex-gap;
+}
