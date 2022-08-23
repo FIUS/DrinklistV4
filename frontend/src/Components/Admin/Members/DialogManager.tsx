@@ -1,5 +1,5 @@
 import { Key } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import { Button, Tooltip } from '@mui/material'
 import React, { useState } from 'react'
 import { Member } from '../../../types/ResponseTypes'
 import ExchangeDialog from './ExchangeDialog'
@@ -16,12 +16,16 @@ const DialogManager = (props: Props) => {
 
     return (
         <>
-            <Button onClick={() => setexopen(true)}><CurrencyExchangeIcon /></Button>
+            <Tooltip title="Guthaben ändern">
+                <Button onClick={() => setexopen(true)}><CurrencyExchangeIcon /></Button>
+            </Tooltip>
             <ExchangeDialog
                 isOpen={exopen}
                 close={() => setexopen(false)}
                 member={props.member} />
-            <Button onClick={() => setopen(true)}><Key /></Button>
+            <Tooltip title="Passwort ändern">
+                <Button onClick={() => setopen(true)}><Key /></Button>
+            </Tooltip>
             <PasswordDialog
                 isOpen={open}
                 close={() => setopen(false)}
