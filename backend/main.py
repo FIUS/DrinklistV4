@@ -598,6 +598,16 @@ class login(Resource):
         return util.build_response("Unauthorized", code=403)
 
 
+@api.route('/cookies')
+class cookie(Resource):
+    def get(self):
+        """
+        Get the memberID and token for using the api
+        """
+
+        return util.build_response({"memberID": request.cookies.get('memberID'), "token": request.cookies.get('token')})
+
+
 @api.route('/logout')
 class logout(Resource):
     @authenticated
