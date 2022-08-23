@@ -58,7 +58,9 @@ const Members = (props: Props) => {
 
 
     const filteredMembers = common.members?.filter(value => {
-        return ((value.name.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
+        return ((value.name.toLocaleLowerCase().includes(searchName.toLowerCase()) ||
+            value.alias.toLocaleLowerCase().includes(searchName.toLowerCase()) ||
+            searchName === "") &&
             (value.id.toString().toLowerCase().includes(searchID.toLowerCase()) || searchID === "")) ||
             (searchName === "" && searchID === "")
     })
