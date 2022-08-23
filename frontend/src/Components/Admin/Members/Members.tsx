@@ -12,7 +12,7 @@ import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, PASSWORT, SICHER_X_LOESCHEN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, NUTZER_LEOSCHEN, PASSWORT, SICHER_X_LOESCHEN, SICHTBARKEIT_AENDERN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 
@@ -203,7 +203,7 @@ const Members = (props: Props) => {
                                     <TableCell>{value.balance.toFixed(2)}€</TableCell>
                                     <TableCell>
                                         <DialogManager member={value} />
-                                        <Tooltip title="Sichtbarkeit ändern">
+                                        <Tooltip title={SICHTBARKEIT_AENDERN}>
                                             <Button onClick={() => {
                                                 doPostRequest("users/" + value.id + "/visibility/toggle", "").then((s_value) => {
                                                     if (s_value.code === 200) {
@@ -218,7 +218,7 @@ const Members = (props: Props) => {
                                                 <VisibilityOff />
                                             </Button>
                                         </Tooltip>
-                                        <Tooltip title="Nutzer löschen">
+                                        <Tooltip title={NUTZER_LEOSCHEN}>
                                             <Button onClick={() => {
                                                 setuserToDelete({ name: value.name, id: value.id })
                                                 setdeleteDialogOpen(true)

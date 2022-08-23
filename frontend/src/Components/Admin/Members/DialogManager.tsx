@@ -5,6 +5,7 @@ import { Member } from '../../../types/ResponseTypes'
 import ExchangeDialog from './ExchangeDialog'
 import PasswordDialog from './PasswordDialog'
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import { GUTHABEN_AENDERN, PASSWORT_AENDERN } from '../../Common/Internationalization/i18n'
 
 type Props = {
     member: Member
@@ -16,14 +17,14 @@ const DialogManager = (props: Props) => {
 
     return (
         <>
-            <Tooltip title="Guthaben ändern">
+            <Tooltip title={GUTHABEN_AENDERN}>
                 <Button onClick={() => setexopen(true)}><CurrencyExchangeIcon /></Button>
             </Tooltip>
             <ExchangeDialog
                 isOpen={exopen}
                 close={() => setexopen(false)}
                 member={props.member} />
-            <Tooltip title="Passwort ändern">
+            <Tooltip title={PASSWORT_AENDERN}>
                 <Button onClick={() => setopen(true)}><Key /></Button>
             </Tooltip>
             <PasswordDialog
