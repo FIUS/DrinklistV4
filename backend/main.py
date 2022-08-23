@@ -1,3 +1,4 @@
+from difflib import SequenceMatcher
 from datetime import datetime, timedelta
 import os
 from statistics import mode
@@ -8,6 +9,7 @@ from flask import send_from_directory
 from flask.wrappers import Request
 from functools import wraps
 import authenticator
+from database.Drink import Drink
 import util
 from web import *
 import json
@@ -227,6 +229,30 @@ class get_drinks(Resource):
         Get all drinks
         """
         return util.build_response(db.get_drinks())
+
+
+@api.route('/drinks/search/<string:drink_search>')
+class search_drinks(Resource):
+    @authenticated
+    def get(self, drink_search):
+        """
+        Search for drinks
+        """
+        drinks: list[Drink] = db.get_drinks()
+        prepared_search = str(drink_search).replace(" ", "").lower()
+
+        for d in drinks:
+            if str(d["name"]).replace(" ", "").lower() == prepared_search:
+                return util.build_response({"precise": True, "drinks": d})
+
+        for d in drinks:
+            d['matching'] = SequenceMatcher(
+                None, d["name"], drink_search).ratio()
+
+        drinks.sort(key=lambda x: x['matching'])
+        drinks.reverse()
+
+        return util.build_response({"precise": False, "drinks": drinks})
 
 
 @api.route('/drinks/categories')
