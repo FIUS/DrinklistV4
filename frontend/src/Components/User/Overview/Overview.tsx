@@ -8,6 +8,7 @@ import { doGetRequest } from '../../Common/StaticFunctions';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { NAME, WER_BIST_DU } from '../../Common/Internationalization/i18n';
+import { Member } from '../../../types/ResponseTypes';
 
 type Props = {}
 
@@ -36,6 +37,12 @@ const Overview = (props: Props) => {
         }
     }, [common.drinks, common.members, common.drinkCategories, dispatch])
 
+    const userVisible = (member: Member) => {
+        return searchfield === "" ||
+            member.name.toLowerCase().includes(searchfield.toLowerCase()) ||
+            member.alias.toLowerCase().includes(searchfield.toLowerCase())
+    }
+
     return (
         <div className={style.outterContainer}>
             <div className={style.headline}>
@@ -60,7 +67,7 @@ const Overview = (props: Props) => {
                 }
                 )?.map(value => {
                     if (!value.hidden) {
-                        return <Grow in={searchfield === "" || value.name.toLowerCase().includes(searchfield.toLowerCase())} key={value.id} unmountOnExit>
+                        return <Grow in={userVisible(value)} key={value.id} unmountOnExit>
                             <div style={{ width: "100%" }}>
                                 <UserButton key={value.id} name={value.alias === "" ? value.name : value.alias} id={value.id} />
                             </div>
