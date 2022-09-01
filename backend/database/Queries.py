@@ -137,7 +137,7 @@ class Queries:
     def buy_drink(self, member_id, drink_id):
         drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
         if drink is None:
-            return "Drink does not exist"
+            return {}
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
 
@@ -148,7 +148,7 @@ class Queries:
 
         self.session.commit()
 
-        return None
+        return drink.to_dict()
 
     def get_drink_categories(self):
         drinks = self.session.query(Drink).all()

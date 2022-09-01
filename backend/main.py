@@ -387,10 +387,10 @@ class buy_drink(Resource):
         """
         status = db.buy_drink(
             request.json["memberID"], request.json["drinkID"])
-        if status == None:
-            return util.build_response("Drink bought")
+        if "name" in status:
+            return util.build_response(f"Drink {status['name']} bought")
         else:
-            return util.build_response(status, code=400)
+            return util.build_response("Drink does not exist", code=400)
 
 
 @api.route('/transactions')
