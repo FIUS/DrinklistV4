@@ -460,6 +460,7 @@ class Queries:
                 name=m['name'],
                 balance=m['balance'],
                 hidden=m['hidden'],
+                alias=m['alias'],
                 password=bytes.fromhex(m['password']),
                 salt=m['salt']))
         for t in imported_data["transactions"]:
