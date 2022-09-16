@@ -54,6 +54,11 @@ def admin(fn):
     return wrapper
 
 
+model_amount = api.model('Amount', {
+    'amount': fields.Float(required=True)
+})
+
+
 @api.route('/users')
 class GET_USERS(Resource):
     @authenticated
@@ -123,6 +128,30 @@ class change_user_password(Resource):
         return util.build_response("Password changed")
 
 
+@api.route('/users/<int:member_id_from>/transfer/<int:member_id_to>')
+class transfer_money(Resource):
+    @authenticated
+    @api.doc(body=model_amount)
+    def post(self, member_id_from, member_id_to):
+        """
+        Transfer money from one member to another
+        """
+
+        amount = float(request.json['amount'])
+
+        if amount < 0:
+            return util.build_response("Amount has to be positive", code=412)
+
+        cookie_member_id = request.cookies.get('memberID')
+        
+        if str(member_id_from) == str(cookie_member_id) or cookie_member_id == "1":
+            db.transfer(member_id_from, member_id_to, amount)
+        else:
+            return util.build_response("Your are not allowed to transfer money from this account", code=403)
+
+        return util.build_response(f"{amount}€ transfered")
+
+
 @api.route('/users/<int:member_id>/visibility/toggle')
 class toggle_user_visibility(Resource):
     @admin
@@ -132,11 +161,6 @@ class toggle_user_visibility(Resource):
         """
         db.change_user_visibility(member_id)
         return util.build_response("Changed visibility")
-
-
-model_amount = api.model('Amount', {
-    'amount': fields.Float(required=True)
-})
 
 
 @api.route('/users/<int:member_id>/deposit')

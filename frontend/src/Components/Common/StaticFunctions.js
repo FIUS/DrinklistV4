@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 
 export const doPostRequest = async (path, data) => {
     const resp = await fetch(window.globalTS.DOMAIN + path,
@@ -8,15 +9,11 @@ export const doPostRequest = async (path, data) => {
             body: JSON.stringify(data)
         });
     const status_code = resp.status
-    if (status_code === 200) {
-        const userJson = await resp.json();
 
-        return { code: status_code, content: userJson }
-    } else if (status_code === 403) {
-        return { code: status_code }
-    } else {
-        return { code: status_code }
-    }
+    const userJson = await resp.json();
+
+    return { code: status_code, content: userJson }
+
 };
 
 
@@ -177,3 +174,8 @@ export const timeTupleToString = (times) => {
     return startHours + ":" + startMinutes + " - " + endHours + ":" + endMinutes + " Uhr"
 }
 
+export const getmemberIDCookie = () => {
+    const rawMemberID = Cookies.get("memberID")
+
+    return rawMemberID ? parseInt(rawMemberID) : null
+}

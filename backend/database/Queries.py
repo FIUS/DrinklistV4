@@ -186,6 +186,15 @@ class Queries:
             id=transaction.member_id).first()
         member.balance -= transaction.amount
 
+        if transaction.connected_transaction_id is not None:
+            transaction_connected: Transaction = self.session.query(
+                Transaction).filter_by(id=transaction.connected_transaction_id).first()
+
+            member_connected: Member = self.session.query(Member).filter_by(
+                id=transaction_connected.member_id).first()
+            member_connected.balance -= transaction_connected.amount
+            self.session.delete(transaction_connected)
+
         self.session.delete(transaction)
 
         self.session.commit()
@@ -377,6 +386,37 @@ class Queries:
             open_issues = int(open_issues.value)
 
         return {"releaseTag": release_tag, "releaseMessage": release_message, "openIssues": open_issues}
+
+    def transfer(self, member_id_from, member_id_to, amount):
+        member_from: Member = self.session.query(
+            Member).filter_by(id=member_id_from).first()
+        member_to: Member = self.session.query(
+            Member).filter_by(id=member_id_to).first()
+
+        member_from.balance -= amount
+        member_to.balance += amount
+
+        transaction_minus = Transaction(
+            description=f"Transfer money to {member_to.name}",
+            member_id=member_from.id,
+            amount=-amount,
+            date=datetime.now())
+
+        transaction_plus = Transaction(
+            description=f"Transfer money from {member_from.name}",
+            member_id=member_to.id,
+            amount=amount,
+            date=datetime.now())
+
+        self.session.add(transaction_minus)
+        self.session.add(transaction_plus)
+
+        self.session.commit()
+
+        transaction_minus.connected_transaction_id = transaction_plus.id
+        transaction_plus.connected_transaction_id = transaction_minus.id
+
+        self.session.commit()
 
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
