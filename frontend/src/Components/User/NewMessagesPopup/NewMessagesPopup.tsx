@@ -2,6 +2,7 @@ import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText
 import Cookies from 'js-cookie'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import { format } from 'react-string-format'
 import { openErrorToast } from '../../../Actions/CommonAction'
 import { Message } from '../../../types/ResponseTypes'
@@ -17,6 +18,7 @@ const NewMessagesPopup = (props: Props) => {
     const [messages, setmessages] = useState<Array<Message>>([])
     const [dialogOpen, setdialogOpen] = useState(false)
     const dispatch = useDispatch()
+    const location = useLocation()
 
     useEffect(() => {
         const cookie = Cookies.get("memberID")
@@ -24,7 +26,7 @@ const NewMessagesPopup = (props: Props) => {
         if (messages.length === 0) {
             getAndStore(format("users/{0}/messages", memberID), setmessages)
         }
-    }, [messages.length])
+    }, [messages.length, location.pathname])
 
     useEffect(() => {
         if (messages.length > 0) {

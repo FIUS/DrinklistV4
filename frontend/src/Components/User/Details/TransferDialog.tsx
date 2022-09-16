@@ -43,8 +43,6 @@ const TransferDialog = (props: Props) => {
         setreason(null)
     }
 
-    console.log(chosenEmoji)
-
     return (
         <Dialog open={props.isOpen} onClose={props.close} sx={{ zIndex: 20000000 }}>
             <DialogTitle>{GELD_UEBERWEISEN}</DialogTitle>
