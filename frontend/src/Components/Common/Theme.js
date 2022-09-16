@@ -731,6 +731,18 @@ export const darkTheme3 = createTheme({
                     backgroundColor: "rgba(0,0,0,0.4)"
                 }
             }
+        }, MuiFormHelperText: {
+            styleOverrides: {
+                root: {
+                    color: "lightgrey"
+                }
+            }
+        }, MuiListItemText: {
+            styleOverrides: {
+                secondary: {
+                    color: 'lightgray'
+                }
+            }
         }, MuiTypography: {
             styleOverrides: {
                 body1: {
@@ -821,6 +833,15 @@ export const darkTheme3 = createTheme({
             styleOverrides: {
                 listbox: {
                     background: "rgba(0,0,0,0.85); "
+                },
+                popper: {
+                    zIndex: 20000001
+                }
+            }
+        }, MuiAvatar: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
                 }
             }
         },
@@ -890,6 +911,12 @@ export const darkTheme4 = createTheme({
             styleOverrides: {
                 body1: {
                     color: "white !important"
+                }
+            }
+        }, MuiFormHelperText: {
+            styleOverrides: {
+                root: {
+                    color: "lightgrey"
                 }
             }
         },
@@ -976,10 +1003,25 @@ export const darkTheme4 = createTheme({
             styleOverrides: {
                 listbox: {
                     background: "rgba(0,0,0,0.85); "
+                },
+                popper: {
+                    zIndex: 20000001
                 }
             }
         },
-        MuiAccordion: {
+        MuiListItemText: {
+            styleOverrides: {
+                secondary: {
+                    color: 'lightgray'
+                }
+            }
+        }, MuiAvatar: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
+                }
+            }
+        }, MuiAccordion: {
             styleOverrides: {
                 root: {
                     maxWidth: (window.innerWidth - 30) + "px"

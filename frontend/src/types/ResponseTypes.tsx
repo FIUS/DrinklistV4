@@ -30,3 +30,9 @@ export type Checkout = {
     currentCash: number,
     transactions?: Array<Transaction>
 }
+
+export type Message = {
+    text: string,
+    memberNameFrom: string,
+    emoji: string
+}

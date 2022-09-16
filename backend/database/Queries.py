@@ -387,7 +387,7 @@ class Queries:
 
         return {"releaseTag": release_tag, "releaseMessage": release_message, "openIssues": open_issues}
 
-    def transfer(self, member_id_from, member_id_to, amount):
+    def transfer(self, member_id_from, member_id_to, amount, message=None):
         member_from: Member = self.session.query(
             Member).filter_by(id=member_id_from).first()
         member_to: Member = self.session.query(
@@ -396,14 +396,21 @@ class Queries:
         member_from.balance -= amount
         member_to.balance += amount
 
+        string_to = f"Transfer money to {member_to.name}"
+        string_from = f"Transfer money from {member_from.name}"
+
+        if message is not None:
+            string_to = f"Transfer money to {member_to.name}: {message}"
+            string_from = f"Transfer money from {member_from.name}: {message}"
+
         transaction_minus = Transaction(
-            description=f"Transfer money to {member_to.name}",
+            description=string_to,
             member_id=member_from.id,
             amount=-amount,
             date=datetime.now())
 
         transaction_plus = Transaction(
-            description=f"Transfer money from {member_from.name}",
+            description=string_from,
             member_id=member_to.id,
             amount=amount,
             date=datetime.now())
@@ -415,6 +422,31 @@ class Queries:
 
         transaction_minus.connected_transaction_id = transaction_plus.id
         transaction_plus.connected_transaction_id = transaction_minus.id
+
+        self.session.commit()
+
+        return member_from.name
+
+    def add_message(self, member_id, message, from_name=None, emoji=None):
+        self.session.add(Reminder(member_id=member_id, text=message,
+                         member_name_from=from_name, emoji=emoji))
+        self.session.commit()
+
+    def get_messages(self, member_id):
+        reminders: list[Reminder] = self.session.query(
+            Reminder).filter_by(member_id=member_id).all()
+        output = []
+        for r in reminders:
+            output.append(r.to_dict())
+
+        return output
+
+    def remove_messages(self, member_id):
+        reminders: list[Reminder] = self.session.query(
+            Reminder).filter_by(member_id=member_id).all()
+
+        for r in reminders:
+            self.session.delete(r)
 
         self.session.commit()
 

@@ -54,6 +54,10 @@ def admin(fn):
     return wrapper
 
 
+def is_self_or_admin(request, member_id):
+    return str(member_id) == str(request.cookies.get('memberID')) or str(request.cookies.get('memberID')) == "1"
+
+
 model_amount = api.model('Amount', {
     'amount': fields.Float(required=True)
 })
@@ -142,10 +146,19 @@ class transfer_money(Resource):
         if amount < 0:
             return util.build_response("Amount has to be positive", code=412)
 
-        cookie_member_id = request.cookies.get('memberID')
-        
-        if str(member_id_from) == str(cookie_member_id) or cookie_member_id == "1":
-            db.transfer(member_id_from, member_id_to, amount)
+        if is_self_or_admin(request, member_id_from):
+            message = None
+            if 'reason' in request.json:
+                message = request.json['reason']
+
+            from_name = db.transfer(
+                member_id_from, member_id_to, amount, message)
+            db.add_message(
+                member_id_to,
+                f"Du hast {'{:.2f}'.format(amount)}€ von {from_name} erhalten{f' mit folgender Nachricht: {message}' if message is not None else ''}",
+                from_name,
+                request.json['emoji'] if 'emoji' in request.json else None
+            )
         else:
             return util.build_response("Your are not allowed to transfer money from this account", code=403)
 
@@ -223,6 +236,27 @@ class delete_user(Resource):
             return util.build_response("User deleted")
         else:
             return util.build_response("Admin and moderator cannot be deleted", code=412)
+
+
+@api.route('/users/<int:member_id>/messages')
+class user_messages(Resource):
+    @authenticated
+    def get(self, member_id):
+        """
+        Returns all messages of a user
+        """
+        if is_self_or_admin(request, member_id):
+            return util.build_response(db.get_messages(member_id))
+        return util.build_response("Unauthorized", code=403)
+
+    @authenticated
+    def delete(self, member_id):
+        """
+        Removes all messages of a user
+        """
+        if is_self_or_admin(request, member_id):
+            return util.build_response(db.remove_messages(member_id))
+        return util.build_response("Unauthorized", code=403)
 
 
 model = api.model('Add User', {
