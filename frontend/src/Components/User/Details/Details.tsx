@@ -1,5 +1,5 @@
 import { Button, Grow, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
@@ -7,14 +7,15 @@ import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
+import { dateToString, doGetRequest, doPostRequest, getmemberIDCookie, timeToString } from '../../Common/StaticFunctions';
 import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
 import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
+import TransferDialog from './TransferDialog'
 const historyLocationThreshold = 1650;
 
 type Props = {}
@@ -25,7 +26,18 @@ const Details = (props: Props) => {
     const dispatch = useDispatch()
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchField, setsearchField] = useState("")
+    const [dialogOpen, setdialogOpen] = useState(false)
     const [isUser, setisUser] = useState(false)
+    const historyRef = useRef<HTMLDivElement>(null)
+    const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
+    
+    const currentMember = unsafeCurrentMember ? unsafeCurrentMember : {
+        id: 0,
+        name: '',
+        balance: 0,
+        hidden: false,
+        alias: ''
+    };
 
     useEffect(() => {
         if (common.drinks === null || common.members === null || common.drinkCategories === null || common.history === null) {
@@ -83,24 +95,29 @@ const Details = (props: Props) => {
             return value.id === parseInt(params.userid ? params.userid : "")
         })?.balance
         const balanceNotNull = balance !== undefined ? balance : 0
-        if (balanceNotNull > 0) {
-            return <Paper className={style.balanceTop} >
+        const textColor = balanceNotNull > 0 ? "limegreen" : "darkred"
+
+        return <>
+            <Paper className={style.balanceTop} style={{ width: historyRef.current?.offsetWidth }}>
                 <Typography variant='h3'>{KONTOSTAND}:</Typography>
-                <Typography variant='h2' color="limegreen">
+                <Typography variant='h2' color={textColor}>
                     {common.members?.find((value) => {
                         return value.id === parseInt(params.userid ? params.userid : "")
                     })?.balance.toFixed(2)}€
                 </Typography>
+            </Paper>
+        </>
+    }
+
+    const extraFunctions = () => {
+        const pageMemberID = params.userid ? parseInt(params.userid) : null
+        if (getmemberIDCookie() === pageMemberID||getmemberIDCookie()===1) {
+            return <Paper className={style.balanceTop} style={{ width: historyRef.current?.offsetWidth }}>
+                <Typography variant='h5'>{SONDERFUNKTIONEN}:</Typography>
+                <Button onClick={() => setdialogOpen(true)}>{UEBERWEISEN}</Button>
             </Paper>
         } else {
-            return <Paper className={style.balanceTop}>
-                <Typography variant='h3'>{KONTOSTAND}:</Typography>
-                <Typography variant='h2' color="darkred">
-                    {common.members?.find((value) => {
-                        return value.id === parseInt(params.userid ? params.userid : "")
-                    })?.balance.toFixed(2)}€
-                </Typography>
-            </Paper>
+            return <></>
         }
     }
 
@@ -111,7 +128,7 @@ const Details = (props: Props) => {
     }
 
 
-    const history = <div className={style.historyContainer}>
+    const history = <div className={style.historyContainer} ref={historyRef}>
         <Typography variant='h4'>{HISTORY}</Typography>
 
         <TableContainer component={Paper}>
@@ -170,9 +187,15 @@ const Details = (props: Props) => {
 
     return (
         <>
+            <TransferDialog
+                isOpen={dialogOpen}
+                close={() => setdialogOpen(false)}
+                member={currentMember}
+            />
             <div className={style.details}>
                 <div className={style.balanceContainer}>
                     {balancePaper()}
+                    {extraFunctions()}
                     <BalanceBox favorites={common.drinks?.filter((value) => {
                         return common.favorites?.includes(value.id)
                     })}
