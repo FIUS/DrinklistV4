@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { format } from 'react-string-format';
-import { openToast, setMembers } from '../../../Actions/CommonAction';
+import { openToast, setHistory, setMembers } from '../../../Actions/CommonAction';
 
 type Props = {
     isOpen: boolean,
@@ -73,6 +73,11 @@ const TransferDialog = (props: Props) => {
                             doGetRequest("users").then((t_value) => {
                                 if (t_value.code === 200) {
                                     dispatch(setMembers(t_value.content))
+                                }
+                            })
+                            doGetRequest("users/" + from + "/history").then((value) => {
+                                if (value.code === 200) {
+                                    dispatch(setHistory(value.content))
                                 }
                             })
                             props.close()

@@ -157,6 +157,11 @@ const Details = (props: Props) => {
                                         doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
                                             if (innerValue.code === 200) {
                                                 dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, value.description) }))
+                                                doGetRequest("users").then((t_value) => {
+                                                    if (t_value.code === 200) {
+                                                        dispatch(setMembers(t_value.content))
+                                                    }
+                                                })
                                                 doGetRequest("users/" + params.userid + "/history").then((value) => {
                                                     if (value.code === 200) {
                                                         dispatch(setHistory(value.content))
