@@ -28,6 +28,7 @@ class Member(db.Model):
             "name": self.name,
             "balance": self.balance,
             "hidden": self.hidden,
+            "alias": self.alias if util.use_alias else "",
             "password": self.password.hex(),
             "salt": self.salt
         }
