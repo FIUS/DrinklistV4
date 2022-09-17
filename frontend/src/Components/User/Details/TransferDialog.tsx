@@ -20,6 +20,8 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Picker from '@emoji-mart/react'
+// eslint-disable-next-line
+import style from './details.module.scss'
 
 type Props = {
     isOpen: boolean,
@@ -44,7 +46,7 @@ const TransferDialog = (props: Props) => {
     }
 
     return (
-        <Dialog open={props.isOpen} onClose={props.close} sx={{ zIndex: 20000000 }}>
+        <Dialog open={props.isOpen} onClose={props.close} sx={{ zIndex: 20000000 }} >
             <DialogTitle>{GELD_UEBERWEISEN}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
