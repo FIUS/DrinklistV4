@@ -1,5 +1,5 @@
 import { Button, Typography } from '@mui/material'
-import React, { useRef } from 'react'
+import React from 'react'
 import style from './drinkbutton.module.scss'
 import Rating from '@mui/material/Rating';
 import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
