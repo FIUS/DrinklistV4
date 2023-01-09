@@ -17,6 +17,7 @@ from database import Queries
 from flask_restx import fields, Resource, Api
 from flask_restx import reqparse
 import flask
+import mail
 
 api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
 api = Api(api_bp, doc='/docu/', base_url='/api')
@@ -513,7 +514,10 @@ class do_checkout(Resource):
         """
         Create a checkout
         """
-        return util.build_response(db.do_checkout(request.json))
+        db.do_checkout(request.json)
+        mail_infos = db.get_checkout_mail()
+        mail.send_checkout_mails(mail_infos)
+        return util.build_response()
 
     @admin
     def get(self):

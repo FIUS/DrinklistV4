@@ -7,8 +7,16 @@ from email import encoders
 import util
 
 
-def send_checkout_mails():
-    subprocess.run(["lualatex", "checkout.tex"], cwd="Latex")
+def send_checkout_mails(user_infos):
+    """
+    {
+        username: {balance,income,paid,name}
+    }
+    """
+    for username, info in user_infos.items():
+        # do for all
+        send_checkout_mail(info["name"], info["balance"],
+                           info["income"], info["paid"], f"{username}@{util.mail_postfix}")
 
 
 def compile_latex(name):
@@ -64,7 +72,7 @@ def send_mail_with_attachment(subject, to_address, attachment, attachment_name, 
     print("Done sending mail")
 
 
-def send_checkout_mail(name, current_balance, income, paid):
+def send_checkout_mail(name, current_balance, income, paid, mail_address):
     income_sum = 0
     paid_sum = 0
 
@@ -114,4 +122,5 @@ def send_checkout_mail(name, current_balance, income, paid):
         writer.write(raw_latex_file)
 
     compile_latex("checkout")
-    send_mail_with_attachment()
+    send_mail_with_attachment("Getränkelisten Abrechnung", mail_address, "Latex/checkout.pdf",
+                              "Abrechnung.pdf", util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))

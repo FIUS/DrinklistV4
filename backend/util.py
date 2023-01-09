@@ -41,6 +41,8 @@ mail_username = os.environ.get(
     "MAIL_USERNAME") if os.environ.get("MAIL_USERNAME") else None
 mail_password = os.environ.get(
     "MAIL_PASSWORD") if os.environ.get("MAIL_PASSWORD") else None
+mail_postfix = os.environ.get(
+    "MAIL_POSTFIX") if os.environ.get("MAIL_POSTFIX") else None
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
@@ -69,3 +71,13 @@ def log(prefix, message):
         output_string = f"[{time}] {prefix} -> {message}"
         with open("log.txt", 'a+') as f:
             f.write(f"{output_string}\n")
+
+
+checkout_mail_text = """Hallo {name},
+eine Getränkelisten abrechnung wurde durchgeführt, wir möchten dich hiermit über deinen aktuellen Kontostand informieren.
+Aktuell hast du ein Guthaben von {balance}€.
+
+Weitere Details, wie die einzelnen Transaktionen seit der letzten Abrechnung (positiv und negativ) findest du im PDF im Anhang.
+
+Viele Grüße
+"""

@@ -272,6 +272,44 @@ class Queries:
 
         self.session.commit()
 
+    def get_checkout_mail(self):
+        members: list[Member] = self.session.query(Member).all()
+        checkouts = self.get_checkouts()
+        if len(checkouts) > 2:
+            last_checkout = self.get_checkouts()[-2]
+            last_date = datetime.strptime(
+                last_checkout["date"], '%Y-%m-%dT%H:%M:%SZ')
+            "{price,income,paid,name}"
+            member_dict = {}
+            for m in members:
+                transactions: list[Transaction] = self.session.query(Transaction).filter(
+                    Transaction.date > last_date, Transaction.member_id == m.id).all()
+                temp_dict = {}
+                temp_dict["balance"] = m.balance
+                temp_dict["name"] = m.alias if m.alias != "" else m.name
+
+                income_transactions = []
+                paid_transactions = []
+
+                for t in transactions:
+                    t_dict = t.to_dict()
+                    if t_dict["amount"] > 0:
+                        # income
+                        income_transactions.append(
+                            [str(t_dict["description"]).replace("&", "\&"), t.date.strftime('%d.%m.%Y'), t_dict["amount"]])
+                    else:
+                        # paid
+                        paid_transactions.append(
+                            [str(t_dict["description"]).replace("&", "\&"), t.date.strftime('%d.%m.%Y'), float(t_dict["amount"])*-1])
+                temp_dict["income"] = income_transactions
+                temp_dict["paid"] = paid_transactions
+
+                member_dict[m.name] = temp_dict
+
+            return member_dict
+        else:
+            return {}
+
     def checkPassword(self, name, password):
         member: Member = self.session.query(
             Member).filter_by(name=name).first()
