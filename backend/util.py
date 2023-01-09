@@ -31,6 +31,17 @@ default_drink_category = int(os.environ.get(
 use_alias = os.environ.get(
     "USE_ALIAS") == "true" if os.environ.get("USE_ALIAS") else True
 
+mail_server = os.environ.get(
+    "MAIL_SERVER") if os.environ.get("MAIL_SERVER") else None
+mail_port = os.environ.get(
+    "MAIL_PORT") if os.environ.get("MAIL_PORT") else 587
+mail_email = os.environ.get(
+    "MAIL_EMAIL") if os.environ.get("MAIL_EMAIL") else None
+mail_username = os.environ.get(
+    "MAIL_USERNAME") if os.environ.get("MAIL_USERNAME") else None
+mail_password = os.environ.get(
+    "MAIL_PASSWORD") if os.environ.get("MAIL_PASSWORD") else None
+
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
 
