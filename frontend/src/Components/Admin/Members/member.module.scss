@@ -1,21 +1,21 @@
 @import "../../Common/variables.module.scss";
 
-.table{
+.table {
     padding: $padding;
 }
 
-.firstRowAlign{
+.firstRowAlign {
     display: flex;
     align-items: flex-end;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-.hidden{
-    background-color: rgba(0,0,0,0.5);
+.hidden {
+    background-color: rgba(0, 0, 0, 0.103);
 }
 
-.statisticBoxes{
+.statisticBoxes {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -23,10 +23,10 @@
     gap: $flex-gap;
 }
 
-.searchID{
+.searchID {
     width: 80px;
 }
 
-.searchName{
+.searchName {
     width: 200px;
 }

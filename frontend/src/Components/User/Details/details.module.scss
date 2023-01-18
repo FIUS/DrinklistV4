@@ -9,20 +9,20 @@
 }
 
 .balanceTop {
-    width: fit-content;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     padding: $padding;
     gap: $flex-gap;
-    //background-color: #f1f1f1 !important;
+    max-width: 440px;
 }
 
 .drinkButtonContainer {
     display: flex;
     gap: $flex-gap;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
+    max-width: 65vw;
 }
 
 .balanceBoxContainer {
@@ -59,7 +59,7 @@
     flex-direction: column;
     gap: $flex-gap;
     min-width: 340px;
-    max-width: 500px;
+    max-width: 410px;
 }
 
 .footer {
