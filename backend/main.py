@@ -261,6 +261,7 @@ class user_messages(Resource):
 
 model = api.model('Add User', {
     'name': fields.String(description='Name of the new user', required=True),
+    'alias': fields.String(description='Alias of the user', required=False),
     'money': fields.Float(description='Initial balance of the user', required=True),
     'password': fields.String(description='Initial password of user', required=True),
 })
@@ -274,8 +275,12 @@ class add_user(Resource):
         """
         Add a user
         """
-        db.add_user(request.json["name"],
-                    request.json["money"], request.json["password"])
+        if 'alias' in request.json:
+            db.add_user(request.json["name"],
+                        request.json["money"], request.json["password"], alias=request.json["alias"])
+        else:
+            db.add_user(request.json["name"],
+                        request.json["money"], request.json["password"])
         return util.build_response("User added")
 
 
