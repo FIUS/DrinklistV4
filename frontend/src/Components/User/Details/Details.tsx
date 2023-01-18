@@ -98,7 +98,7 @@ const Details = (props: Props) => {
         const textColor = balanceNotNull > 0 ? "limegreen" : "darkred"
 
         return <>
-            <Paper className={style.balanceTop} /*style={{ width: historyRef.current?.offsetWidth }}*/>
+            <Paper className={style.balanceTop}>
                 <Typography variant='h3'>{KONTOSTAND}:</Typography>
                 <Typography variant='h2' color={textColor}>
                     {common.members?.find((value) => {
@@ -112,7 +112,7 @@ const Details = (props: Props) => {
     const extraFunctions = () => {
         const pageMemberID = params.userid ? parseInt(params.userid) : null
 
-        return <Paper className={style.balanceTop} /*style={{ width: historyRef.current?.offsetWidth }}*/>
+        return <Paper className={style.balanceTop}>
             {getmemberIDCookie() === pageMemberID || getmemberIDCookie() === 1 ? <>
                 <Typography variant='h5'>{SONDERFUNKTIONEN}:</Typography>
                 <Button onClick={() => setdialogOpen(true)}>{UEBERWEISEN}</Button>
