@@ -16,6 +16,7 @@ import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABG
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
+import { Drink } from '../../../types/ResponseTypes'
 
 type Props = {}
 
@@ -128,6 +129,9 @@ const Details = (props: Props) => {
         }) !== undefined
     }
 
+    const filterSeachDrinks = (drink: Drink) => {
+        return searchField === "" || drink.name.toLowerCase().includes(searchField.toLowerCase())
+    }
 
     const history = <div className={style.historyContainer} ref={historyRef}>
         <Typography variant='h5'>{HISTORY}:</Typography>
@@ -221,9 +225,9 @@ const Details = (props: Props) => {
                             const drinks = common.drinks?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).filter(value => {
                                 return value.category === category
                             })
-                            if (drinks?.some((value) => searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase()))) {
+                            if (drinks?.some((value) => filterSeachDrinks(value))) {
                                 return <>
-                                    <AvailableDrinkCard category={category} drinks={drinks} memberID={params.userid ? params.userid : ""} />
+                                    <AvailableDrinkCard category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
                                 </>
                             } else {
                                 return <></>
