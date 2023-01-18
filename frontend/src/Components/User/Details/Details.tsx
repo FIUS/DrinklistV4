@@ -1,6 +1,5 @@
-import { Button, Grow, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
-import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -13,10 +12,10 @@ import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
-const historyLocationThreshold = 1650;
+import AvailableDrinkCard from './AvailableDrinkCard'
 
 type Props = {}
 
@@ -28,9 +27,10 @@ const Details = (props: Props) => {
     const [searchField, setsearchField] = useState("")
     const [dialogOpen, setdialogOpen] = useState(false)
     const [isUser, setisUser] = useState(false)
+    const [historyExpanded, sethistoryExpanded] = useState(false)
     const historyRef = useRef<HTMLDivElement>(null)
     const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
-    
+
     const currentMember = unsafeCurrentMember ? unsafeCurrentMember : {
         id: 0,
         name: '',
@@ -98,7 +98,7 @@ const Details = (props: Props) => {
         const textColor = balanceNotNull > 0 ? "limegreen" : "darkred"
 
         return <>
-            <Paper className={style.balanceTop} style={{ width: historyRef.current?.offsetWidth }}>
+            <Paper className={style.balanceTop} /*style={{ width: historyRef.current?.offsetWidth }}*/>
                 <Typography variant='h3'>{KONTOSTAND}:</Typography>
                 <Typography variant='h2' color={textColor}>
                     {common.members?.find((value) => {
@@ -111,14 +111,15 @@ const Details = (props: Props) => {
 
     const extraFunctions = () => {
         const pageMemberID = params.userid ? parseInt(params.userid) : null
-        if (getmemberIDCookie() === pageMemberID||getmemberIDCookie()===1) {
-            return <Paper className={style.balanceTop} style={{ width: historyRef.current?.offsetWidth }}>
+
+        return <Paper className={style.balanceTop} /*style={{ width: historyRef.current?.offsetWidth }}*/>
+            {getmemberIDCookie() === pageMemberID || getmemberIDCookie() === 1 ? <>
                 <Typography variant='h5'>{SONDERFUNKTIONEN}:</Typography>
                 <Button onClick={() => setdialogOpen(true)}>{UEBERWEISEN}</Button>
-            </Paper>
-        } else {
-            return <></>
-        }
+            </> : <></>}
+
+            {history}
+        </Paper>
     }
 
     const shouldAddUndoColumn = () => {
@@ -129,10 +130,10 @@ const Details = (props: Props) => {
 
 
     const history = <div className={style.historyContainer} ref={historyRef}>
-        <Typography variant='h4'>{HISTORY}</Typography>
+        <Typography variant='h5'>{HISTORY}:</Typography>
 
         <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+            <Table aria-label="simple table" size="small">
                 <TableHead>
                     <TableRow>
                         <TableCell>{BESCHREIBUNG}</TableCell>
@@ -142,7 +143,7 @@ const Details = (props: Props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {common.history?.map(value => {
+                    {common.history?.slice(0, historyExpanded ? common.history.length : 6).map(value => {
                         return <>
                             <TableRow
                                 key={value.id}
@@ -185,6 +186,11 @@ const Details = (props: Props) => {
                             </TableRow>
                         </>
                     })}
+                    <TableRow>
+                        <TableCell colSpan={3}>
+                            <Button fullWidth onClick={() => { sethistoryExpanded(!historyExpanded) }}>{historyExpanded ? ZEIGE_WENIGER : ZEIGE_ALLE}</Button>
+                        </TableCell>
+                    </TableRow>
                 </TableBody>
             </Table>
         </TableContainer>
@@ -201,16 +207,15 @@ const Details = (props: Props) => {
                 <div className={style.balanceContainer}>
                     {balancePaper()}
                     {extraFunctions()}
-                    <BalanceBox favorites={common.drinks?.filter((value) => {
-                        return common.favorites?.includes(value.id)
-                    })}
-                        memberID={params.userid ? params.userid : ""} />
-                    {window.innerWidth <= historyLocationThreshold ? <></> : history}
                 </div>
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'><>{HALLO} <b>{getUsername()}</b>!</></Typography>
                     <TextField placeholder={SUCHE_DOT_DOT_DOT} value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
+                    <BalanceBox favorites={common.drinks?.filter((value) => {
+                        return common.favorites?.includes(value.id)
+                    })}
+                        memberID={params.userid ? params.userid : ""} />
                     <div className={style.buyDrinkContainerInner}>
                         {common.drinkCategories?.sort((category1, category2) => category1.localeCompare(category2)).map(category => {
                             const drinks = common.drinks?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).filter(value => {
@@ -218,10 +223,7 @@ const Details = (props: Props) => {
                             })
                             if (drinks?.some((value) => searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase()))) {
                                 return <>
-                                    <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
-                                    {drinks?.map((value) => {
-                                        return <Grow in={searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase())} unmountOnExit><div><DrinkButton drink={value} memberID={params.userid ? params.userid : ""} /></div></Grow>
-                                    })}
+                                    <AvailableDrinkCard category={category} drinks={drinks} memberID={params.userid ? params.userid : ""} />
                                 </>
                             } else {
                                 return <></>
@@ -229,10 +231,6 @@ const Details = (props: Props) => {
                         })}
                     </div>
                 </div>
-
-                {window.innerWidth > historyLocationThreshold ? <></> : history}
-
-
             </div>
             <Spacer vertical={50} />
             {!isUser ? <NavigationButton destination='/' /> : <></>}
