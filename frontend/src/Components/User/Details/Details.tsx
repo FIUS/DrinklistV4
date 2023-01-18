@@ -32,6 +32,8 @@ const Details = (props: Props) => {
     const historyRef = useRef<HTMLDivElement>(null)
     const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
 
+    const mobileHistroyThreshold = 1270;
+
     const currentMember = unsafeCurrentMember ? unsafeCurrentMember : {
         id: 0,
         name: '',
@@ -210,7 +212,7 @@ const Details = (props: Props) => {
             <div className={style.details}>
                 <div className={style.balanceContainer}>
                     {balancePaper()}
-                    {extraFunctions()}
+                    {window.innerWidth > mobileHistroyThreshold ? extraFunctions() : <></>}
                 </div>
 
                 <div className={style.buyDrinkContainer}>
@@ -235,6 +237,7 @@ const Details = (props: Props) => {
                         })}
                     </div>
                 </div>
+                {window.innerWidth <= mobileHistroyThreshold ? extraFunctions() : <></>}
             </div>
             <Spacer vertical={50} />
             {!isUser ? <NavigationButton destination='/' /> : <></>}
