@@ -82,10 +82,10 @@ class Queries:
         user.hidden = not user.hidden
         self.session.commit()
 
-    def add_user(self, name, money, password, hidden=False):
+    def add_user(self, name, money, password, alias="", hidden=False):
         pw_hash, salt = TokenManager.hashPassword(password)
         self.session.add(
-            Member(name=name, balance=money, password=pw_hash, salt=salt, hidden=hidden))
+            Member(name=name, balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
         self.session.commit()
 
     def get_drinks(self):
