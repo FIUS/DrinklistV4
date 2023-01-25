@@ -13,6 +13,7 @@ import TopBar from './Components/Common/TopBar/TopBar';
 import Routing from './Components/Routing/Routing';
 import LoginChecker from './Components/Common/LoginChecker/LoginChecker';
 import Toast from './Components/Common/Toast/Toast';
+import NewMessagesPopup from './Components/User/NewMessagesPopup/NewMessagesPopup';
 
 declare global {
   interface Window {
@@ -38,7 +39,7 @@ function App() {
   const store = createStore(allReducer, composeWithDevTools())
 
   useEffect(() => {
-    setthemeCookie(Cookies.get("theme") !== undefined ? Number(Cookies.get("theme")) : 4)
+    setthemeCookie(Cookies.get("theme") !== undefined ? Number(Cookies.get("theme")) : 3)
   }, [])
 
   return (
@@ -51,6 +52,7 @@ function App() {
             <Provider store={store}>
               <LoginChecker />
               <Toast />
+              <NewMessagesPopup />
               <Box sx={{ display: 'flex' }}>
                 <TopBar />
                 <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0 }}>

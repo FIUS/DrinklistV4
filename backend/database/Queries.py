@@ -1,5 +1,6 @@
 import json
 from operator import truediv
+from unicodedata import name
 import requests
 from authenticator import TokenManager
 import util
@@ -81,10 +82,10 @@ class Queries:
         user.hidden = not user.hidden
         self.session.commit()
 
-    def add_user(self, name, money, password, hidden=False):
+    def add_user(self, name, money, password, alias="", hidden=False):
         pw_hash, salt = TokenManager.hashPassword(password)
         self.session.add(
-            Member(name=name, balance=money, password=pw_hash, salt=salt, hidden=hidden))
+            Member(name=name, balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
         self.session.commit()
 
     def get_drinks(self):
@@ -136,7 +137,7 @@ class Queries:
     def buy_drink(self, member_id, drink_id):
         drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
         if drink is None:
-            return "Drink does not exist"
+            return {}
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
 
@@ -147,7 +148,7 @@ class Queries:
 
         self.session.commit()
 
-        return None
+        return drink.to_dict()
 
     def get_drink_categories(self):
         drinks = self.session.query(Drink).all()
@@ -184,6 +185,15 @@ class Queries:
         member: Member = self.session.query(Member).filter_by(
             id=transaction.member_id).first()
         member.balance -= transaction.amount
+
+        if transaction.connected_transaction_id is not None:
+            transaction_connected: Transaction = self.session.query(
+                Transaction).filter_by(id=transaction.connected_transaction_id).first()
+
+            member_connected: Member = self.session.query(Member).filter_by(
+                id=transaction_connected.member_id).first()
+            member_connected.balance -= transaction_connected.amount
+            self.session.delete(transaction_connected)
 
         self.session.delete(transaction)
 
@@ -283,6 +293,20 @@ class Queries:
         member.salt = salt
         self.session.commit()
 
+    def change_user_alias(self, member_id, alias):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        member.alias = alias
+        self.session.commit()
+
+    def change_user_name(self, member_id, name):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        print(member_id)
+        print(name)
+        member.name = name
+        self.session.commit()
+
     def backup_database(self):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
         drinks: list[Drink] = self.session.query(Drink).all()
@@ -363,6 +387,69 @@ class Queries:
 
         return {"releaseTag": release_tag, "releaseMessage": release_message, "openIssues": open_issues}
 
+    def transfer(self, member_id_from, member_id_to, amount, message=None):
+        member_from: Member = self.session.query(
+            Member).filter_by(id=member_id_from).first()
+        member_to: Member = self.session.query(
+            Member).filter_by(id=member_id_to).first()
+
+        member_from.balance -= amount
+        member_to.balance += amount
+
+        string_to = f"Transfer money to {member_to.name}"
+        string_from = f"Transfer money from {member_from.name}"
+
+        if message is not None:
+            string_to = f"Transfer money to {member_to.name}: {message}"
+            string_from = f"Transfer money from {member_from.name}: {message}"
+
+        transaction_minus = Transaction(
+            description=string_to,
+            member_id=member_from.id,
+            amount=-amount,
+            date=datetime.now())
+
+        transaction_plus = Transaction(
+            description=string_from,
+            member_id=member_to.id,
+            amount=amount,
+            date=datetime.now())
+
+        self.session.add(transaction_minus)
+        self.session.add(transaction_plus)
+
+        self.session.commit()
+
+        transaction_minus.connected_transaction_id = transaction_plus.id
+        transaction_plus.connected_transaction_id = transaction_minus.id
+
+        self.session.commit()
+
+        return member_from.name
+
+    def add_message(self, member_id, message, from_name=None, emoji=None):
+        self.session.add(Reminder(member_id=member_id, text=message,
+                         member_name_from=from_name, emoji=emoji))
+        self.session.commit()
+
+    def get_messages(self, member_id):
+        reminders: list[Reminder] = self.session.query(
+            Reminder).filter_by(member_id=member_id).all()
+        output = []
+        for r in reminders:
+            output.append(r.to_dict())
+
+        return output
+
+    def remove_messages(self, member_id):
+        reminders: list[Reminder] = self.session.query(
+            Reminder).filter_by(member_id=member_id).all()
+
+        for r in reminders:
+            self.session.delete(r)
+
+        self.session.commit()
+
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
         drinks: list[Drink] = self.session.query(Drink).all()
@@ -405,6 +492,7 @@ class Queries:
                 name=m['name'],
                 balance=m['balance'],
                 hidden=m['hidden'],
+                alias=m['alias'],
                 password=bytes.fromhex(m['password']),
                 salt=m['salt']))
         for t in imported_data["transactions"]:

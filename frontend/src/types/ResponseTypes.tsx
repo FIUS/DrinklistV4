@@ -2,7 +2,8 @@ export type Member = {
     id: number,
     name: string,
     balance: number,
-    hidden: boolean
+    hidden: boolean,
+    alias: string
 }
 
 export type Drink = {
@@ -28,4 +29,10 @@ export type Checkout = {
     date: string,
     currentCash: number,
     transactions?: Array<Transaction>
+}
+
+export type Message = {
+    text: string,
+    memberNameFrom: string,
+    emoji: string
 }

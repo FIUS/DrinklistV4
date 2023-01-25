@@ -1,5 +1,5 @@
-import { AddBox, Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
@@ -12,10 +12,12 @@ import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, GELD, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, PASSWORT, SICHER_X_LOESCHEN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, HINZUFUEGEN, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, NUTZER_LEOSCHEN, SICHER_X_LOESCHEN, SICHTBARKEIT_AENDERN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
-
+import MemberNameEditDialog from './MemberNameEditDialog';
+import { Member } from '../../../types/ResponseTypes';
+import Infobox from '../../Common/InfoBox/Infobox';
 type Props = {}
 
 const Members = (props: Props) => {
@@ -25,10 +27,13 @@ const Members = (props: Props) => {
     const [name, setname] = useState("")
     const [balance, setbalance] = useState(0.0)
     const [password, setpassword] = useState("")
+    const [alias, setalias] = useState("")
     const [searchName, setsearchName] = useState("")
     const [searchID, setsearchID] = useState("")
     const [deleteDialogOpen, setdeleteDialogOpen] = useState(false)
     const [userToDelete, setuserToDelete] = useState<{ name: string, id: number }>({ name: "", id: -1 })
+    const [memberChangeOpen, setmemberChangeOpen] = useState(false)
+    const [memberToChange, setmemberToChange] = useState<Member | null>(null)
 
     useEffect(() => {
 
@@ -55,7 +60,9 @@ const Members = (props: Props) => {
 
 
     const filteredMembers = common.members?.filter(value => {
-        return ((value.name.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
+        return ((value.name.toLocaleLowerCase().includes(searchName.toLowerCase()) ||
+            value.alias.toLocaleLowerCase().includes(searchName.toLowerCase()) ||
+            searchName === "") &&
             (value.id.toString().toLowerCase().includes(searchID.toLowerCase()) || searchID === "")) ||
             (searchName === "" && searchID === "")
     })
@@ -80,6 +87,75 @@ const Members = (props: Props) => {
                     colorCode={window.globalTS.ICON_COLOR} />
                 <TopDepter members={common.members} />
             </div>
+            <Infobox headline='Neuen Benutzer anlegen'>
+                <>
+                    <div className={style.newUserBoxInputs}>
+                        <TextField
+                            label='Benutzername'
+                            value={name}
+                            onChange={(value) => {
+                                setname(value.target.value)
+                            }}
+                            size="small"
+                        />
+                        <TextField
+                            label='Alias (optional)'
+                            value={alias}
+                            onChange={(value) => {
+                                setalias(value.target.value)
+                            }}
+                            size="small"
+                        />
+                        <TextField
+                            label='Guthaben'
+                            type="number"
+                            value={balance}
+                            onChange={(value) => {
+                                if (parseFloat(value.target.value)) {
+                                    setbalance(parseFloat(value.target.value))
+                                }
+                            }}
+                            size="small"
+                        />
+                        <TextField
+                            label='Passwort'
+                            type="password"
+                            value={password}
+                            onChange={(value) => {
+                                setpassword(value.target.value)
+                            }}
+                            size="small"
+                        />
+                    </div>
+                    <Spacer vertical={10} />
+                    <Button variant='outlined' onClick={(value) => {
+                        if (name !== "" && password !== "") {
+                            doPostRequest("users/add",
+                                {
+                                    name: name,
+                                    money: balance,
+                                    password: password,
+                                    alias: alias
+                                }
+                            ).then((s_value) => {
+                                if (s_value.code === 200) {
+                                    setname("")
+                                    setbalance(0.0)
+                                    setpassword("")
+                                    setalias("")
+                                    doGetRequest("users").then((t_value) => {
+                                        if (t_value.code === 200) {
+                                            dispatch(setMembers(t_value.content))
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    }}>
+                        {HINZUFUEGEN}
+                    </Button>
+                </>
+            </Infobox>
             <div className={style.table}>
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table" size='small'>
@@ -92,76 +168,6 @@ const Members = (props: Props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            <TableRow
-                                key={"row.name"}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell></TableCell>
-                                <TableCell component="th" scope="row">
-                                    <TextField
-                                        variant='standard'
-                                        label={NAME}
-                                        value={name}
-                                        onChange={(value) => {
-                                            setname(value.target.value)
-                                        }}
-                                        size="small"
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        type="number"
-                                        variant='standard'
-                                        label={GELD}
-                                        value={balance}
-                                        onChange={(value) => {
-                                            if (parseFloat(value.target.value)) {
-                                                setbalance(parseFloat(value.target.value))
-                                            }
-                                        }}
-                                        size="small"
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <div className={style.firstRowAlign}>
-                                        <TextField
-                                            type="password"
-                                            variant='standard'
-                                            label={PASSWORT}
-                                            value={password}
-                                            onChange={(value) => {
-                                                setpassword(value.target.value)
-                                            }}
-                                            size="small"
-                                        />
-                                        <Button onClick={(value) => {
-                                            if (name !== "" && password !== "") {
-                                                doPostRequest("users/add",
-                                                    {
-                                                        name: name,
-                                                        money: balance,
-                                                        password: password
-                                                    }
-                                                ).then((s_value) => {
-                                                    if (s_value.code === 200) {
-                                                        setname("")
-                                                        setbalance(0.0)
-                                                        setpassword("")
-                                                        doGetRequest("users").then((t_value) => {
-                                                            if (t_value.code === 200) {
-                                                                dispatch(setMembers(t_value.content))
-                                                            }
-                                                        })
-                                                    }
-                                                })
-                                            }
-                                        }}>
-                                            <AddBox />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-
-                            </TableRow>
                             <TableRow>
                                 <TableCell>
                                     <TextField
@@ -198,30 +204,43 @@ const Members = (props: Props) => {
                                 >
                                     <TableCell>{value.id}</TableCell>
                                     <TableCell component="th" scope="row">
-                                        {value.name}
+                                        <Button
+                                            sx={{ color: "text.primary", textTransform: "none" }}
+                                            onClick={() => {
+                                                setmemberToChange(value)
+                                                setmemberChangeOpen(true)
+                                            }}
+                                        >
+                                            {value.alias !== "" ? format("{0} ({1})", value.name, value.alias) : value.name}
+                                        </Button>
+
                                     </TableCell>
                                     <TableCell>{value.balance.toFixed(2)}€</TableCell>
                                     <TableCell>
                                         <DialogManager member={value} />
-                                        <Button onClick={() => {
-                                            doPostRequest("users/" + value.id + "/visibility/toggle", "").then((s_value) => {
-                                                if (s_value.code === 200) {
-                                                    doGetRequest("users").then((t_value) => {
-                                                        if (t_value.code === 200) {
-                                                            dispatch(setMembers(t_value.content))
-                                                        }
-                                                    })
-                                                }
-                                            })
-                                        }}>
-                                            <VisibilityOff />
-                                        </Button>
-                                        <Button onClick={() => {
-                                            setuserToDelete({ name: value.name, id: value.id })
-                                            setdeleteDialogOpen(true)
-                                        }}>
-                                            <Delete />
-                                        </Button>
+                                        <Tooltip title={SICHTBARKEIT_AENDERN}>
+                                            <Button onClick={() => {
+                                                doPostRequest("users/" + value.id + "/visibility/toggle", "").then((s_value) => {
+                                                    if (s_value.code === 200) {
+                                                        doGetRequest("users").then((t_value) => {
+                                                            if (t_value.code === 200) {
+                                                                dispatch(setMembers(t_value.content))
+                                                            }
+                                                        })
+                                                    }
+                                                })
+                                            }}>
+                                                <VisibilityOff />
+                                            </Button>
+                                        </Tooltip>
+                                        <Tooltip title={NUTZER_LEOSCHEN}>
+                                            <Button onClick={() => {
+                                                setuserToDelete({ name: value.name, id: value.id })
+                                                setdeleteDialogOpen(true)
+                                            }}>
+                                                <Delete />
+                                            </Button>
+                                        </Tooltip>
 
                                     </TableCell>
 
@@ -249,6 +268,17 @@ const Members = (props: Props) => {
                         })
                     }}
                     no={() => { }}
+                />
+                <MemberNameEditDialog
+                    isOpen={memberChangeOpen}
+                    close={() => setmemberChangeOpen(false)}
+                    member={memberToChange ? memberToChange : {
+                        id: 0,
+                        name: "",
+                        balance: 0,
+                        hidden: true,
+                        alias: ""
+                    }}
                 />
             </div>
             <Spacer vertical={50} />

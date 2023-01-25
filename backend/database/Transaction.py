@@ -16,6 +16,10 @@ class Transaction(db.Model):
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
     checkout_id = sql.Column(sql.Integer, sql.ForeignKey(
         'checkout.id'), nullable=True, default=None)
+    connected_transaction_id = sql.Column(sql.Integer, sql.ForeignKey(
+        'transaction.id'), nullable=True)
+    connected_transaction = relationship(
+        'database.Transaction.Transaction', lazy="joined", post_update=True)
 
     def to_dict(self):
         output = {

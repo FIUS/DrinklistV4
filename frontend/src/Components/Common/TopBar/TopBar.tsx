@@ -24,6 +24,7 @@ import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
 import { ABRECHNUNGEN, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
+import Cookies from 'js-cookie';
 
 type Props = {}
 
@@ -94,14 +95,24 @@ const TopBar = (props: Props) => {
             window.globalTS.ADDITIONAL_INFORMATION !== ""
     }
 
+    const isUser = () => {
+        return parseInt(Cookies.get("memberID") as string)
+    }
+
     return (
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <Toolbar sx={{ justifyContent: "space-between" }}>
                     <div style={{ display: "flex" }}>
                         {getIcon()}
-
-                        <Button size="large" color="inherit" onClick={() => navigate("/")} sx={{ display: "inline-flex" }} variant="text">
+                        <Button
+                            size="large"
+                            color="inherit"
+                            onClick={() =>
+                                navigate(isUser() !== 1 && isUser() !== 2 ? "/user/" + isUser() : "/")
+                            }
+                            sx={{ display: "inline-flex" }}
+                            variant="text">
                             {window.globalTS.HOME_BUTTON}
                         </Button>
                     </div>

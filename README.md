@@ -13,7 +13,7 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Defaults to: `127.0.0.1:3000`
 * `DEBUG`
   * If set a developent server is used for more debug info
-  * Defaults to: `False`
+  * Defaults to: `false`
 * `DB_CONNECTION`
   * Path to sqlite file or connection string for postress etc.
   * Defaults to: `sqlite:///database.db`
@@ -38,6 +38,9 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
 * `DEFAULT_DRINK_CATEGORY`
   * The category name of drinks for which no category is provided
   * Defaults to: `Getränk`
+* `USE_ALIAS`
+  * If aliases should be displayed. Disabling this feature **will not** delete the aliases. If reenabled the previously used aliases will be displayed again
+  * Defaults to: `true`
 
 ### Importing from old Drinklist
 * `X_AUTH_TOKEN`

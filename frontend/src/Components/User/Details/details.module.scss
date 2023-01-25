@@ -1,6 +1,6 @@
 @import "../../Common/variables.module.scss";
 
-.balanceContainer{
+.balanceContainer {
     width: fit-content;
     display: flex;
     flex-direction: column;
@@ -8,60 +8,61 @@
     gap: $flex-gap;
 }
 
-.balanceTop{
-    width: fit-content;
+.balanceTop {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     padding: $padding;
     gap: $flex-gap;
-    //background-color: #f1f1f1 !important;
+    max-width: 440px;
 }
 
-.drinkButtonContainer{
+.drinkButtonContainer {
     display: flex;
     gap: $flex-gap;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
+    max-width: 65vw;
 }
 
-.balanceBoxContainer{
+.balanceBoxContainer {
     display: flex;
     flex-direction: column;
     gap: $flex-gap;
 }
 
-.buyDrinkContainer{
+.buyDrinkContainer {
     display: flex;
     flex-direction: column;
     gap: $flex-gap;
     min-width: 330px;
 }
 
-.buyDrinkContainerInner{
+.buyDrinkContainerInner {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: $flex-gap;
-    column-gap: calc(2*$flex-gap);
+    column-gap: calc(2 * $flex-gap);
     max-width: 1050px;
 }
 
-.details{
+.details {
     display: flex;
-    gap: calc(3*$flex-gap);
+    gap: calc(3 * $flex-gap);
     padding: $padding;
     flex-wrap: wrap;
 }
 
-.historyContainer{
+.historyContainer {
     display: flex;
     flex-direction: column;
     gap: $flex-gap;
     min-width: 340px;
+    max-width: 410px;
 }
 
-.footer{
+.footer {
     position: fixed;
     bottom: 0;
     display: flex;
@@ -70,15 +71,19 @@
     padding: calc($padding/2);
 }
 
-.footerButton{
+.footerButton {
     width: 100%;
 }
 
-.deleteContainer{
+.deleteContainer {
     width: fit-content;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: row;
+}
+
+em-emoji-picker {
+    max-width: 60vw;
 }

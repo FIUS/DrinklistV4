@@ -1,3 +1,4 @@
+from difflib import SequenceMatcher
 from datetime import datetime, timedelta
 import os
 from statistics import mode
@@ -8,6 +9,7 @@ from flask import send_from_directory
 from flask.wrappers import Request
 from functools import wraps
 import authenticator
+from database.Drink import Drink
 import util
 from web import *
 import json
@@ -51,6 +53,15 @@ def admin(fn):
         return fn(*args, **kwargs)
     wrapper.__name__ = fn.__name__
     return wrapper
+
+
+def is_self_or_admin(request, member_id):
+    return str(member_id) == str(request.cookies.get('memberID')) or str(request.cookies.get('memberID')) == "1"
+
+
+model_amount = api.model('Amount', {
+    'amount': fields.Float(required=True)
+})
 
 
 @api.route('/users')
@@ -122,6 +133,39 @@ class change_user_password(Resource):
         return util.build_response("Password changed")
 
 
+@api.route('/users/<int:member_id_from>/transfer/<int:member_id_to>')
+class transfer_money(Resource):
+    @authenticated
+    @api.doc(body=model_amount)
+    def post(self, member_id_from, member_id_to):
+        """
+        Transfer money from one member to another
+        """
+
+        amount = float(request.json['amount'])
+
+        if amount < 0:
+            return util.build_response("Amount has to be positive", code=412)
+
+        if is_self_or_admin(request, member_id_from):
+            message = None
+            if 'reason' in request.json:
+                message = request.json['reason']
+
+            from_name = db.transfer(
+                member_id_from, member_id_to, amount, message)
+            db.add_message(
+                member_id_to,
+                f"Du hast {'{:.2f}'.format(amount)}€ von {from_name} erhalten{f' mit folgender Nachricht: {message}' if message is not None else ''}",
+                from_name,
+                request.json['emoji'] if 'emoji' in request.json else None
+            )
+        else:
+            return util.build_response("Your are not allowed to transfer money from this account", code=403)
+
+        return util.build_response(f"{amount}€ transfered")
+
+
 @api.route('/users/<int:member_id>/visibility/toggle')
 class toggle_user_visibility(Resource):
     @admin
@@ -131,11 +175,6 @@ class toggle_user_visibility(Resource):
         """
         db.change_user_visibility(member_id)
         return util.build_response("Changed visibility")
-
-
-model_amount = api.model('Amount', {
-    'amount': fields.Float(required=True)
-})
 
 
 @api.route('/users/<int:member_id>/deposit')
@@ -148,6 +187,42 @@ class user_deposit(Resource):
         """
         db.deposit_user(member_id, float(request.json["amount"]))
         return util.build_response("Money added")
+
+
+model = api.model('Alias', {
+    'alias': fields.String(required=True)
+})
+
+
+@api.route('/users/<int:member_id>/alias')
+class user_deposit(Resource):
+    @admin
+    @api.doc(body=model)
+    def post(self, member_id):
+        """
+        Set the alias of a user
+        """
+        db.change_user_alias(member_id, str(request.json["alias"]))
+        return util.build_response("Alias changed")
+
+
+model = api.model('Name', {
+    'name': fields.String(required=True)
+})
+
+
+@api.route('/users/<int:member_id>/name')
+class user_deposit(Resource):
+    @admin
+    @api.doc(body=model)
+    def post(self, member_id):
+        """
+        Set the username of a user
+        """
+        if str(request.json["name"]) == "":
+            return util.build_response("Name cannot be empty", code=412)
+        db.change_user_name(member_id, str(request.json["name"]))
+        return util.build_response("Name changed")
 
 
 @api.route('/users/<int:member_id>/delete')
@@ -164,8 +239,30 @@ class delete_user(Resource):
             return util.build_response("Admin and moderator cannot be deleted", code=412)
 
 
+@api.route('/users/<int:member_id>/messages')
+class user_messages(Resource):
+    @authenticated
+    def get(self, member_id):
+        """
+        Returns all messages of a user
+        """
+        if is_self_or_admin(request, member_id):
+            return util.build_response(db.get_messages(member_id))
+        return util.build_response("Unauthorized", code=403)
+
+    @authenticated
+    def delete(self, member_id):
+        """
+        Removes all messages of a user
+        """
+        if is_self_or_admin(request, member_id):
+            return util.build_response(db.remove_messages(member_id))
+        return util.build_response("Unauthorized", code=403)
+
+
 model = api.model('Add User', {
     'name': fields.String(description='Name of the new user', required=True),
+    'alias': fields.String(description='Alias of the user', required=False),
     'money': fields.Float(description='Initial balance of the user', required=True),
     'password': fields.String(description='Initial password of user', required=True),
 })
@@ -179,8 +276,12 @@ class add_user(Resource):
         """
         Add a user
         """
-        db.add_user(request.json["name"],
-                    request.json["money"], request.json["password"])
+        if 'alias' in request.json:
+            db.add_user(request.json["name"],
+                        request.json["money"], request.json["password"], alias=request.json["alias"])
+        else:
+            db.add_user(request.json["name"],
+                        request.json["money"], request.json["password"])
         return util.build_response("User added")
 
 
@@ -192,6 +293,30 @@ class get_drinks(Resource):
         Get all drinks
         """
         return util.build_response(db.get_drinks())
+
+
+@api.route('/drinks/search/<string:drink_search>')
+class search_drinks(Resource):
+    @authenticated
+    def get(self, drink_search):
+        """
+        Search for drinks
+        """
+        drinks: list[Drink] = db.get_drinks()
+        prepared_search = str(drink_search).replace(" ", "").lower()
+
+        for d in drinks:
+            if str(d["name"]).replace(" ", "").lower() == prepared_search:
+                return util.build_response({"precise": True, "drinks": d})
+
+        for d in drinks:
+            d['matching'] = SequenceMatcher(
+                None, d["name"], drink_search).ratio()
+
+        drinks.sort(key=lambda x: x['matching'])
+        drinks.reverse()
+
+        return util.build_response({"precise": False, "drinks": drinks})
 
 
 @api.route('/drinks/categories')
@@ -326,10 +451,10 @@ class buy_drink(Resource):
         """
         status = db.buy_drink(
             request.json["memberID"], request.json["drinkID"])
-        if status == None:
-            return util.build_response("Drink bought")
+        if "name" in status:
+            return util.build_response(f"Drink {status['name']} bought")
         else:
-            return util.build_response(status, code=400)
+            return util.build_response("Drink does not exist", code=400)
 
 
 @api.route('/transactions')
@@ -535,6 +660,16 @@ class login(Resource):
             token = token_manager.create_token(member_id)
             return util.build_response("Login successfull", cookieToken=token, cookieMemberID=member_id)
         return util.build_response("Unauthorized", code=403)
+
+
+@api.route('/cookies')
+class cookie(Resource):
+    def get(self):
+        """
+        Get the memberID and token for using the api
+        """
+
+        return util.build_response({"memberID": request.cookies.get('memberID'), "token": request.cookies.get('token')})
 
 
 @api.route('/logout')

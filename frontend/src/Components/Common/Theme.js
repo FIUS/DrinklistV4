@@ -530,7 +530,15 @@ export const theme02 = createTheme({
                     maxWidth: (window.innerWidth - 30) + "px"
                 }
             }
-        }
+        },
+        MuiAutocomplete: {
+            styleOverrides: {
+
+                popper: {
+                    zIndex: 20000001
+                }
+            }
+        },
     },
     palette: {
         neutral: {
@@ -558,7 +566,7 @@ export const theme02 = createTheme({
         },
         divider: '#E6E8F0',
         primary: {
-            main: '#5048E5',
+            main: '#396689',
             light: '#828DF8',
             dark: '#3832A0',
             contrastText: '#FFFFFF'
@@ -731,6 +739,24 @@ export const darkTheme3 = createTheme({
                     backgroundColor: "rgba(0,0,0,0.4)"
                 }
             }
+        }, MuiFormHelperText: {
+            styleOverrides: {
+                root: {
+                    color: "lightgrey"
+                }
+            }
+        }, MuiListItemText: {
+            styleOverrides: {
+                secondary: {
+                    color: 'lightgray'
+                }
+            }
+        }, MuiTypography: {
+            styleOverrides: {
+                body1: {
+                    color: "white !important"
+                }
+            }
         },
         MuiButtonBase: {
             styleOverrides: {
@@ -815,6 +841,15 @@ export const darkTheme3 = createTheme({
             styleOverrides: {
                 listbox: {
                     background: "rgba(0,0,0,0.85); "
+                },
+                popper: {
+                    zIndex: 20000001
+                }
+            }
+        }, MuiAvatar: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
                 }
             }
         },
@@ -848,4 +883,180 @@ export const darkTheme3 = createTheme({
     }
 });
 
-export const themes = [normalTheme, darkTheme1, darkTheme2, theme02, darkTheme3]
+export const darkTheme4 = createTheme({
+    palette: {
+        primary: {
+            main: "#064663"
+        },
+        secondary: {
+            main: "#ECB365"
+        },
+        text: {
+            primary: "#eeeeee"
+        }
+    },
+    components: {
+        MuiScopedCssBaseline: {
+            styleOverrides: {
+                root: {
+                    background: [
+                        "rgba(7, 71, 100, 1.0);",
+                        "-webkit-radial-gradient(top left, rgba(7, 71, 100, 1.0), rgba(4, 29, 51, 1.0));",
+                        "-moz-radial-gradient(top left, rgba(7, 71, 100, 1.0), rgba(4, 29, 51, 1.0));",
+                        "radial-gradient(to bottom right, rgba(7, 71, 100, 1.0), rgba(4, 29, 51, 1.0));",
+                    ],
+                    minHeight: "100vh"
+                }
+            }
+        },
+        MuiPaper: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
+                }
+            }
+        }, MuiTypography: {
+            styleOverrides: {
+                body1: {
+                    color: "white !important"
+                }
+            }
+        }, MuiFormHelperText: {
+            styleOverrides: {
+                root: {
+                    color: "lightgrey"
+                }
+            }
+        },
+        MuiButtonBase: {
+            styleOverrides: {
+                root: {
+                    color: "#ECB365"
+                }
+            }
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    color: "#ECB365",
+                    backgroundColor: "rgba(255,255,255,0.15)"
+                },
+                text: {
+                    backgroundColor: "rgba(0,0,0,0.0)"
+                }
+            }
+        },
+        MuiSvgIcon: {
+            styleOverrides: {
+                root: {
+                    color: "#eeeeee"
+                }
+            }
+        },
+        MuiTableCell: {
+            styleOverrides: {
+                root: {
+                    borderBottom: "none"
+                }
+            }
+        },
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: "#064663"
+                }
+            }
+        },
+        MuiInputBase: {
+            styleOverrides: {
+                input: {
+                    marginBottom: "3px",
+                    color: "white"
+                }
+            }
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    color: "rgba(255,255,255,0.8)",
+                    "&.Mui-focused": {
+                        color: "rgba(255,255,255,0.8)"
+                    }
+                }, focused: {}
+            }
+        },
+        MuiDialogContentText: {
+            styleOverrides: {
+                root: {
+                    color: "rgba(255,255,255,0.9)"
+                }
+            }
+        },
+        MuiTableHead: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(255,255,255,0.05);"
+                }
+            }
+        },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    maxWidth: (window.innerWidth - 30) + "px",
+                    width: "fit-content"
+                }
+            }
+        },
+        MuiAutocomplete: {
+            styleOverrides: {
+                listbox: {
+                    background: "rgba(0,0,0,0.85); "
+                },
+                popper: {
+                    zIndex: 20000001
+                }
+            }
+        },
+        MuiListItemText: {
+            styleOverrides: {
+                secondary: {
+                    color: 'lightgray'
+                }
+            }
+        }, MuiAvatar: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
+                }
+            }
+        }, MuiAccordion: {
+            styleOverrides: {
+                root: {
+                    maxWidth: (window.innerWidth - 30) + "px"
+                }
+            }
+        },
+        MuiAlert: {
+            styleOverrides: {
+                standardError: {
+                    backgroundColor: "rgb(40 20 20);",
+                    color: "#ffa99c"
+                },
+                standardInfo: {
+                    backgroundColor: "rgb(10 30 30);",
+                    color: "#67d0ff"
+                },
+                standardSuccess: {
+                    backgroundColor: "rgb(20 40 20);",
+                    color: "#60df66"
+                },
+                standardWarning: {
+                    backgroundColor: "rgb(30 30 10);",
+                    color: "#ffb346"
+                }
+            }
+        }
+    }
+});
+
+export const themes = [normalTheme, darkTheme1, darkTheme2, theme02, darkTheme3, darkTheme4]
