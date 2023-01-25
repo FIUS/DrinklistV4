@@ -22,7 +22,8 @@ app.register_blueprint(api_bp)
 
 token_manager = authenticator.TokenManager()
 
-db = Queries.Queries(sql_database)
+with app.app_context():
+    db = Queries.Queries(sql_database)
 
 taskScheduler = TaskScheduler.TaskScheduler()
 taskScheduler.start()

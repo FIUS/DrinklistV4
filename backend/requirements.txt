@@ -7,4 +7,4 @@ psycopg2
 waitress
 requests
 flask-restx
-werkzeug==2.2.2
+werkzeug
