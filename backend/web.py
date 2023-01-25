@@ -9,6 +9,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 if os.environ.get("DB_CONNECTION"):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_CONNECTION")
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+    os.makedirs("instance/sqlite", exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite/database.db'
 
 sql_database = SQLAlchemy(app)
