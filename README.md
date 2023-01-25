@@ -16,7 +16,9 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Defaults to: `false`
 * `DB_CONNECTION`
   * Path to sqlite file or connection string for postress etc.
-  * Defaults to: `sqlite:///database.db`
+  * Defaults to: `sqlite:///db/database.db`
+  * Note the sqlite file is relative to the `instance` directory, meaning the actual path of the database file starts with `instance/.../*.db`
+    * The default path is therefore `instance/db/database.db`
 * `ADMIN_USERNAME`
   * Username of admin user
   * Defaults to: `admin`
