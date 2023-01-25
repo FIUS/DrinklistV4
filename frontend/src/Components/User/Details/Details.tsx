@@ -135,6 +135,63 @@ const Details = (props: Props) => {
         return searchField === "" || drink.name.toLowerCase().includes(searchField.toLowerCase())
     }
 
+    const expandButton = <TableRow>
+        <TableCell colSpan={3}>
+            <Button fullWidth onClick={() => { sethistoryExpanded(!historyExpanded) }}>{historyExpanded ? ZEIGE_WENIGER : ZEIGE_ALLE}</Button>
+        </TableCell>
+    </TableRow>
+
+    const historyLegend = common.history?.slice(0, historyExpanded ? common.history.length : 6).map(value => {
+        return <>
+            <TableRow
+                key={value.id}
+            >
+                <TableCell component="th" scope="row">
+                    {value.description}
+                </TableCell>
+                <TableCell>{value.amount.toFixed(2)}€</TableCell>
+                <TableCell>{dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}</TableCell>
+                {value.revertable ? <TableCell className={style.deleteContainer}>
+                    <Button onClick={() => {
+                        doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
+                            if (innerValue.code === 200) {
+                                dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, value.description) }))
+                                doGetRequest("users").then((t_value) => {
+                                    if (t_value.code === 200) {
+                                        dispatch(setMembers(t_value.content))
+                                    }
+                                })
+                                doGetRequest("users/" + params.userid + "/history").then((value) => {
+                                    if (value.code === 200) {
+                                        dispatch(setHistory(value.content))
+                                    }
+                                })
+                            } else if (innerValue.code === 412) {
+                                dispatch(openToast({
+                                    message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
+                                    headline: ZEITLIMIT_ABGELAUFEN,
+                                    duration: 10000,
+                                    type: "error"
+                                }))
+                            } else {
+                                dispatch(openErrorToast())
+                            }
+                        })
+                    }}>
+                        <Delete />
+                    </Button>
+                </TableCell> : <></>}
+            </TableRow>
+        </>
+    })
+
+    const getHistoryLegend = () => {
+        const notUndefined = historyLegend ? historyLegend : []
+        const temp = [...notUndefined]
+        temp.splice(6, 0, expandButton)
+        return temp
+    }
+
     const history = <div className={style.historyContainer} ref={historyRef}>
         <Typography variant='h5'>{HISTORY}:</Typography>
 
@@ -149,54 +206,7 @@ const Details = (props: Props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {common.history?.slice(0, historyExpanded ? common.history.length : 6).map(value => {
-                        return <>
-                            <TableRow
-                                key={value.id}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {value.description}
-                                </TableCell>
-                                <TableCell>{value.amount.toFixed(2)}€</TableCell>
-                                <TableCell>{dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}</TableCell>
-                                {value.revertable ? <TableCell className={style.deleteContainer}>
-                                    <Button onClick={() => {
-                                        doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
-                                            if (innerValue.code === 200) {
-                                                dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, value.description) }))
-                                                doGetRequest("users").then((t_value) => {
-                                                    if (t_value.code === 200) {
-                                                        dispatch(setMembers(t_value.content))
-                                                    }
-                                                })
-                                                doGetRequest("users/" + params.userid + "/history").then((value) => {
-                                                    if (value.code === 200) {
-                                                        dispatch(setHistory(value.content))
-                                                    }
-                                                })
-                                            } else if (innerValue.code === 412) {
-                                                dispatch(openToast({
-                                                    message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
-                                                    headline: ZEITLIMIT_ABGELAUFEN,
-                                                    duration: 10000,
-                                                    type: "error"
-                                                }))
-                                            } else {
-                                                dispatch(openErrorToast())
-                                            }
-                                        })
-                                    }}>
-                                        <Delete />
-                                    </Button>
-                                </TableCell> : <></>}
-                            </TableRow>
-                        </>
-                    })}
-                    <TableRow>
-                        <TableCell colSpan={3}>
-                            <Button fullWidth onClick={() => { sethistoryExpanded(!historyExpanded) }}>{historyExpanded ? ZEIGE_WENIGER : ZEIGE_ALLE}</Button>
-                        </TableCell>
-                    </TableRow>
+                    {getHistoryLegend()}
                 </TableBody>
             </Table>
         </TableContainer>
