@@ -16,7 +16,7 @@ import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABG
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
-import { Drink } from '../../../types/ResponseTypes'
+import { Drink, Transaction } from '../../../types/ResponseTypes'
 
 type Props = {}
 
@@ -141,6 +141,41 @@ const Details = (props: Props) => {
         </TableCell>
     </TableRow>
 
+    const dateOrRevert = (transaction: Transaction) => {
+        if (transaction.revertable) {
+            return <Button fullWidth onClick={() => {
+                doPostRequest("transactions/" + transaction.id + "/undo", null).then((innerValue) => {
+                    if (innerValue.code === 200) {
+                        dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, transaction.description) }))
+                        doGetRequest("users").then((t_value) => {
+                            if (t_value.code === 200) {
+                                dispatch(setMembers(t_value.content))
+                            }
+                        })
+                        doGetRequest("users/" + params.userid + "/history").then((value) => {
+                            if (value.code === 200) {
+                                dispatch(setHistory(value.content))
+                            }
+                        })
+                    } else if (innerValue.code === 412) {
+                        dispatch(openToast({
+                            message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
+                            headline: ZEITLIMIT_ABGELAUFEN,
+                            duration: 10000,
+                            type: "error"
+                        }))
+                    } else {
+                        dispatch(openErrorToast())
+                    }
+                })
+            }}>
+                <Delete />
+            </Button>
+        } else {
+            return format("{0} - {1}", dateToString(new Date(transaction.date)), timeToString(new Date(transaction.date)))
+        }
+    }
+
     const historyLegend = common.history?.slice(0, historyExpanded ? common.history.length : 6).map(value => {
         return <>
             <TableRow
@@ -150,37 +185,9 @@ const Details = (props: Props) => {
                     {value.description}
                 </TableCell>
                 <TableCell>{value.amount.toFixed(2)}€</TableCell>
-                <TableCell>{dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}</TableCell>
-                {value.revertable ? <TableCell className={style.deleteContainer}>
-                    <Button onClick={() => {
-                        doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
-                            if (innerValue.code === 200) {
-                                dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, value.description) }))
-                                doGetRequest("users").then((t_value) => {
-                                    if (t_value.code === 200) {
-                                        dispatch(setMembers(t_value.content))
-                                    }
-                                })
-                                doGetRequest("users/" + params.userid + "/history").then((value) => {
-                                    if (value.code === 200) {
-                                        dispatch(setHistory(value.content))
-                                    }
-                                })
-                            } else if (innerValue.code === 412) {
-                                dispatch(openToast({
-                                    message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
-                                    headline: ZEITLIMIT_ABGELAUFEN,
-                                    duration: 10000,
-                                    type: "error"
-                                }))
-                            } else {
-                                dispatch(openErrorToast())
-                            }
-                        })
-                    }}>
-                        <Delete />
-                    </Button>
-                </TableCell> : <></>}
+                <TableCell>
+                    {dateOrRevert(value)}
+                </TableCell>
             </TableRow>
         </>
     })
@@ -201,8 +208,7 @@ const Details = (props: Props) => {
                     <TableRow>
                         <TableCell>{BESCHREIBUNG}</TableCell>
                         <TableCell>{BETRAG}</TableCell>
-                        <TableCell>{DATUM}</TableCell>
-                        {shouldAddUndoColumn() ? <TableCell >{RUECKGAENGIG}</TableCell> : <></>}
+                        <TableCell>{DATUM + (shouldAddUndoColumn() ? " / " + RUECKGAENGIG : "")}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
