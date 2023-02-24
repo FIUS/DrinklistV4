@@ -165,6 +165,10 @@ export const timeToString = (date) => {
     return startHours + ":" + startMinutes + " Uhr"
 }
 
+export const datetimeToString = (date) => {
+    return dateToString(new Date(date)) + " - " + timeToString(new Date(date))
+}
+
 export const timeTupleToString = (times) => {
     const startMinutes = times[0].getMinutes().toString().padStart(2, '0');
     const startHours = times[0].getHours().toString().padStart(2, '0');

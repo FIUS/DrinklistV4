@@ -7,7 +7,7 @@ import { BESCHREIBUNG, DATUM, KONTO, RUECKGAENGIG, SICHER_TRANSAKTION_RUECKGAENI
 import Loader from '../../Common/Loader/Loader';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
-import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
+import { datetimeToString, dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import style from './transactions.module.scss';
 
@@ -34,7 +34,7 @@ const Transactions = (props: Props) => {
     const filteredTransactions = transactions.filter(value => {
         return ((value.description.toLowerCase().includes(searchDescription.toLowerCase()) || searchDescription === "") &&
             (value.memberName?.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
-            (value.date.toLowerCase().includes(searchDate.toLowerCase()) || searchDate === "")) ||
+            (datetimeToString(new Date(value.date)).toLowerCase().includes(searchDate.toLowerCase()) || searchDate === "")) ||
             (searchDescription === "" && searchName === "" && searchDate === "")
     })
 
@@ -56,7 +56,7 @@ const Transactions = (props: Props) => {
                         {value.amount.toFixed(2)}€
                     </TableCell>
                     <TableCell>
-                        {dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}
+                        {datetimeToString(new Date(value.date))}
                     </TableCell>
                     <TableCell>
                         <Button onClick={(s_value) => {
