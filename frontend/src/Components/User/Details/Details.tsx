@@ -1,6 +1,5 @@
-import { Button, Grow, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
-import DrinkButton from '../DrinkButton/DrinkButton'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
@@ -13,10 +12,11 @@ import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
-const historyLocationThreshold = 1650;
+import AvailableDrinkCard from './AvailableDrinkCard'
+import { Drink, Transaction } from '../../../types/ResponseTypes'
 
 type Props = {}
 
@@ -28,9 +28,12 @@ const Details = (props: Props) => {
     const [searchField, setsearchField] = useState("")
     const [dialogOpen, setdialogOpen] = useState(false)
     const [isUser, setisUser] = useState(false)
+    const [historyExpanded, sethistoryExpanded] = useState(false)
     const historyRef = useRef<HTMLDivElement>(null)
     const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
-    
+
+    const mobileHistroyThreshold = 1270;
+
     const currentMember = unsafeCurrentMember ? unsafeCurrentMember : {
         id: 0,
         name: '',
@@ -98,7 +101,7 @@ const Details = (props: Props) => {
         const textColor = balanceNotNull > 0 ? "limegreen" : "darkred"
 
         return <>
-            <Paper className={style.balanceTop} style={{ width: historyRef.current?.offsetWidth }}>
+            <Paper className={style.balanceTop}>
                 <Typography variant='h3'>{KONTOSTAND}:</Typography>
                 <Typography variant='h2' color={textColor}>
                     {common.members?.find((value) => {
@@ -111,14 +114,15 @@ const Details = (props: Props) => {
 
     const extraFunctions = () => {
         const pageMemberID = params.userid ? parseInt(params.userid) : null
-        if (getmemberIDCookie() === pageMemberID||getmemberIDCookie()===1) {
-            return <Paper className={style.balanceTop} style={{ width: historyRef.current?.offsetWidth }}>
+
+        return <Paper className={style.balanceTop}>
+            {getmemberIDCookie() === pageMemberID || getmemberIDCookie() === 1 ? <>
                 <Typography variant='h5'>{SONDERFUNKTIONEN}:</Typography>
                 <Button onClick={() => setdialogOpen(true)}>{UEBERWEISEN}</Button>
-            </Paper>
-        } else {
-            return <></>
-        }
+            </> : <></>}
+
+            {history}
+        </Paper>
     }
 
     const shouldAddUndoColumn = () => {
@@ -127,64 +131,88 @@ const Details = (props: Props) => {
         }) !== undefined
     }
 
+    const filterSeachDrinks = (drink: Drink) => {
+        return searchField === "" || drink.name.toLowerCase().includes(searchField.toLowerCase())
+    }
+
+    const expandButton = <TableRow>
+        <TableCell colSpan={3}>
+            <Button fullWidth onClick={() => { sethistoryExpanded(!historyExpanded) }}>{historyExpanded ? ZEIGE_WENIGER : ZEIGE_ALLE}</Button>
+        </TableCell>
+    </TableRow>
+
+    const dateOrRevert = (transaction: Transaction) => {
+        if (transaction.revertable) {
+            return <Button fullWidth onClick={() => {
+                doPostRequest("transactions/" + transaction.id + "/undo", null).then((innerValue) => {
+                    if (innerValue.code === 200) {
+                        dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, transaction.description) }))
+                        doGetRequest("users").then((t_value) => {
+                            if (t_value.code === 200) {
+                                dispatch(setMembers(t_value.content))
+                            }
+                        })
+                        doGetRequest("users/" + params.userid + "/history").then((value) => {
+                            if (value.code === 200) {
+                                dispatch(setHistory(value.content))
+                            }
+                        })
+                    } else if (innerValue.code === 412) {
+                        dispatch(openToast({
+                            message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
+                            headline: ZEITLIMIT_ABGELAUFEN,
+                            duration: 10000,
+                            type: "error"
+                        }))
+                    } else {
+                        dispatch(openErrorToast())
+                    }
+                })
+            }}>
+                <Delete />
+            </Button>
+        } else {
+            return format("{0} - {1}", dateToString(new Date(transaction.date)), timeToString(new Date(transaction.date)))
+        }
+    }
+
+    const historyLegend = common.history?.slice(0, historyExpanded ? common.history.length : 6).map(value => {
+        return <>
+            <TableRow
+                key={value.id}
+            >
+                <TableCell component="th" scope="row">
+                    {value.description}
+                </TableCell>
+                <TableCell>{value.amount.toFixed(2)}€</TableCell>
+                <TableCell>
+                    {dateOrRevert(value)}
+                </TableCell>
+            </TableRow>
+        </>
+    })
+
+    const getHistoryLegend = () => {
+        const notUndefined = historyLegend ? historyLegend : []
+        const temp = [...notUndefined]
+        temp.splice(6, 0, expandButton)
+        return temp
+    }
 
     const history = <div className={style.historyContainer} ref={historyRef}>
-        <Typography variant='h4'>{HISTORY}</Typography>
+        <Typography variant='h5'>{HISTORY}:</Typography>
 
         <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+            <Table aria-label="simple table" size="small">
                 <TableHead>
                     <TableRow>
                         <TableCell>{BESCHREIBUNG}</TableCell>
                         <TableCell>{BETRAG}</TableCell>
-                        <TableCell>{DATUM}</TableCell>
-                        {shouldAddUndoColumn() ? <TableCell >{RUECKGAENGIG}</TableCell> : <></>}
+                        <TableCell>{DATUM + (shouldAddUndoColumn() ? " / " + RUECKGAENGIG : "")}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {common.history?.map(value => {
-                        return <>
-                            <TableRow
-                                key={value.id}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {value.description}
-                                </TableCell>
-                                <TableCell>{value.amount.toFixed(2)}€</TableCell>
-                                <TableCell>{dateToString(new Date(value.date))} - {timeToString(new Date(value.date))}</TableCell>
-                                {value.revertable ? <TableCell className={style.deleteContainer}>
-                                    <Button onClick={() => {
-                                        doPostRequest("transactions/" + value.id + "/undo", null).then((innerValue) => {
-                                            if (innerValue.code === 200) {
-                                                dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, value.description) }))
-                                                doGetRequest("users").then((t_value) => {
-                                                    if (t_value.code === 200) {
-                                                        dispatch(setMembers(t_value.content))
-                                                    }
-                                                })
-                                                doGetRequest("users/" + params.userid + "/history").then((value) => {
-                                                    if (value.code === 200) {
-                                                        dispatch(setHistory(value.content))
-                                                    }
-                                                })
-                                            } else if (innerValue.code === 412) {
-                                                dispatch(openToast({
-                                                    message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
-                                                    headline: ZEITLIMIT_ABGELAUFEN,
-                                                    duration: 10000,
-                                                    type: "error"
-                                                }))
-                                            } else {
-                                                dispatch(openErrorToast())
-                                            }
-                                        })
-                                    }}>
-                                        <Delete />
-                                    </Button>
-                                </TableCell> : <></>}
-                            </TableRow>
-                        </>
-                    })}
+                    {getHistoryLegend()}
                 </TableBody>
             </Table>
         </TableContainer>
@@ -200,28 +228,24 @@ const Details = (props: Props) => {
             <div className={style.details}>
                 <div className={style.balanceContainer}>
                     {balancePaper()}
-                    {extraFunctions()}
-                    <BalanceBox favorites={common.drinks?.filter((value) => {
-                        return common.favorites?.includes(value.id)
-                    })}
-                        memberID={params.userid ? params.userid : ""} />
-                    {window.innerWidth <= historyLocationThreshold ? <></> : history}
+                    {window.innerWidth > mobileHistroyThreshold ? extraFunctions() : <></>}
                 </div>
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'><>{HALLO} <b>{getUsername()}</b>!</></Typography>
                     <TextField placeholder={SUCHE_DOT_DOT_DOT} value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
+                    <BalanceBox favorites={common.drinks?.filter((value) => {
+                        return common.favorites?.includes(value.id)
+                    })}
+                        memberID={params.userid ? params.userid : ""} />
                     <div className={style.buyDrinkContainerInner}>
                         {common.drinkCategories?.sort((category1, category2) => category1.localeCompare(category2)).map(category => {
                             const drinks = common.drinks?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).filter(value => {
                                 return value.category === category
                             })
-                            if (drinks?.some((value) => searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase()))) {
+                            if (drinks?.some((value) => filterSeachDrinks(value))) {
                                 return <>
-                                    <Typography variant='h6' style={{ width: "100%" }}>{category}</Typography>
-                                    {drinks?.map((value) => {
-                                        return <Grow in={searchField === "" || value.name.toLowerCase().includes(searchField.toLowerCase())} unmountOnExit><div><DrinkButton drink={value} memberID={params.userid ? params.userid : ""} /></div></Grow>
-                                    })}
+                                    <AvailableDrinkCard category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
                                 </>
                             } else {
                                 return <></>
@@ -229,10 +253,7 @@ const Details = (props: Props) => {
                         })}
                     </div>
                 </div>
-
-                {window.innerWidth > historyLocationThreshold ? <></> : history}
-
-
+                {window.innerWidth <= mobileHistroyThreshold ? extraFunctions() : <></>}
             </div>
             <Spacer vertical={50} />
             {!isUser ? <NavigationButton destination='/' /> : <></>}

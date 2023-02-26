@@ -12,7 +12,4 @@
 
 .footerButton {
     width: 100%;
-    @media screen and (min-width: $PHONE_SIZE_THRESHOLD) {
-        height: 70px;
-    }
 }

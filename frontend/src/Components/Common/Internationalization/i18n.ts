@@ -139,5 +139,7 @@ export const WARNUNG = "Warnung";
 export const WENDE_DICH_AN_ADMIN_RUECKGAENGIG = "Bitte wende dich an den Getränkelisten verwalter um dies rückgängig zu machen";
 export const WER_BIST_DU = "Wer bist du?";
 export const WERT = "Wert";
+export const ZEIGE_ALLE = "▼ Zeige alle ▼";
+export const ZEIGE_WENIGER="▲ Zeige weniger ▲";
 export const ZEITLIMIT_ABGELAUFEN = "Zeitlimit abgelaufen";
 export const ZURUECK = "Zurück";

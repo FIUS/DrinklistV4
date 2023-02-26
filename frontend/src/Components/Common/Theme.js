@@ -530,7 +530,15 @@ export const theme02 = createTheme({
                     maxWidth: (window.innerWidth - 30) + "px"
                 }
             }
-        }
+        },
+        MuiAutocomplete: {
+            styleOverrides: {
+
+                popper: {
+                    zIndex: 20000001
+                }
+            }
+        },
     },
     palette: {
         neutral: {
@@ -558,7 +566,7 @@ export const theme02 = createTheme({
         },
         divider: '#E6E8F0',
         primary: {
-            main: '#5048E5',
+            main: '#396689',
             light: '#828DF8',
             dark: '#3832A0',
             contrastText: '#FFFFFF'
