@@ -84,6 +84,16 @@ class get_user_favorites(Resource):
         return util.build_response(db.get_user_favorites(member_id))
 
 
+@api.route('/users/<int:member_id>/favorites/generated')
+class get_user_favorites_generated(Resource):
+    @authenticated
+    def get(self, member_id):
+        """
+        Get favorite drinks of a user
+        """
+        return util.build_response(db.get_most_bought_drink_id(member_id, datetime.now()))
+
+
 @api.route('/users/<int:member_id>/history')
 class get_user_history(Resource):
     @authenticated

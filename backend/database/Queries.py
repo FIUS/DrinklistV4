@@ -14,6 +14,8 @@ from sqlalchemy import desc
 from typing import List
 import constants
 import os
+from sqlalchemy import extract
+from difflib import SequenceMatcher
 
 
 class Queries:
@@ -285,6 +287,88 @@ class Queries:
         else:
             return None
 
+    def get_most_bought_drink_name(self, member_id: int, timestamp: datetime):
+        # Round timestamp down to nearest 15-minute interval
+        now = datetime.now()
+        timestamp = timestamp.replace(second=0, microsecond=0)
+        timestamp = timestamp.replace(
+            year=now.year, month=now.month, day=now.day)
+        timestamp = timestamp - timedelta(minutes=timestamp.minute % 15)
+
+        # Calculate the date 120 days ago
+        date_range = timestamp - timedelta(days=120)
+
+        # Check for transactions for given member_id for the rest of the day
+        max_drink_amounts = {}
+        for i in range(0, 24*4):
+            interval_start = timestamp + timedelta(minutes=i*15)
+            interval_end = timestamp + timedelta(minutes=(i+1)*15)
+
+            # Get all transactions for member_id within current 15-minute interval
+            transactions = self.session.query(Transaction).filter(
+                Transaction.member_id == member_id,
+                extract('hour', Transaction.date) == interval_start.hour,
+                extract('minute', Transaction.date) >= interval_start.minute,
+                extract('minute', Transaction.date) < interval_end.minute,
+                Transaction.date >= date_range
+            ).all()
+
+            transactions = [
+                t for t in transactions if "Transfer" not in t.description]
+
+            # Calculate total amount of each drink purchased
+            drink_amounts = {}
+            for transaction in transactions:
+                drink_name = transaction.description
+                if drink_name in drink_amounts:
+                    drink_amounts[drink_name] += 1
+                else:
+                    drink_amounts[drink_name] = 1
+
+            # If transactions found in interval, return drink with highest total amount
+            if drink_amounts:
+                return {"drink": max(drink_amounts, key=drink_amounts.get), "confident": True if i == 0 else False}
+
+            # Update max_drink_amounts with current interval's drink amounts
+            for drink, amount in drink_amounts.items():
+                if drink in max_drink_amounts:
+                    max_drink_amounts[drink] += amount
+                else:
+                    max_drink_amounts[drink] = amount
+
+        # If no transactions found for any interval, return drink with highest total amount for entire day
+        if max_drink_amounts:
+            return {"drink": max(max_drink_amounts, key=max_drink_amounts.get), "confident": False}
+        else:
+            return {"drink": None, "confident": False}
+
+    def get_drink_id_from_name(self, name):
+        if name is None:
+            print("No favorite drink found")
+            return None
+        drink: Drink = self.session.query(Drink).filter_by(name=name).first()
+        if drink is not None:
+            return drink.id
+        else:
+            # Find closest match using sequence matcher
+            drinks = self.session.query(Drink).all()
+            best_match = None
+            best_match_ratio = 0
+            for drink in drinks:
+                ratio = SequenceMatcher(None, name, drink.name).ratio()
+                if ratio > best_match_ratio:
+                    best_match = drink
+                    best_match_ratio = ratio
+
+            if best_match_ratio > 0.9:
+                return best_match.id
+            else:
+                return None
+
+    def get_most_bought_drink_id(self, member_id: int, timestamp: datetime) -> int:
+        drink_name = self.get_most_bought_drink_name(member_id, timestamp)
+        return {"drinkID": self.get_drink_id_from_name(drink_name["drink"]), "confidence": drink_name["confident"]}
+
     def change_member_password(self, password, member_id):
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
@@ -302,8 +386,7 @@ class Queries:
     def change_user_name(self, member_id, name):
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
-        print(member_id)
-        print(name)
+
         member.name = name
         self.session.commit()
 
