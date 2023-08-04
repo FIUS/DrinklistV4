@@ -14,9 +14,10 @@ def send_checkout_mails(user_infos):
     }
     """
     for username, info in user_infos.items():
+        mail=username if "@" in username else f"{username}@{util.mail_postfix}"
         # do for all
         send_checkout_mail(info["name"], info["balance"],
-                           info["income"], info["paid"], f"{username}@{util.mail_postfix}")
+                           info["income"], info["paid"], mail)
 
 
 def compile_latex(name):
@@ -118,9 +119,12 @@ def send_checkout_mail(name, current_balance, income, paid, mail_address):
     raw_latex_file = raw_latex_file.replace("??income-table??", income_table)
     raw_latex_file = raw_latex_file.replace("??paid-table??", paid_table)
 
-    with open('Latex/checkout.tex', "w") as writer:
-        writer.write(raw_latex_file)
+    filename="checkout"
 
-    compile_latex("checkout")
-    send_mail_with_attachment("Getränkelisten Abrechnung", mail_address, "Latex/checkout.pdf",
-                              "Abrechnung.pdf", util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))
+    with open(f'Latex/{filename}.tex', "w") as writer:
+        writer.write(raw_latex_file)
+    
+    compile_latex(filename)
+
+    send_mail_with_attachment("Getränkelisten Abrechnung", mail_address, f"Latex/{filename}.pdf",
+                            "Abrechnung.pdf", util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))

@@ -522,8 +522,9 @@ class do_checkout(Resource):
         """
         db.do_checkout(request.json)
         mail_infos = db.get_checkout_mail()
-        mail.send_checkout_mails(mail_infos)
-        return util.build_response()
+        if util.mail_server is not None:
+            mail.send_checkout_mails(mail_infos)
+        return util.build_response("")
 
     @admin
     def get(self):
@@ -690,7 +691,7 @@ class logout(Resource):
 
 if __name__ == "__main__":
     if util.logging_enabled:
-        app.run("0.0.0.0", threaded=True)
+        app.run("0.0.0.0", threaded=True, debug=True)
     else:
         from waitress import serve
         serve(app, host="0.0.0.0", port=5000, threads=4)
