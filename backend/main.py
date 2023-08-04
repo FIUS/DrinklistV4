@@ -17,6 +17,7 @@ from database import Queries
 from flask_restx import fields, Resource, Api
 from flask_restx import reqparse
 import flask
+import mail
 
 api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
 api = Api(api_bp, doc='/docu/', base_url='/api')
@@ -529,7 +530,11 @@ class do_checkout(Resource):
         """
         Create a checkout
         """
-        return util.build_response(db.do_checkout(request.json))
+        db.do_checkout(request.json)
+        mail_infos = db.get_checkout_mail()
+        if util.mail_server is not None:
+            mail.send_checkout_mails(mail_infos)
+        return util.build_response("")
 
     @admin
     def get(self):
@@ -696,7 +701,7 @@ class logout(Resource):
 
 if __name__ == "__main__":
     if util.logging_enabled:
-        app.run("0.0.0.0", threaded=True)
+        app.run("0.0.0.0", threaded=True, debug=True)
     else:
         from waitress import serve
         serve(app, host="0.0.0.0", port=5000, threads=4)

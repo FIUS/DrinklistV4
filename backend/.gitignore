@@ -4,7 +4,11 @@ __pycache__/
 log.txt
 # C extensions
 *.so
-
+*.aux
+*.pdf
+!Banner.pdf
+*.tex
+!*-template.tex
 tempfiles/
 
 # Distribution / packaging
