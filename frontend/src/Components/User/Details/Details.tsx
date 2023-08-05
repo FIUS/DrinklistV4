@@ -92,6 +92,16 @@ const Details = (props: Props) => {
         return common.members?.find(value => value.id === parseInt(params.userid ? params.userid : "-1"))?.name
     }
 
+    const getAlias = () => {
+        let alias = common.members?.find(value => value.id === parseInt(params.userid ? params.userid : "-1"))?.alias
+        if (alias === "") {
+            alias = getUsername()
+        }
+        return alias
+    }
+
+
+
 
     const balancePaper = () => {
         const balance = common.members?.find((value) => {
@@ -232,7 +242,7 @@ const Details = (props: Props) => {
                 </div>
 
                 <div className={style.buyDrinkContainer}>
-                    <Typography variant='h4'><>{HALLO} <b>{getUsername()}</b>!</></Typography>
+                    <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
                     <TextField placeholder={SUCHE_DOT_DOT_DOT} value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
                     <BalanceBox favorites={common.drinks?.filter((value) => {
                         return common.favorites?.includes(value.id)

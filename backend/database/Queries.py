@@ -434,12 +434,12 @@ class Queries:
         member_from.balance -= amount
         member_to.balance += amount
 
-        string_to = f"Transfer money to {member_to.name}"
-        string_from = f"Transfer money from {member_from.name}"
+        string_to = f"Transfer money to {member_to.alias if member_to.alias!='' else member_to.name}"
+        string_from = f"Transfer money from {member_from.alias if member_from.alias!='' else member_from.name}"
 
         if message is not None:
-            string_to = f"Transfer money to {member_to.name}: {message}"
-            string_from = f"Transfer money from {member_from.name}: {message}"
+            string_to = f"Transfer money to {member_to.alias if member_to.alias!='' else member_to.name}: {message}"
+            string_from = f"Transfer money from {member_from.alias if member_from.alias!='' else member_from.name}: {message}"
 
         transaction_minus = Transaction(
             description=string_to,
@@ -487,6 +487,11 @@ class Queries:
             self.session.delete(r)
 
         self.session.commit()
+
+    def get_username_alias(self, member_id):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        return member.name, member.alias
 
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
