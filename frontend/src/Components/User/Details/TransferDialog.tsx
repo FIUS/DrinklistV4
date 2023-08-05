@@ -36,13 +36,14 @@ const TransferDialog = (props: Props) => {
     const [reason, setreason] = useState<string | null>(null)
     const [amount, setamount] = useState(0)
     const [chosenEmoji, setChosenEmoji] = useState<string>("💸");
-
+    const [transferButtonDisabled, settransferButtonDisabled] = useState(false)
     const dispatch = useDispatch();
 
     const resetInput = () => {
         setselectedUser(null)
         setamount(0)
         setreason(null)
+        settransferButtonDisabled(false)
     }
 
     return (
@@ -107,7 +108,7 @@ const TransferDialog = (props: Props) => {
                 }}>
                     {ABBRECHEN}
                 </Button>
-                <Button onClick={() => {
+                <Button disabled={transferButtonDisabled} onClick={() => {
                     const from = props.member.id;
                     const to = common.members?.find((value) => {
                         return value.name === selectedUser;
@@ -128,6 +129,7 @@ const TransferDialog = (props: Props) => {
                         payload = { ...payload, reason: reason }
                     }
 
+                    settransferButtonDisabled(true)
                     doPostRequest(format("users/{0}/transfer/{1}", from, to ? to : -1), payload).then(value => {
                         if (value.code === 200) {
                             dispatch(openToast({ message: GELD_UEBERWIESEN, type: "success" }))
@@ -146,6 +148,7 @@ const TransferDialog = (props: Props) => {
                             props.close()
                         } else {
                             dispatch(openToast({ message: value.content, type: "error" }))
+                            settransferButtonDisabled(false)
                         }
                     })
                 }}>

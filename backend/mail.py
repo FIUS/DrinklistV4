@@ -7,6 +7,10 @@ from email import encoders
 import util
 
 
+def mail_from_username(username):
+    return username if "@" in username else f"{username}@{util.mail_postfix}"
+
+
 def send_checkout_mails(user_infos):
     """
     {
@@ -14,10 +18,30 @@ def send_checkout_mails(user_infos):
     }
     """
     for username, info in user_infos.items():
-        mail=username if "@" in username else f"{username}@{util.mail_postfix}"
+        mail = mail_from_username()
         # do for all
         send_checkout_mail(info["name"], info["balance"],
                            info["income"], info["paid"], mail)
+
+
+def send_transfer_mails(from_name, from_alias, to_name, to_alias, from_message, to_message):
+    from_mail = mail_from_username(from_name)
+    to_mail = mail_from_username(to_name)
+
+    if util.mail_server is None:
+        return
+
+    send_mail("Getränkelisten Überweisung",from_mail,f"""Hallo {from_alias if from_alias !='' else from_name},
+{from_message}
+
+Dein Getränkelisten Team
+""")
+
+    send_mail("Getränkelisten Überweisung",to_mail,f"""Hallo {to_alias if to_alias !='' else to_name},
+{to_message}
+
+Dein Getränkelisten Team
+""")
 
 
 def compile_latex(name):
@@ -27,6 +51,33 @@ def compile_latex(name):
 def format_float(input):
     return '{0:.2f}'.format(input).replace(".", ",")
 
+def send_mail(subject, to_address, body):
+    print("Start sending mail")
+    # Email details
+    from_address = util.mail_email
+
+    # Create the email
+    msg = MIMEMultipart()
+    msg["From"] = from_address
+    msg["To"] = to_address
+    msg["Subject"] = subject
+
+    # Add the body of the email
+    msg.attach(MIMEText(body, "plain"))
+
+    # Connect to the email server
+    server = smtplib.SMTP(util.mail_server, int(util.mail_port))
+    server.starttls()
+    # Login to the email server
+    server.login(
+        util.mail_username, util.mail_password)
+
+    # Send the email
+    server.sendmail(from_address, to_address, msg.as_string())
+
+    # Disconnect from the server
+    server.quit()
+    print("Done sending mail")
 
 def send_mail_with_attachment(subject, to_address, attachment, attachment_name, body):
     print("Start sending mail")
@@ -119,12 +170,12 @@ def send_checkout_mail(name, current_balance, income, paid, mail_address):
     raw_latex_file = raw_latex_file.replace("??income-table??", income_table)
     raw_latex_file = raw_latex_file.replace("??paid-table??", paid_table)
 
-    filename="checkout"
+    filename = "checkout"
 
     with open(f'Latex/{filename}.tex', "w") as writer:
         writer.write(raw_latex_file)
-    
+
     compile_latex(filename)
 
     send_mail_with_attachment("Getränkelisten Abrechnung", mail_address, f"Latex/{filename}.pdf",
-                            "Abrechnung.pdf", util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))
+                              "Abrechnung.pdf", util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))

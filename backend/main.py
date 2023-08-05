@@ -165,12 +165,27 @@ class transfer_money(Resource):
 
             from_name = db.transfer(
                 member_id_from, member_id_to, amount, message)
+
+            from_name, from_alias = db.get_username_alias(member_id_from)
+            to_name, to_alias = db.get_username_alias(member_id_to)
+
             db.add_message(
                 member_id_to,
                 f"Du hast {'{:.2f}'.format(amount)}€ von {from_name} erhalten{f' mit folgender Nachricht: {message}' if message is not None else ''}",
                 from_name,
                 request.json['emoji'] if 'emoji' in request.json else None
             )
+
+            from_message = f" mit folgender Nachricht: '{message}' " if message is not None else ' '
+            to_message = f" mit folgender Nachricht: '{message}' " if message is not None else ' '
+
+            mail.send_transfer_mails(from_name,
+                                     from_alias,
+                                     to_name,
+                                     to_alias,
+                                     f"Du hast {'{:.2f}'.format(amount)}€ an {to_alias if to_alias !='' else to_name}{to_message}gesendet",
+                                     f"Du hast {'{:.2f}'.format(amount)}€ von {from_alias if from_alias !='' else from_name}{from_message}erhalten")
+
         else:
             return util.build_response("Your are not allowed to transfer money from this account", code=403)
 
