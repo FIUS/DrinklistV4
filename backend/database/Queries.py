@@ -82,6 +82,7 @@ class Queries:
         user: Member = self.session.query(
             Member).filter_by(id=int(member_id)).first()
         user.hidden = not user.hidden if visibility is None else visibility
+        print(user.name,user.hidden,visibility)
         self.session.commit()
 
     def add_user(self, name, money, password, alias="", hidden=False):
@@ -588,6 +589,8 @@ class Queries:
             try:
                 if result[1] < datetime.now()-timedelta(days=int(util.auto_hide_days)):
                     self.change_user_visibility(result[0], True)
+                else:
+                    self.change_user_visibility(result[0], False)
             except:
                 pass
 
