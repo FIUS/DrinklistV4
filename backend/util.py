@@ -30,6 +30,9 @@ default_drink_category = int(os.environ.get(
     "DEFAULT_DRINK_CATEGORY")) if os.environ.get("DEFAULT_DRINK_CATEGORY") else "Getränk"
 use_alias = os.environ.get(
     "USE_ALIAS") == "true" if os.environ.get("USE_ALIAS") else True
+auto_hide_days = os.environ.get(
+    "AUTO_HIDE_DAYS") == "true" if os.environ.get("AUTO_HIDE_DAYS") else None
+
 
 mail_server = os.environ.get(
     "MAIL_SERVER") if os.environ.get("MAIL_SERVER") else None

@@ -28,8 +28,11 @@ token_manager = authenticator.TokenManager()
 with app.app_context():
     db = Queries.Queries(sql_database)
 
-taskScheduler = TaskScheduler.TaskScheduler()
-taskScheduler.start()
+    db.hide_inactive()
+
+    taskScheduler = TaskScheduler.TaskScheduler()
+    taskScheduler.add_Daily_Task(db.hide_inactive)
+    taskScheduler.start()
 
 
 def is_admin():

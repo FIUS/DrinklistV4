@@ -78,10 +78,10 @@ class Queries:
         user.salt = salt
         self.session.commit()
 
-    def change_user_visibility(self, member_id):
+    def change_user_visibility(self, member_id, visibility=None):
         user: Member = self.session.query(
-            Member).filter_by(id=member_id).first()
-        user.hidden = not user.hidden
+            Member).filter_by(id=int(member_id)).first()
+        user.hidden = not user.hidden if visibility is None else visibility
         self.session.commit()
 
     def add_user(self, name, money, password, alias="", hidden=False):
@@ -575,6 +575,21 @@ class Queries:
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
         return member.name, member.alias
+
+    def hide_inactive(self):
+        if util.auto_hide_days is None:
+            return
+        
+        latest_transactions = self.session.query(Transaction.member_id, func.max(Transaction.date).label('latest_date')) \
+            .group_by(Transaction.member_id).all()
+
+        # Print the results
+        for result in latest_transactions:
+            try:
+                if result[1] < datetime.now()-timedelta(days=int(util.auto_hide_days)):
+                    self.change_user_visibility(result[0], True)
+            except:
+                pass
 
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()
