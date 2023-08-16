@@ -76,13 +76,13 @@ const Overview = (props: Props) => {
     }
 
     const historyBox = () => {
-        if (history !== null) {
+        if (history !== null && window.innerWidth > window.globalTS.MOBILE_THRESHOLD) {
             return <Box sx={{ position: 'fixed', bottom: '10px', left: '10px' }}>
                 <Fab variant="extended"
                     size="medium"
                     color="default"
                     ref={anchor}
-                    style={{ 'overflow': 'hidden' }}
+                    className={style.historyContainer}
                 >
                     <HistoryIcon />
                     <Spacer horizontal={10} />

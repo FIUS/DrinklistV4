@@ -1,6 +1,6 @@
 @import "../../Common/variables.module.scss";
 
-.outterContainer{
+.outterContainer {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -8,28 +8,33 @@
     gap: $flex-gap;
 }
 
-.headline{
+.headline {
     padding-top: $padding;
 }
 
-.input{
+.input {
     width: 70%;
     min-width: 350px !important;
 }
 
-.buttonArea{
+.buttonArea {
     display: grid;
     gap: $flex-gap;
     justify-content: center;
     width: 100%;
     padding: $padding;
 
-    @media (min-width:$PHONE_SIZE_THRESHOLD){
+    @media (min-width:$PHONE_SIZE_THRESHOLD) {
         grid-template-columns: repeat(auto-fill, 200px);
     }
 
-    @media (max-width:$PHONE_SIZE_THRESHOLD){
+    @media (max-width:$PHONE_SIZE_THRESHOLD) {
         grid-template-columns: repeat(auto-fill, 100%);
     }
-      
+
+}
+
+.historyContainer {
+    overflow: hidden;
+    padding: $padding;
 }
