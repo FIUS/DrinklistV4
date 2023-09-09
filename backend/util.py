@@ -50,7 +50,7 @@ mail_postfix = os.environ.get(
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
 
-os.environ['TZ'] = 'Europe/London'
+os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
 
 
