@@ -80,7 +80,5 @@ checkout_mail_text = """Hallo {name},
 eine Getränkelisten abrechnung wurde durchgeführt, wir möchten dich hiermit über deinen aktuellen Kontostand informieren.
 Aktuell hast du ein Guthaben von {balance}€.
 
-Weitere Details, wie die einzelnen Transaktionen seit der letzten Abrechnung (positiv und negativ) findest du im PDF im Anhang.
-
 Viele Grüße
 """

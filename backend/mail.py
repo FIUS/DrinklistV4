@@ -18,7 +18,7 @@ def send_checkout_mails(user_infos):
     }
     """
     for username, info in user_infos.items():
-        mail = mail_from_username()
+        mail = mail_from_username(username)
         # do for all
         send_checkout_mail(info["name"], info["balance"],
                            info["income"], info["paid"], mail)
@@ -31,13 +31,13 @@ def send_transfer_mails(from_name, from_alias, to_name, to_alias, from_message, 
     if util.mail_server is None:
         return
 
-    send_mail("Getränkelisten Überweisung",from_mail,f"""Hallo {from_alias if from_alias !='' else from_name},
+    send_mail("Getränkelisten Überweisung", from_mail, f"""Hallo {from_alias if from_alias !='' else from_name},
 {from_message}
 
 Dein Getränkelisten Team
 """)
 
-    send_mail("Getränkelisten Überweisung",to_mail,f"""Hallo {to_alias if to_alias !='' else to_name},
+    send_mail("Getränkelisten Überweisung", to_mail, f"""Hallo {to_alias if to_alias !='' else to_name},
 {to_message}
 
 Dein Getränkelisten Team
@@ -51,33 +51,39 @@ def compile_latex(name):
 def format_float(input):
     return '{0:.2f}'.format(input).replace(".", ",")
 
+
 def send_mail(subject, to_address, body):
     print("Start sending mail")
-    # Email details
-    from_address = util.mail_email
 
-    # Create the email
-    msg = MIMEMultipart()
-    msg["From"] = from_address
-    msg["To"] = to_address
-    msg["Subject"] = subject
+    try:
+        # Email details
+        from_address = util.mail_email
 
-    # Add the body of the email
-    msg.attach(MIMEText(body, "plain"))
+        # Create the email
+        msg = MIMEMultipart()
+        msg["From"] = from_address
+        msg["To"] = to_address
+        msg["Subject"] = subject
 
-    # Connect to the email server
-    server = smtplib.SMTP(util.mail_server, int(util.mail_port))
-    server.starttls()
-    # Login to the email server
-    server.login(
-        util.mail_username, util.mail_password)
+        # Add the body of the email
+        msg.attach(MIMEText(body, "plain"))
 
-    # Send the email
-    server.sendmail(from_address, to_address, msg.as_string())
+        # Connect to the email server
+        server = smtplib.SMTP(util.mail_server, int(util.mail_port))
+        server.starttls()
+        # Login to the email server
+        server.login(
+            util.mail_username, util.mail_password)
 
-    # Disconnect from the server
-    server.quit()
-    print("Done sending mail")
+        # Send the email
+        server.sendmail(from_address, to_address, msg.as_string())
+
+        # Disconnect from the server
+        server.quit()
+        print("Done sending mail")
+    except:
+        print("Failed to send to:", to_address)
+
 
 def send_mail_with_attachment(subject, to_address, attachment, attachment_name, body):
     print("Start sending mail")
@@ -177,4 +183,5 @@ def send_checkout_mail(name, current_balance, income, paid, mail_address):
 
     # compile_latex(filename)
 
-    send_mail("Getränkelisten Abrechnung", mail_address, util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))
+    send_mail("Getränkelisten Abrechnung", mail_address, util.checkout_mail_text.format(
+        name=name, balance=format_float(current_balance)))
