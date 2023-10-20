@@ -125,57 +125,56 @@ def send_mail_with_attachment(subject, to_address, attachment, attachment_name, 
 
 
 def send_checkout_mail(name, current_balance, income, paid, mail_address):
-    income_sum = 0
-    paid_sum = 0
+    # income_sum = 0
+    # paid_sum = 0
 
-    income_table = ""
-    paid_table = ""
+    # income_table = ""
+    # paid_table = ""
 
-    for idx, i in enumerate(income):
-        income_sum += i[2]
+    # for idx, i in enumerate(income):
+    #     income_sum += i[2]
 
-        line = ""
-        if idx % 2 == 0:
-            income_table += "\\rowcolor[gray]{.9}"
+    #     line = ""
+    #     if idx % 2 == 0:
+    #         income_table += "\\rowcolor[gray]{.9}"
 
-        line += f"{i[0]} & {i[1]} & {format_float(i[2])}€\\tabularnewline\n"
-        income_table += line
+    #     line += f"{i[0]} & {i[1]} & {format_float(i[2])}€\\tabularnewline\n"
+    #     income_table += line
 
-    for idx, i in enumerate(paid):
-        paid_sum += i[2]
+    # for idx, i in enumerate(paid):
+    #     paid_sum += i[2]
 
-        line = ""
-        if idx % 2 == 0:
-            paid_table += "\\rowcolor[gray]{.9}"
+    #     line = ""
+    #     if idx % 2 == 0:
+    #         paid_table += "\\rowcolor[gray]{.9}"
 
-        line += f"{i[0]} & {i[1]} & {format_float(i[2])}€\\tabularnewline\n"
-        paid_table += line
+    #     line += f"{i[0]} & {i[1]} & {format_float(i[2])}€\\tabularnewline\n"
+    #     paid_table += line
 
-    paid_table += "\\midrule\n"
-    income_table += "\\midrule\n"
+    # paid_table += "\\midrule\n"
+    # income_table += "\\midrule\n"
 
-    raw_latex_file = None
-    with open('Latex/checkout-template.tex') as reader:
-        raw_latex_file = reader.read()
+    # raw_latex_file = None
+    # with open('Latex/checkout-template.tex') as reader:
+    #     raw_latex_file = reader.read()
 
-    raw_latex_file = raw_latex_file.replace("??name??", name)
-    raw_latex_file = raw_latex_file.replace(
-        "??current-balance??", format_float(current_balance))
+    # raw_latex_file = raw_latex_file.replace("??name??", name)
+    # raw_latex_file = raw_latex_file.replace(
+    #     "??current-balance??", format_float(current_balance))
 
-    raw_latex_file = raw_latex_file.replace(
-        "??income-sum??", format_float(income_sum))
-    raw_latex_file = raw_latex_file.replace(
-        "??paid-sum??", format_float(paid_sum))
+    # raw_latex_file = raw_latex_file.replace(
+    #     "??income-sum??", format_float(income_sum))
+    # raw_latex_file = raw_latex_file.replace(
+    #     "??paid-sum??", format_float(paid_sum))
 
-    raw_latex_file = raw_latex_file.replace("??income-table??", income_table)
-    raw_latex_file = raw_latex_file.replace("??paid-table??", paid_table)
+    # raw_latex_file = raw_latex_file.replace("??income-table??", income_table)
+    # raw_latex_file = raw_latex_file.replace("??paid-table??", paid_table)
 
-    filename = "checkout"
+    # filename = "checkout"
 
-    with open(f'Latex/{filename}.tex', "w") as writer:
-        writer.write(raw_latex_file)
+    # with open(f'Latex/{filename}.tex', "w") as writer:
+    #     writer.write(raw_latex_file)
 
-    compile_latex(filename)
+    # compile_latex(filename)
 
-    send_mail_with_attachment("Getränkelisten Abrechnung", mail_address, f"Latex/{filename}.pdf",
-                              "Abrechnung.pdf", util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))
+    send_mail("Getränkelisten Abrechnung", mail_address, util.checkout_mail_text.format(name=name, balance=format_float(current_balance)))
