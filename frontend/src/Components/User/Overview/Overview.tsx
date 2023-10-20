@@ -121,6 +121,7 @@ const Overview = (props: Props) => {
                     placeholder={NAME}
                     type="search"
                     value={searchfield}
+                    autoFocus
                     onChange={
                         (value) => { setsearchfield(value.target.value) }
                     }
