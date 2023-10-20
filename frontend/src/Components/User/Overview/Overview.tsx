@@ -75,6 +75,11 @@ const Overview = (props: Props) => {
             member.alias.toLowerCase().includes(searchfield.toLowerCase())
     }
 
+    const exactSearchMatch = (member: Member) => {
+        return member.name.toLowerCase() === (searchfield.toLowerCase()) ||
+            member.alias.toLowerCase() === (searchfield.toLowerCase())
+    }
+
     const historyBox = () => {
         if (history !== null && window.innerWidth > window.globalTS.MOBILE_THRESHOLD) {
             return <Box sx={{ position: 'fixed', bottom: '10px', left: '10px' }}>
@@ -128,7 +133,7 @@ const Overview = (props: Props) => {
                         return name1.localeCompare(name2)
                     }
                     )?.map(value => {
-                        if (!value.hidden) {
+                        if (!value.hidden || (exactSearchMatch(value))) {
                             return <Grow in={userVisible(value)} key={value.id} unmountOnExit>
                                 <div style={{ width: "100%" }}>
                                     <UserButton key={value.id} name={value.alias === "" ? value.name : value.alias} id={value.id} />
