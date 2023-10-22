@@ -41,12 +41,22 @@ const Overview = (props: Props) => {
     }, [historyState])
 
     useEffect(() => {
-        doGetRequest("transactions/limit/3").then((value) => {
+        doGetRequest("transactions/limit/10").then((value) => {
             if (value.code === 200) {
-                sethistory(value.content)
+                const transactions: Array<Transaction> = value.content;
+                const filteredTransactions = transactions.filter((transaction) => {
+                    let nameMatches = false;
+                    common.drinks?.forEach((drink) => {
+                        if (transaction.description.toLocaleLowerCase().includes(drink.name.toLocaleLowerCase())) {
+                            nameMatches = true;
+                        }
+                    })
+                    return nameMatches;
+                })
+                sethistory(filteredTransactions)
             }
         })
-    }, [])
+    }, [common.drinks])
 
 
     useEffect(() => {
@@ -81,7 +91,7 @@ const Overview = (props: Props) => {
     }
 
     const historyBox = () => {
-        if (history !== null && window.innerWidth > window.globalTS.MOBILE_THRESHOLD) {
+        if (history !== null && window.innerWidth > window.globalTS.MOBILE_THRESHOLD && history.length > 2) {
             return <Box sx={{ position: 'fixed', bottom: '10px', left: '10px' }}>
                 <Fab variant="extended"
                     size="medium"
