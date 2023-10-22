@@ -4,6 +4,12 @@
     padding: $padding;
 }
 
+.newMemberContainer{
+    margin-left: $padding !important;
+    margin-right: $padding !important;
+    max-width: max-content;
+}
+
 .firstRowAlign {
     display: flex;
     align-items: flex-end;

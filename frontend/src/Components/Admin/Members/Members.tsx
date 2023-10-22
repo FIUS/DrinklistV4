@@ -1,5 +1,6 @@
 import { Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
@@ -17,7 +18,7 @@ import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 import MemberNameEditDialog from './MemberNameEditDialog';
 import { Member } from '../../../types/ResponseTypes';
-import Infobox from '../../Common/InfoBox/Infobox';
+
 type Props = {}
 
 const Members = (props: Props) => {
@@ -87,11 +88,16 @@ const Members = (props: Props) => {
                     colorCode={window.globalTS.ICON_COLOR} />
                 <TopDepter members={common.members} />
             </div>
-            <Infobox headline='Neuen Benutzer anlegen'>
-                <>
+            <Accordion className={style.newMemberContainer} >
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                >
+                    <Typography variant='h5'>Neuen Benutzer anlegen</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
                     <div className={style.newUserBoxInputs}>
                         <TextField
-                            label='Benutzername'
+                            label='E-Mail'
                             value={name}
                             onChange={(value) => {
                                 setname(value.target.value)
@@ -154,8 +160,8 @@ const Members = (props: Props) => {
                     }}>
                         {HINZUFUEGEN}
                     </Button>
-                </>
-            </Infobox>
+                </AccordionDetails>
+            </Accordion>
             <div className={style.table}>
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table" size='small'>
