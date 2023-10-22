@@ -22,6 +22,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Picker from '@emoji-mart/react'
 // eslint-disable-next-line
 import style from './details.module.scss'
+import { safeMemberName } from '../../Common/StaticFunctionsTyped';
 
 type Props = {
     isOpen: boolean,
@@ -56,7 +57,13 @@ const TransferDialog = (props: Props) => {
                 <Spacer vertical={20} />
                 <Autocomplete
                     sx={{ zIndex: 20000001 }}
-                    options={common.members ? common.members.map(value => value.name) : []}
+                    options={common.members ? common.members.map(value => {
+                        if (value.alias !== "") {
+                            return format("{0} ({1})", safeMemberName(value), value.name)
+                        } else {
+                            return value.name
+                        }
+                    }) : []}
                     value={selectedUser}
                     onChange={(event, value) => { setselectedUser(value !== null ? value : "") }}
                     renderInput={(params) =>
@@ -111,7 +118,7 @@ const TransferDialog = (props: Props) => {
                 <Button disabled={transferButtonDisabled} onClick={() => {
                     const from = props.member.id;
                     const to = common.members?.find((value) => {
-                        return value.name === selectedUser;
+                        return selectedUser?.includes(value.name);
                     })?.id;
 
 
