@@ -44,6 +44,7 @@ const Login = (props: Props) => {
                         label={NAME}
                         value={username}
                         onChange={(value) => { setusername(value.target.value) }}
+                        autoFocus
                     />
 
                     <Spacer vertical={30} />

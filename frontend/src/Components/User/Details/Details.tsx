@@ -243,7 +243,13 @@ const Details = (props: Props) => {
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
-                    <TextField placeholder={SUCHE_DOT_DOT_DOT} value={searchField} onChange={(value) => setsearchField(value.target.value)} type="search" />
+                    <TextField
+                        placeholder={SUCHE_DOT_DOT_DOT}
+                        value={searchField}
+                        onChange={(value) => setsearchField(value.target.value)}
+                        type="search"
+                        autoFocus
+                    />
                     <BalanceBox favorites={common.drinks?.filter((value) => {
                         return common.favorites?.includes(value.id)
                     })}
