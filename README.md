@@ -21,15 +21,19 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
     * The default path is therefore `instance/db/database.db` (inside docker container `/usr/src/app/instance/db/database.db`)
 * `ADMIN_USERNAME`
   * Username of admin user
+  * Ignored after building database for the first time
   * Defaults to: `admin`
 * `ADMIN_PASSWORD`
   * Password of admin user
+  * Ignored after building database for the first time
   * Defaults to: `unsafe`
 * `MOD_USERNAME`
   * Username of moderator
+  * Ignored after building database for the first time
   * Defaults to: `moderator`
 * `MOD_PASSWORD`
   * Password of moderator
+  * Ignored after building database for the first time
   * Defaults to: `unsafe`
 * `USER_PASSWORD`
   * Password that will be assigned on import from old Drinklist
