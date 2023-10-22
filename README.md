@@ -43,6 +43,31 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
 * `USE_ALIAS`
   * If aliases should be displayed. Disabling this feature **will not** delete the aliases. If reenabled the previously used aliases will be displayed again
   * Defaults to: `true`
+* `AUTO_HIDE_DAYS`
+  * Days after which a user is automatically hidden if he has not bought any drinks in this time
+  * Feature is disabled if set to `None` (disabled per default)
+  * Defaults to: `None`
+  
+### Email environment variables
+* `MAIL_SERVER`
+  * The mail server address to use for sending mails
+  * Mail feature is disabled if set to `None` (disabled per default)
+  * Defaults to: `None`
+* `MAIL_PORT`
+  * The port of the mail server
+  * Defaults to: 587
+* `MAIL_EMAIL`
+  * The email address to use for sending mails
+  * Defaults to: `None`
+* `MAIL_USERNAME`
+  * The username to use for sending mails
+  * Defaults to: `None`
+* `MAIL_PASSWORD`
+  * The password to use for sending mails
+  * Defaults to: `None`
+* `MAIL_POSTFIX`
+  * If the username does not contain `@` characters this postfix (plus `@` character) is appended to the username and used to construct the email address
+  * Defaults to: `None`
 
 ### Importing from old Drinklist
 * `X_AUTH_TOKEN`
