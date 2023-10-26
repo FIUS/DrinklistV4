@@ -311,6 +311,9 @@ class add_user(Resource):
         else:
             db.add_user(request.json["name"],
                         request.json["money"], request.json["password"])
+            
+        mail.send_welcome_mail(request.json["name"])
+        
         return util.build_response("User added")
 
 

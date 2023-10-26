@@ -42,6 +42,12 @@ Dein Getränkelisten Team
 
 Dein Getränkelisten Team
 """)
+    
+def send_welcome_mail(username):
+    mail=mail_from_username(username)
+    send_mail("Wilkommen zur Drinklist",mail,f"""Hallo,
+du wurdest zur Drinklist hinzugefügt. Du kannst ab jetzt auf {util.domain} Getränke abstreichen.
+""")
 
 
 def compile_latex(name):
