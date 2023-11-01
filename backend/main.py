@@ -23,10 +23,10 @@ api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
 api = Api(api_bp, doc='/docu/', base_url='/api')
 app.register_blueprint(api_bp)
 
-token_manager = authenticator.TokenManager()
 
 with app.app_context():
     db = Queries.Queries(sql_database)
+    token_manager = authenticator.TokenManager(db)
 
     db.hide_inactive()
 

@@ -2,19 +2,18 @@ import datetime
 import secrets
 import hashlib
 import util
-from database.Queries import Queries
 
 
 class TokenManager:
     def __init__(self, queries):
-        self.queries: Queries = queries
+        self.queries = queries
         self.token_storage = dict()
         self.cookie_expires = util.cookie_expire
 
-        sessions=self.queries.load_tokens()
+        sessions = self.queries.load_tokens()
         for s in sessions:
             self.token_storage[s.token] = {
-            'memberID': s.member_id, 'time': s.time}
+                'memberID': s.member_id, 'time': s.time}
 
     def check_token(self, memberID, token):
         if token in self.token_storage:
