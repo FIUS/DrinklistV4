@@ -614,7 +614,7 @@ class Queries:
             self.session.delete(session)
             self.session.commit()
     
-    def load_tokens(self)->list[Session]:
+    def load_tokens(self):
         return self.session.query(Session).all()
 
     def restore_database(self, imported_data):
