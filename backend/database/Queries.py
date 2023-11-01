@@ -82,7 +82,7 @@ class Queries:
         user: Member = self.session.query(
             Member).filter_by(id=int(member_id)).first()
         user.hidden = not user.hidden if visibility is None else visibility
-        print(user.name,user.hidden,visibility)
+        print(user.name, user.hidden, visibility)
         self.session.commit()
 
     def add_user(self, name, money, password, alias="", hidden=False):
@@ -580,7 +580,7 @@ class Queries:
     def hide_inactive(self):
         if util.auto_hide_days is None:
             return
-        
+
         latest_transactions = self.session.query(Transaction.member_id, func.max(Transaction.date).label('latest_date')) \
             .group_by(Transaction.member_id).all()
 
@@ -593,6 +593,29 @@ class Queries:
                     self.change_user_visibility(result[0], False)
             except:
                 pass
+
+    def add_token(self, token, member_id, time):
+        session: Session = self.session.query(
+            Session).filter_by(member_id=member_id).first()
+        if session is None:
+            self.session.add(
+                Session(token=token, member_id=member_id, time=time))
+        else:
+            session.token = token
+            session.time = time
+
+        self.session.commit()
+
+    def delete_token(self, token):
+        session: Session = self.session.query(
+            Session).filter_by(token=token).first()
+        
+        if session is not None:
+            self.session.delete(session)
+            self.session.commit()
+    
+    def load_tokens(self)->list[Session]:
+        return self.session.query(Session).all()
 
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()

@@ -5,9 +5,15 @@ import util
 
 
 class TokenManager:
-    def __init__(self):
+    def __init__(self, queries):
+        self.queries = queries
         self.token_storage = dict()
         self.cookie_expires = util.cookie_expire
+
+        sessions = self.queries.load_tokens()
+        for s in sessions:
+            self.token_storage[s.token] = {
+                'memberID': s.member_id, 'time': s.time}
 
     def check_token(self, memberID, token):
         if token in self.token_storage:
@@ -25,12 +31,15 @@ class TokenManager:
 
     def create_token(self, memberID):
         token = secrets.token_urlsafe(64)
+        time = datetime.datetime.utcnow()
         self.token_storage[token] = {
-            'memberID': memberID, 'time': datetime.datetime.utcnow()}
+            'memberID': memberID, 'time': time}
+        self.queries.add_token(token, memberID, time)
         return token
 
     def delete_token(self, token):
         del(self.token_storage[token])
+        self.queries.delete_token(token)
 
     def hashPassword(password, salt=None):
         usedSalt = secrets.token_hex(32) if salt is None else salt

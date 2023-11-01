@@ -5,3 +5,4 @@ from database.Favorite import Favorite
 from database.Checkout import Checkout
 from database.KeyValue import KeyValue
 from database.Reminder import Reminder
+from database.Session import Session
