@@ -17,6 +17,7 @@ import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
+import CountUp from 'react-countup';
 
 type Props = {}
 
@@ -100,9 +101,6 @@ const Details = (props: Props) => {
         return alias
     }
 
-
-
-
     const balancePaper = () => {
         const balance = common.members?.find((value) => {
             return value.id === parseInt(params.userid ? params.userid : "")
@@ -110,13 +108,24 @@ const Details = (props: Props) => {
         const balanceNotNull = balance !== undefined ? balance : 0
         const textColor = balanceNotNull > 0 ? "limegreen" : "darkred"
 
+        const value = common.members?.find((value) => {
+            return value.id === parseInt(params.userid ? params.userid : "")
+        })?.balance;
+
+        const lastValue = common.history?.find(value => value.memberID === parseInt(params.userid ? params.userid : ""))?.amount
+
+        const saveValue = value ? value : 0;
+        const saveLastValue = lastValue ? lastValue : 0;
+        
         return <>
             <Paper className={style.balanceTop}>
                 <Typography variant='h3'>{KONTOSTAND}:</Typography>
                 <Typography variant='h2' color={textColor}>
-                    {common.members?.find((value) => {
-                        return value.id === parseInt(params.userid ? params.userid : "")
-                    })?.balance.toFixed(2)}€
+                    <CountUp start={saveValue - saveLastValue}
+                        end={saveValue}
+                        decimals={2}
+                        duration={0.5}
+                    />€
                 </Typography>
             </Paper>
         </>
