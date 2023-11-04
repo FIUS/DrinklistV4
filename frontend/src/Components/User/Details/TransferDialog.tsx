@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Member } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
-import { Autocomplete, Avatar, Button, InputAdornment, Paper, TextField } from '@mui/material';
-import { ABBRECHEN, AN_WEN_UEBERWEISEN, BETRAG, BETRAG_NICHT_NEGATIV, BITTE_EMPFAENGER, EMOJI_DP, GELD_UEBERWEISEN, GELD_UEBERWIESEN, MEHR_OPTIONEN, NAME, OPTIONAL, SUCHE_DOT_DOT_DOT, UEBERWEISEN, VERWENDUNGSZWECK, VORSCHLAEGE } from '../../Common/Internationalization/i18n';
+import { InputAdornment, TextField } from '@mui/material';
+import { AN_WEN_UEBERWEISEN, BETRAG, BETRAG_NICHT_NEGATIV, BITTE_EMPFAENGER, EMOJI_DP, GELD_UEBERWEISEN, GELD_UEBERWIESEN, MEHR_OPTIONEN, OPTIONAL, SUCHE_DOT_DOT_DOT, VERWENDUNGSZWECK, VORSCHLAEGE } from '../../Common/Internationalization/i18n';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../Reducer/reducerCombiner';
@@ -22,7 +21,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Picker from '@emoji-mart/react'
 // eslint-disable-next-line
 import style from './details.module.scss'
-import { calculateAvatarText, safeMemberName, stringToColor } from '../../Common/StaticFunctionsTyped';
+import { safeMemberName } from '../../Common/StaticFunctionsTyped';
 import UserBox from './UserBox';
 import TransferSummary from './TransferSummary';
 
@@ -186,6 +185,7 @@ const TransferDialog = (props: Props) => {
                             }
                         })
                     }}
+                    acceptButtonDisabled={transferButtonDisabled}
                 />
                 <Spacer vertical={25} />
                 <Accordion>

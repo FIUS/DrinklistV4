@@ -1,4 +1,4 @@
-import { Avatar, Button, Chip, Typography } from '@mui/material'
+import { Avatar, Button, Typography } from '@mui/material'
 import React from 'react'
 import { calculateAvatarText, stringToColor } from '../../Common/StaticFunctionsTyped'
 import Spacer from '../../Common/Spacer'

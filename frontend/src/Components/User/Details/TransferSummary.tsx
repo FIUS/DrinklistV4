@@ -12,6 +12,7 @@ type Props = {
     details: String,
     cancel: () => void,
     accept: () => void,
+    acceptButtonDisabled?: boolean
 }
 
 const TransferSummary = (props: Props) => {
@@ -63,10 +64,10 @@ const TransferSummary = (props: Props) => {
                 {detailElement()}
                 <Spacer vertical={20} />
                 <Stack className={style.nameHeadline} direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-                    <Button color='error' variant='contained' size='small' onClick={()=>{props.cancel()}}>
+                    <Button color='error' variant='contained' size='small' onClick={() => { props.cancel() }}>
                         <CloseIcon />
                     </Button>
-                    <Button color='success' variant='contained' size='small' onClick={()=>{props.accept()}}>
+                    <Button color='success' variant='contained' size='small' onClick={() => { props.accept() }} disabled={props.acceptButtonDisabled}>
                         <CheckIcon />
                     </Button>
                 </Stack>
