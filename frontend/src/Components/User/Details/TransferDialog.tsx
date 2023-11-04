@@ -6,7 +6,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Member } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
-import { Autocomplete, Button, InputAdornment, TextField } from '@mui/material';
+import { Autocomplete, Avatar, Button, InputAdornment, Paper, TextField } from '@mui/material';
 import { ABBRECHEN, AN_WEN_UEBERWEISEN, BETRAG, BETRAG_NICHT_NEGATIV, BITTE_EMPFAENGER, EMOJI_DP, GELD_UEBERWEISEN, GELD_UEBERWIESEN, MEHR_OPTIONEN, NAME, OPTIONAL, UEBERWEISEN, VERWENDUNGSZWECK } from '../../Common/Internationalization/i18n';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,7 +22,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Picker from '@emoji-mart/react'
 // eslint-disable-next-line
 import style from './details.module.scss'
-import { safeMemberName } from '../../Common/StaticFunctionsTyped';
+import { calculateAvatarText, safeMemberName, stringToColor } from '../../Common/StaticFunctionsTyped';
+import UserBox from './UserBox';
+import TransferSummary from './TransferSummary';
 
 type Props = {
     isOpen: boolean,
@@ -33,7 +35,8 @@ type Props = {
 const TransferDialog = (props: Props) => {
 
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
-    const [selectedUser, setselectedUser] = useState<string | null>(null)
+    const [selectedUser, setselectedUser] = useState({ "name": "", "id": -1 })
+    const [search, setsearch] = useState("")
     const [reason, setreason] = useState<string | null>(null)
     const [amount, setamount] = useState(0)
     const [chosenEmoji, setChosenEmoji] = useState<string>("💸");
@@ -41,50 +44,128 @@ const TransferDialog = (props: Props) => {
     const dispatch = useDispatch();
 
     const resetInput = () => {
-        setselectedUser(null)
+        setselectedUser({ "name": "", "id": -1 })
+        setChosenEmoji("💸")
         setamount(0)
         setreason(null)
         settransferButtonDisabled(false)
     }
 
+    const userSearch = (member: Member) => {
+        return member.name.toLowerCase().includes(search.toLowerCase()) ||
+            member.alias.toLowerCase().includes(search.toLowerCase())
+    }
+
     return (
         <Dialog open={props.isOpen} onClose={props.close} sx={{ zIndex: 20000000 }} >
             <DialogTitle>{GELD_UEBERWEISEN}</DialogTitle>
-            <DialogContent>
+            <DialogContent className={style.transferBox}>
                 <DialogContentText>
                     {AN_WEN_UEBERWEISEN}
                 </DialogContentText>
-                <Spacer vertical={20} />
-                <Autocomplete
-                    sx={{ zIndex: 20000001 }}
-                    options={common.members ? common.members.map(value => {
-                        if (value.alias !== "") {
-                            return format("{0} ({1})", safeMemberName(value), value.name)
-                        } else {
-                            return value.name
-                        }
-                    }) : []}
-                    value={selectedUser}
-                    onChange={(event, value) => { setselectedUser(value !== null ? value : "") }}
-                    renderInput={(params) =>
-                        <TextField {...params}
-                            label={NAME}
-                            variant='standard'
-                            onChange={(value) => { setselectedUser(value.target.value) }}
-                        />
-                    }
+                <TextField
+                    label={"Suche"}
+                    variant='standard'
+                    type='text'
+                    value={search}
+                    onChange={(value) => { setsearch(value.target.value) }}
+                    fullWidth
                 />
+                {search !== "" ? <><Spacer vertical={15} /><div className={style.recommendationBox}>
+                    {common.members?.filter((member) => userSearch(member)).slice(0, 3).map((member) => {
+                        return <UserBox name={safeMemberName(member)} onClick={() => {
+                            setselectedUser({ "name": safeMemberName(member), "id": member.id });
+                            setsearch("")
+                        }} />
+                    })}
+                </div> </> : <></>}
+
+                <Spacer vertical={10} />
+                <Typography variant='overline'>
+                    Vorschläge
+                </Typography>
+                <div className={style.recommendationBox}>
+                    <UserBox name="Tom" onClick={() => {
+                        setselectedUser({ "name": "Tom", "id": 2 });
+                        setsearch("")
+                    }} />
+                    <UserBox name="Pete" onClick={() => {
+                        setselectedUser({ "name": "Tom", "id": 2 });
+                        setsearch("")
+                    }} />
+                </div>
                 <Spacer vertical={10} />
                 <TextField
                     label={BETRAG}
-                    variant='standard'
+                    variant='outlined'
                     type='number'
                     onChange={(value) => { setamount(parseFloat(value.target.value)) }}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">€</InputAdornment>,
                     }}
                 />
-                <Spacer vertical={20} />
+                <Spacer vertical={15} />
+                <TextField
+                    label={VERWENDUNGSZWECK}
+                    variant='outlined'
+                    fullWidth
+                    helperText={format("({0})", OPTIONAL)}
+                    onChange={(value) => { setreason(value.target.value) }}
+                />
+                <Spacer vertical={10} />
+
+                <TransferSummary amount={amount}
+                    name={selectedUser.name}
+                    icon={chosenEmoji ? chosenEmoji : "💸"}
+                    details={reason ? reason : ""}
+                    cancel={() => {
+                        resetInput()
+                        props.close()
+                    }}
+                    accept={() => {
+
+                        const from = props.member.id;
+                        const to = selectedUser.id;
+
+                        if (to === -1) {
+                            dispatch(openToast({ message: BITTE_EMPFAENGER, type: "error" }))
+                            return
+                        }
+                        if (amount < 0) {
+                            dispatch(openToast({ message: BETRAG_NICHT_NEGATIV, type: "error" }))
+                            return
+                        }
+
+                        let payload: { amount: number, emoji: string } | { amount: number, reason: string, emoji: string } = { amount: amount, emoji: chosenEmoji }
+                        if (reason !== null && reason !== "") {
+                            payload = { ...payload, reason: reason }
+                        }
+
+                        settransferButtonDisabled(true)
+                        doPostRequest(format("users/{0}/transfer/{1}", from, to ? to : -1), payload).then(value => {
+                            if (value.code === 200) {
+                                dispatch(openToast({ message: GELD_UEBERWIESEN, type: "success" }))
+                                doGetRequest("users").then((t_value) => {
+                                    if (t_value.code === 200) {
+                                        dispatch(setMembers(t_value.content))
+                                    }
+                                })
+                                doGetRequest("users/" + from + "/history").then((value) => {
+                                    if (value.code === 200) {
+                                        dispatch(setHistory(value.content))
+                                    }
+                                })
+
+                                resetInput()
+                                props.close()
+                            } else {
+                                dispatch(openToast({ message: value.content, type: "error" }))
+                                settransferButtonDisabled(false)
+                            }
+                        })
+                    }}
+                />
+                <Spacer vertical={25} />
                 <Accordion>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
@@ -92,76 +173,12 @@ const TransferDialog = (props: Props) => {
                         <Typography>{MEHR_OPTIONEN}</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <TextField
-                            label={VERWENDUNGSZWECK}
-                            fullWidth
-                            helperText={format("({0})", OPTIONAL)}
-                            variant='standard'
-                            onChange={(value) => { setreason(value.target.value) }}
-                        />
-                        <Spacer vertical={30} />
                         <Typography variant="h5">{EMOJI_DP} {chosenEmoji}</Typography>
                         <Spacer vertical={10} />
                         <Picker onEmojiSelect={(value: any) => { setChosenEmoji(value.native) }} />
                     </AccordionDetails>
                 </Accordion>
-
-
             </DialogContent>
-            <DialogActions>
-                <Button onClick={() => {
-                    resetInput()
-                    props.close()
-                }}>
-                    {ABBRECHEN}
-                </Button>
-                <Button disabled={transferButtonDisabled} onClick={() => {
-                    const from = props.member.id;
-                    const to = common.members?.find((value) => {
-                        return selectedUser?.includes(value.name);
-                    })?.id;
-
-
-                    if (!to) {
-                        dispatch(openToast({ message: BITTE_EMPFAENGER, type: "error" }))
-                        return
-                    }
-                    if (amount < 0) {
-                        dispatch(openToast({ message: BETRAG_NICHT_NEGATIV, type: "error" }))
-                        return
-                    }
-
-                    let payload: { amount: number, emoji: string } | { amount: number, reason: string, emoji: string } = { amount: amount, emoji: chosenEmoji }
-                    if (reason !== null && reason !== "") {
-                        payload = { ...payload, reason: reason }
-                    }
-
-                    settransferButtonDisabled(true)
-                    doPostRequest(format("users/{0}/transfer/{1}", from, to ? to : -1), payload).then(value => {
-                        if (value.code === 200) {
-                            dispatch(openToast({ message: GELD_UEBERWIESEN, type: "success" }))
-                            doGetRequest("users").then((t_value) => {
-                                if (t_value.code === 200) {
-                                    dispatch(setMembers(t_value.content))
-                                }
-                            })
-                            doGetRequest("users/" + from + "/history").then((value) => {
-                                if (value.code === 200) {
-                                    dispatch(setHistory(value.content))
-                                }
-                            })
-
-                            resetInput()
-                            props.close()
-                        } else {
-                            dispatch(openToast({ message: value.content, type: "error" }))
-                            settransferButtonDisabled(false)
-                        }
-                    })
-                }}>
-                    {UEBERWEISEN}
-                </Button>
-            </DialogActions>
         </Dialog>
     )
 }
