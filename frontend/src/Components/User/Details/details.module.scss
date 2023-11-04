@@ -41,7 +41,7 @@
 
 .buyDrinkContainerInner {
     display: grid;
-    grid-template-columns: repeat( auto-fit, minmax(300px, 1fr) );
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     grid-gap: $flex-gap;
 }
 
@@ -80,6 +80,37 @@
     align-items: center;
     justify-content: center;
     flex-direction: row;
+}
+
+.recommendationBox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: $flex-gap;
+}
+
+.transferBox{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: $flex-gap;
+}
+
+.headline{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.nameHeadline{
+    display: flex;
+}
+
+.confirmButtonContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
 }
 
 em-emoji-picker {
