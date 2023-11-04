@@ -56,6 +56,30 @@ const TransferDialog = (props: Props) => {
             member.alias.toLowerCase().includes(search.toLowerCase())
     }
 
+    const filterTransactions = () => {
+        const transactions = common.history?.filter(transaction => transaction.memberID === props.member.id).filter(t => {
+            return t.description.toLocaleLowerCase().includes("transfer")
+        }).splice(0,5)
+        
+        const memberNames: [string, number][] | undefined = common.members?.map(member => [safeMemberName(member), member.id])
+        var transactionCount: { [key: string]: [number, number] } = {}
+        memberNames?.forEach(member => transactionCount[member[0]] = [member[1], 0])
+        transactions?.forEach(t => {
+            memberNames?.forEach(m => {
+                if (t.description.toLocaleLowerCase().includes(m[0].toLocaleLowerCase())) {
+                    transactionCount[m[0]] = [m[1], transactionCount[m[0]][1] + 1]
+                }
+            })
+        })
+        // Convert transactionCount to key value pairs
+        const transactionCountArray: Array<[string, number, number]> = Object.keys(transactionCount).map((key) => [key, ...transactionCount[key]]);
+        // Sort the array based on the second element (high to low)
+        transactionCountArray.sort((first, second) => second[2] - first[2]);
+        
+        // Return the first 2 elements
+        return transactionCountArray.slice(0, 2)
+    }
+
     return (
         <Dialog open={props.isOpen} onClose={props.close} sx={{ zIndex: 20000000 }} >
             <DialogTitle>{GELD_UEBERWEISEN}</DialogTitle>
@@ -85,14 +109,12 @@ const TransferDialog = (props: Props) => {
                     Vorschläge
                 </Typography>
                 <div className={style.recommendationBox}>
-                    <UserBox name="Tom" onClick={() => {
-                        setselectedUser({ "name": "Tom", "id": 2 });
-                        setsearch("")
-                    }} />
-                    <UserBox name="Pete" onClick={() => {
-                        setselectedUser({ "name": "Tom", "id": 2 });
-                        setsearch("")
-                    }} />
+                    {filterTransactions().map(transaction => {
+                        return <UserBox name={transaction[0]} onClick={() => {
+                            setselectedUser({ "name": transaction[0], "id": transaction[1] });
+                            setsearch("")
+                        }} />
+                    })}
                 </div>
                 <Spacer vertical={10} />
                 <TextField
