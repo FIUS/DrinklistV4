@@ -3,6 +3,7 @@ import Spacer from '../../Common/Spacer'
 import style from './details.module.scss'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import { BITTE_EMPFAENGER, KEIN_VERWENDUNGSZWECK } from '../../Common/Internationalization/i18n';
 
 type Props = {
     name: String,
@@ -21,12 +22,12 @@ const TransferSummary = (props: Props) => {
                 {props.name.replaceAll(/\p{Emoji}+/gu, "").replaceAll(" ", "")}
             </Typography>
         } else {
-            return <Typography sx={{ fontStyle: 'italic' }}>Empfänger wählen</Typography>
+            return <Typography sx={{ fontStyle: 'italic' }}>{BITTE_EMPFAENGER}</Typography>
         }
     }
     const description = () => {
         if (props.details === "") {
-            return <Typography sx={{ fontStyle: 'italic' }}>Kein Verwendungszweck</Typography>
+            return <Typography sx={{ fontStyle: 'italic' }}>{KEIN_VERWENDUNGSZWECK}</Typography>
         } else {
             return <Typography>
                 {props.details}

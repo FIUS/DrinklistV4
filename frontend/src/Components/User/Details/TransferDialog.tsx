@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Member } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
 import { Autocomplete, Avatar, Button, InputAdornment, Paper, TextField } from '@mui/material';
-import { ABBRECHEN, AN_WEN_UEBERWEISEN, BETRAG, BETRAG_NICHT_NEGATIV, BITTE_EMPFAENGER, EMOJI_DP, GELD_UEBERWEISEN, GELD_UEBERWIESEN, MEHR_OPTIONEN, NAME, OPTIONAL, UEBERWEISEN, VERWENDUNGSZWECK } from '../../Common/Internationalization/i18n';
+import { ABBRECHEN, AN_WEN_UEBERWEISEN, BETRAG, BETRAG_NICHT_NEGATIV, BITTE_EMPFAENGER, EMOJI_DP, GELD_UEBERWEISEN, GELD_UEBERWIESEN, MEHR_OPTIONEN, NAME, OPTIONAL, SUCHE_DOT_DOT_DOT, UEBERWEISEN, VERWENDUNGSZWECK, VORSCHLAEGE } from '../../Common/Internationalization/i18n';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../Reducer/reducerCombiner';
@@ -88,7 +88,7 @@ const TransferDialog = (props: Props) => {
                     {AN_WEN_UEBERWEISEN}
                 </DialogContentText>
                 <TextField
-                    label={"Suche"}
+                    label={SUCHE_DOT_DOT_DOT}
                     variant='standard'
                     type='text'
                     value={search}
@@ -106,7 +106,7 @@ const TransferDialog = (props: Props) => {
 
                 <Spacer vertical={10} />
                 <Typography variant='overline'>
-                    Vorschläge
+                    {VORSCHLAEGE}
                 </Typography>
                 <div className={style.recommendationBox}>
                     {filterTransactions().map(transaction => {
