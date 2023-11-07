@@ -32,6 +32,8 @@ use_alias = os.environ.get(
     "USE_ALIAS") == "true" if os.environ.get("USE_ALIAS") else True
 auto_hide_days = int(os.environ.get(
     "AUTO_HIDE_DAYS")) if os.environ.get("AUTO_HIDE_DAYS") else None
+password_hash_rounds = max(10000, int(os.environ.get(
+    "PASSSWORD_HASH_ROUNDS"))) if os.environ.get("PASSSWORD_HASH_ROUNDS") else 500000
 
 
 mail_server = os.environ.get(
