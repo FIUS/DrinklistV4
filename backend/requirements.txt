@@ -1,3 +1,4 @@
+flask-restx
 flask
 flask-cors
 urllib3
@@ -6,5 +7,4 @@ flask_sqlalchemy
 psycopg2
 waitress
 requests
-flask-restx
 werkzeug
