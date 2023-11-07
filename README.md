@@ -51,6 +51,9 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Days after which a user is automatically hidden if he has not bought any drinks in this time
   * Feature is disabled if set to `None` (disabled per default)
   * Defaults to: `None`
+* `PASSSWORD_HASH_ROUNDS`
+  * Number of hash rounds for pbkdf2_hmac.
+  * Minimum is 10 000. It is recommended to use at least 100 000
   
 ### Email environment variables
 * `MAIL_SERVER`
