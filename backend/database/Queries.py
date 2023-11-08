@@ -589,8 +589,8 @@ class Queries:
             try:
                 if result[1] < datetime.now()-timedelta(days=int(util.auto_hide_days)):
                     self.change_user_visibility(result[0], True)
-                else:
-                    self.change_user_visibility(result[0], False)
+                #else:
+                #    self.change_user_visibility(result[0], False)
             except:
                 pass
 
