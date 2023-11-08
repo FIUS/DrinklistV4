@@ -80,14 +80,14 @@ const Overview = (props: Props) => {
     }, [common.drinks, common.members, common.drinkCategories, dispatch])
 
     const userVisible = (member: Member) => {
-        return searchfield === "" ||
+        return (searchfield === "" ||
             member.name.toLowerCase().includes(searchfield.toLowerCase()) ||
-            member.alias.toLowerCase().includes(searchfield.toLowerCase())
+            member.alias.toLowerCase().includes(searchfield.toLowerCase())) && !member.hidden
     }
 
     const exactSearchMatch = (member: Member) => {
-        return member.name.toLowerCase() === (searchfield.toLowerCase()) ||
-            member.alias.toLowerCase() === (searchfield.toLowerCase())
+        return (member.name.toLowerCase() === (searchfield.toLowerCase()) ||
+            member.alias.toLowerCase() === (searchfield.toLowerCase())) && searchfield !== ""
     }
 
     const historyBox = () => {
@@ -145,7 +145,7 @@ const Overview = (props: Props) => {
                     }
                     )?.map(value => {
                         if (!value.hidden || (exactSearchMatch(value))) {
-                            return <Grow in={userVisible(value)} key={value.id} unmountOnExit>
+                            return <Grow in={userVisible(value) || exactSearchMatch(value)} key={value.id} unmountOnExit>
                                 <div style={{ width: "100%" }}>
                                     <UserButton key={value.id} name={value.alias === "" ? value.name : value.alias} id={value.id} />
                                 </div>
