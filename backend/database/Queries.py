@@ -88,7 +88,7 @@ class Queries:
     def add_user(self, name, money, password, alias="", hidden=False):
         pw_hash, salt = TokenManager.hashPassword(password)
         self.session.add(
-            Member(name=name, balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
+            Member(name=name.lower(), balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
         self.session.commit()
 
     def get_drinks(self):
@@ -315,7 +315,7 @@ class Queries:
 
     def checkPassword(self, name, password):
         member: Member = self.session.query(
-            Member).filter_by(name=name).first()
+            Member).filter_by(name=name.lower()).first()
         if member is None:
             return None
 
