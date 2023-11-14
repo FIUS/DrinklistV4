@@ -594,6 +594,15 @@ class Queries:
             except:
                 pass
 
+    def convert_usernames_to_lower(self):
+        members = self.session.query(Member).all()
+
+        for m in members:
+            member: Member = m
+            member.name = member.name.lower()
+
+        self.session.commit()
+
     def add_token(self, token, member_id, time):
         session: Session = self.session.query(
             Session).filter_by(member_id=member_id).first()
