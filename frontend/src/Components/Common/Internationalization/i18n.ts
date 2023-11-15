@@ -27,6 +27,7 @@ export const BETRAG_NICHT_NEGATIV = "Betrag darf nicht negativ sein";
 export const BITTE_EMPFAENGER = "Bitte einen Empfänger eintragen";
 export const BUDGET = "Budget";
 export const BUILD_NUMBER = "Build: {0}";
+export const CUPONS = "Cupons";
 export const DATENSCHUTZ = "Datenschutz";
 export const DATUM = "Datum";
 export const DIFFERENZ = "Differenz";

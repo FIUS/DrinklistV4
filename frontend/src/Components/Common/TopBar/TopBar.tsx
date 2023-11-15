@@ -23,7 +23,8 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
-import { ABRECHNUNGEN, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
+import { ABRECHNUNGEN, CUPONS, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
+import SellIcon from '@mui/icons-material/Sell';
 import Cookies from 'js-cookie';
 
 type Props = {}
@@ -193,6 +194,14 @@ const TopBar = (props: Props) => {
                                         <AccountBalanceIcon />
                                     </ListItemIcon>
                                     <ListItemText primary={ABRECHNUNGEN} />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton onClick={() => navigate("/admin/cupons")}>
+                                    <ListItemIcon>
+                                        <SellIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={CUPONS} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>

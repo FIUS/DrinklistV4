@@ -17,9 +17,9 @@ import Infobox from '../../Common/InfoBox/Infobox';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, LETZE_100_KAEUFE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, CUPONS, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, LETZE_100_KAEUFE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import { Transaction } from '../../../types/ResponseTypes';
-
+import SellIcon from '@mui/icons-material/Sell';
 
 type Props = {}
 
@@ -178,6 +178,16 @@ const Overview = (props: Props) => {
                     <ReceiptLongIcon sx={buttonSize} />
                     <Spacer horizontal={10} />
                     <Typography variant={headingType}>{TRANSAKTIONEN}</Typography>
+                </Button>
+                <Button
+                    size="large"
+                    className={style.button}
+                    variant='contained'
+                    onClick={() => navigate("cupons")}
+                >
+                    <SellIcon sx={buttonSize} />
+                    <Spacer horizontal={10} />
+                    <Typography variant={headingType}>{CUPONS}</Typography>
                 </Button>
                 <Button
                     size="large"
