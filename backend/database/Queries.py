@@ -88,7 +88,7 @@ class Queries:
     def add_user(self, name, money, password, alias="", hidden=False):
         pw_hash, salt = TokenManager.hashPassword(password)
         self.session.add(
-            Member(name=name, balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
+            Member(name=name.lower(), balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
         self.session.commit()
 
     def get_drinks(self):
@@ -315,7 +315,7 @@ class Queries:
 
     def checkPassword(self, name, password):
         member: Member = self.session.query(
-            Member).filter_by(name=name).first()
+            Member).filter_by(name=name.lower()).first()
         if member is None:
             return None
 
@@ -593,6 +593,27 @@ class Queries:
                 #    self.change_user_visibility(result[0], False)
             except:
                 pass
+
+    def convert_usernames_to_lower(self):
+        members = self.session.query(Member).all()
+
+        for m in members:
+            member: Member = m
+            member.name = member.name.lower()
+
+        self.session.commit()
+
+    def add_aliases_if_non_existend(self):
+        members = self.session.query(Member).all()
+
+        for m in members:
+            member: Member = m
+            if member.alias == "":
+                # Set the username as alias with first letter after spaces capitalized
+                member.alias = " ".join([name.capitalize()
+                                         for name in member.name.split(" ")])
+
+        self.session.commit()
 
     def add_token(self, token, member_id, time):
         session: Session = self.session.query(

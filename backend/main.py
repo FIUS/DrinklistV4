@@ -29,6 +29,8 @@ with app.app_context():
     token_manager = authenticator.TokenManager(db)
 
     db.hide_inactive()
+    db.convert_usernames_to_lower()
+    db.add_aliases_if_non_existend()
 
     taskScheduler = TaskScheduler.TaskScheduler()
     taskScheduler.add_Daily_Task(db.hide_inactive)
