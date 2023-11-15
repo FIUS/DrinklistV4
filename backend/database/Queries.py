@@ -603,6 +603,18 @@ class Queries:
 
         self.session.commit()
 
+    def add_aliases_if_non_existend(self):
+        members = self.session.query(Member).all()
+
+        for m in members:
+            member: Member = m
+            if member.alias == "":
+                # Set the username as alias with first letter after spaces capitalized
+                member.alias = " ".join([name.capitalize()
+                                         for name in member.name.split(" ")])
+
+        self.session.commit()
+
     def add_token(self, token, member_id, time):
         session: Session = self.session.query(
             Session).filter_by(member_id=member_id).first()
