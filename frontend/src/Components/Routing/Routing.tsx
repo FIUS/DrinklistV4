@@ -10,6 +10,7 @@ import Login from '../Common/Login/Login';
 import Details from '../User/Details/Details';
 import UserOverview from '../User/Overview/Overview';
 import CuponOverview from '../Admin/Cupons/Overview';
+import AddCupon from '../Admin/Cupons/AddCupon';
 
 type Props = {}
 
@@ -26,6 +27,7 @@ const Routing = (props: Props) => {
                 <Route path="/admin/drinks" element={<Drinks />} />
                 <Route path="/admin/checkout" element={<Checkout />} />
                 <Route path="/admin/cupons" element={<CuponOverview />} />
+                <Route path="/admin/cupons/add" element={<AddCupon />} />
                 <Route path="/admin/settings" element={<Settings />} />
             </Routes>
         </>

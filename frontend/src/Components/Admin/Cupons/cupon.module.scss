@@ -1,0 +1,18 @@
+@import "../../Common/variables.module.scss";
+
+.cuponsPage{
+    padding: $padding;
+}
+
+.addCuponPage{
+    padding: $padding;
+}
+
+.cuponDisplayContainer{
+    width: fit-content;
+    padding: $padding;
+}
+
+.cuponDisplayHeadline{
+    display: flex;
+}
