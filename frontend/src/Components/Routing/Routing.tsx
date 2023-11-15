@@ -9,6 +9,7 @@ import Transactions from '../Admin/Transactions/Transactions';
 import Login from '../Common/Login/Login';
 import Details from '../User/Details/Details';
 import UserOverview from '../User/Overview/Overview';
+import CuponOverview from '../Admin/Cupons/Overview';
 
 type Props = {}
 
@@ -24,6 +25,7 @@ const Routing = (props: Props) => {
                 <Route path="/admin/transactions" element={<Transactions />} />
                 <Route path="/admin/drinks" element={<Drinks />} />
                 <Route path="/admin/checkout" element={<Checkout />} />
+                <Route path="/admin/cupons" element={<CuponOverview />} />
                 <Route path="/admin/settings" element={<Settings />} />
             </Routes>
         </>
