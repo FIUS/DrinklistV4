@@ -7,7 +7,7 @@ import util
 
 class Transaction(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
-    description = sql.Column(sql.String(100), nullable=False)
+    description = sql.Column(sql.String(150), nullable=False)
     member_id = sql.Column(sql.Integer, sql.ForeignKey(
         'member.id', ondelete='SET NULL'), nullable=True)
     member = relationship(
