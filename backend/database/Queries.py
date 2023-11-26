@@ -57,7 +57,9 @@ class Queries:
             entry: Transaction = e
             output.append(entry.to_dict())
 
+        output.sort(key=lambda transaction: transaction['id'])
         output.reverse()
+        
         return output
 
     def add_user_favorite(self, member_id, drink_id):
