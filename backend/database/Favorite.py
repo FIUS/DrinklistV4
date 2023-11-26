@@ -6,12 +6,12 @@ from sqlalchemy.orm import relationship
 class Favorite(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     member_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'member.id'), nullable=False)
+        'member.id', ondelete='SET NULL'))
     member = relationship(
         'database.Member.Member', lazy="joined")
 
     drink_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'drink.id'), nullable=False)
+        'drink.id', ondelete='SET NULL'))
     drink = relationship(
         'database.Drink.Drink', lazy="joined")
 

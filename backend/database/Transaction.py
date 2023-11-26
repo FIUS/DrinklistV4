@@ -7,17 +7,17 @@ import util
 
 class Transaction(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
-    description = sql.Column(sql.String(100), nullable=False)
+    description = sql.Column(sql.String(150), nullable=False)
     member_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'member.id'), nullable=False)
+        'member.id', ondelete='SET NULL'), nullable=True)
     member = relationship(
         'database.Member.Member', lazy="joined")
     amount = sql.Column(sql.Float, nullable=True)
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
     checkout_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'checkout.id'), nullable=True, default=None)
+        'checkout.id', ondelete='SET NULL'), nullable=True, default=None)
     connected_transaction_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'transaction.id'), nullable=True)
+        'transaction.id', ondelete='SET NULL'), nullable=True)
     connected_transaction = relationship(
         'database.Transaction.Transaction', lazy="joined", post_update=True)
 
