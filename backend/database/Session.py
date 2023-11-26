@@ -7,7 +7,7 @@ class Session(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     token = sql.Column(sql.String(100), nullable=False, unique=True)
     member_id = sql.Column(
-        sql.Integer, sql.ForeignKey('member.id'), nullable=False)
+        sql.Integer, sql.ForeignKey('member.id', ondelete='SET NULL'), nullable=True)
     member = relationship('database.Member.Member', lazy="joined")
     time = sql.Column(sql.DateTime, nullable=False)
 

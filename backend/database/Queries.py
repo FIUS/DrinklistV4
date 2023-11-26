@@ -16,6 +16,7 @@ import constants
 import os
 from sqlalchemy import extract
 from difflib import SequenceMatcher
+from sqlalchemy import inspect, text
 
 
 class Queries:
@@ -589,7 +590,7 @@ class Queries:
             try:
                 if result[1] < datetime.now()-timedelta(days=int(util.auto_hide_days)):
                     self.change_user_visibility(result[0], True)
-                #else:
+                # else:
                 #    self.change_user_visibility(result[0], False)
             except:
                 pass
@@ -630,11 +631,11 @@ class Queries:
     def delete_token(self, token):
         session: Session = self.session.query(
             Session).filter_by(token=token).first()
-        
+
         if session is not None:
             self.session.delete(session)
             self.session.commit()
-    
+
     def load_tokens(self):
         return self.session.query(Session).all()
 
@@ -656,24 +657,10 @@ class Queries:
         for t in transactions:
             self.session.delete(t)
 
-        for c in imported_data["checkouts"]:
-            self.session.add(
-                Checkout(
-                    id=c['id'],
-                    date=datetime.strptime(c['date'], "%Y-%m-%dT%H:%M:%SZ"),
-                    current_cash=c['currentCash']))
-        for d in imported_data["drinks"]:
-            self.session.add(Drink(
-                id=d['id'],
-                name=d['name'],
-                stock=d['stock'],
-                price=d['price'],
-                category=d['category']))
-        for f in imported_data["favorites"]:
-            self.session.add(Favorite(
-                id=f['id'],
-                member_id=f['member_id'],
-                drink_id=f['drink_id']))
+        print("Deleting old data...")
+        self.session.commit()
+        print("Done")
+
         for m in imported_data["members"]:
             self.session.add(Member(
                 id=m['id'],
@@ -683,15 +670,124 @@ class Queries:
                 alias=m['alias'],
                 password=bytes.fromhex(m['password']),
                 salt=m['salt']))
-        for t in imported_data["transactions"]:
-            self.session.add(Transaction(
-                id=t['id'],
-                description=t['description'],
-                member_id=t['memberID'],
-                amount=t['amount'],
-                date=datetime.strptime(t['date'], "%Y-%m-%dT%H:%M:%SZ"),
-                checkout_id=t['checkout_id']))
+
+        print("Added members")
+
+        try:
+            for d in imported_data["drinks"]:
+                self.session.add(Drink(
+                    id=d['id'],
+                    name=d['name'],
+                    stock=d['stock'],
+                    price=d['price'],
+                    category=d['category']))
+
+            self.session.commit()
+        except:
+            self.session.rollback()
+            for d in imported_data["drinks"]:
+                try:
+                    self.session.add(Drink(
+                        id=d['id'],
+                        name=d['name'],
+                        stock=d['stock'],
+                        price=d['price'],
+                        category=d['category']))
+
+                    self.session.commit()
+                except:
+                    self.session.rollback()
+                    print("Failed to import drink", d['name'])
+            
+
+        print("Added drinks")
+
+        for c in imported_data["checkouts"]:
+            self.session.add(
+                Checkout(
+                    id=c['id'],
+                    date=datetime.strptime(c['date'], "%Y-%m-%dT%H:%M:%SZ"),
+                    current_cash=c['currentCash']))
+
         self.session.commit()
+
+        print("Added checkouts")
+
+        try:
+
+            for f in imported_data["favorites"]:
+                self.session.add(Favorite(
+                    id=f['id'],
+                    member_id=f['member_id'],
+                    drink_id=f['drink_id']))
+
+            self.session.commit()
+        except:
+            self.session.rollback()
+            for f in imported_data["favorites"]:
+                try:
+                    self.session.add(Favorite(
+                        id=f['id'],
+                        member_id=f['member_id'],
+                        drink_id=f['drink_id']))
+
+                    self.session.commit()
+                except:
+                    self.session.rollback()
+                    print("Failed to import favorite", f['id'])
+        print("Added favorites")
+
+        try:
+
+            for t in imported_data["transactions"]:
+                self.session.add(Transaction(
+                    id=t['id'],
+                    description=t['description'],
+                    member_id=t['memberID'],
+                    amount=t['amount'],
+                    date=datetime.strptime(t['date'], "%Y-%m-%dT%H:%M:%SZ"),
+                    checkout_id=t['checkout_id']))
+
+            self.session.commit()
+        except:
+            self.session.rollback()
+            print("Failed to import transactions")
+            counter = 0
+            failed_counter = 0
+            for idx, t in enumerate(imported_data["transactions"]):
+                try:
+                    self.session.add(Transaction(
+                        id=t['id'],
+                        description=t['description'],
+                        member_id=t['memberID'],
+                        amount=t['amount'],
+                        date=datetime.strptime(
+                            t['date'], "%Y-%m-%dT%H:%M:%SZ"),
+                        checkout_id=t['checkout_id']))
+
+                    self.session.commit()
+                    counter += 1
+                    if counter % 100 == 0:
+                        print("Imported transaction", idx, "/",
+                              len(imported_data["transactions"]))
+                        counter = 0
+                except:
+                    self.session.rollback()
+                    failed_counter += 1
+                    print("Failed to import transaction",
+                          t['id'], t['description'])
+            print("Failed to import", failed_counter, "transactions")
+
+        print("Added transactions")
+
+        # Get table names
+        tables = inspect(self.db.engine).get_table_names()
+
+        # For each table update the auto increment value
+        for table in tables:
+            query = text(
+                f"SELECT setval('{str(table).lower()}_id_seq', (SELECT MAX(id) from {table}));")
+            self.session.execute(query)
 
         return
 

@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 class Reminder(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     member_id = sql.Column(sql.Integer, sql.ForeignKey(
-        'member.id'), nullable=False)
+        'member.id', ondelete='SET NULL'), nullable=True)
     member = relationship(
         'database.Member.Member', lazy="joined")
 
