@@ -16,6 +16,11 @@ class TokenManager:
                 'memberID': s.member_id, 'time': s.time}
 
     def check_token(self, memberID, token):
+        if token not in self.token_storage:
+            sessions = self.queries.load_tokens()
+            for s in sessions:
+                self.token_storage[s.token] = {
+                    'memberID': s.member_id, 'time': s.time}
         if token in self.token_storage:
             stored_token = self.token_storage[token]
             storedMemberID = int(stored_token['memberID'])
