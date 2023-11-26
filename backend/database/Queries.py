@@ -783,11 +783,14 @@ class Queries:
         # Get table names
         tables = inspect(self.db.engine).get_table_names()
 
-        # For each table update the auto increment value
-        for table in tables:
-            query = text(
-                f"SELECT setval('{str(table).lower()}_id_seq', (SELECT MAX(id) from {table}));")
-            self.session.execute(query)
+        try:
+            # For each table update the auto increment value
+            for table in tables:
+                query = text(
+                    f"SELECT setval('{str(table).lower()}_id_seq', (SELECT MAX(id) from {table}));")
+                self.session.execute(query)
+        except:
+            print("Failed to update auto increment values (expected on sqlite))")
 
         return
 
