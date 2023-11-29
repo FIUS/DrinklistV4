@@ -1,4 +1,4 @@
-name: Build and push Backend
+name: Build and push Backend stable
 
 # Controls when the workflow will run
 on:
