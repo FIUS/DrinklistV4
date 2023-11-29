@@ -647,6 +647,7 @@ class Queries:
         favorites: list[Favorite] = self.session.query(Favorite).all()
         members: list[Member] = self.session.query(Member).all()
         transactions: list[Transaction] = self.session.query(Transaction).all()
+        sessions: list[Session] = self.session.query(Session).all()
 
         for c in checkouts:
             self.session.delete(c)
@@ -658,6 +659,8 @@ class Queries:
             self.session.delete(m)
         for t in transactions:
             self.session.delete(t)
+        for s in sessions:
+            self.session.delete(s)
 
         print("Deleting old data...")
         self.session.commit()
