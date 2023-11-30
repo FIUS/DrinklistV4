@@ -67,6 +67,17 @@ const Login = (props: Props) => {
                     >
                         {LOGIN}
                     </Button>
+                    <Button
+                        size='large'
+                        variant='contained'
+                        onClick={() => {
+                            login()
+                        }}
+                        disabled={disableLoginButton}
+                        type='submit'
+                    >
+                        {"Login with provider"}
+                    </Button>
                 </FormControl>
             </form>
         </div>
