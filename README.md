@@ -76,6 +76,32 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * If the username does not contain `@` characters this postfix (plus `@` character) is appended to the username and used to construct the email address
   * Defaults to: `None`
 
+### OpenID Connect environment variables
+* `OIDC_CLIENT_ID`
+  * The client id of the openid connect client
+  * Defaults to: `None`
+* `OIDC_CLIENT_SECRET`
+  * The secret of the openid connect client
+  * Defaults to: `None`
+* `OIDC_REDIRECT_MAIN_PAGE`
+  * The domain on which the drinklist is hosten **including `http(s)://`**
+  * Defaults to: `http://127.0.0.1:3000`
+* `OIDC_AUTH_PATH`
+  * The url where the login redirects to e.g. `<server>/oauth2/auth`
+  * Defaults to: `None`
+* `OIDC_AUTH_TOKEN`
+  * The url where the token is retreived to e.g. `<server>/oauth2/token`
+  * Defaults to: `None`
+* `OIDC_AUTH_REDIRECT`
+  * The url of the backend where the login provider sends the data to
+  * Defaults to: `http://127.0.0.1:5000/api/oidc-redirect`
+* `OIDC_USER_INFO`
+  * The url under which the backend can retreive the information of the user with the token
+  * Defaults to: `None`
+* `OIDC_USER_NEEDS_VERIFICATION`
+  * Flag if users need to be activated by an admin when using openid connect for the first time
+  * Defaults to: `true`
+
 ### Importing from old Drinklist
 * `X_AUTH_TOKEN`
   * If you need to import data from an old drinklist provide an admin api token and this drinklist will fetch all data from the old drinklist
