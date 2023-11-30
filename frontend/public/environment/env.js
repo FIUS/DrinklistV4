@@ -13,5 +13,5 @@ window.globalTS = {
     "WELCOME_TEXT_1": "Bitte logge dich ein!",
     "HOME_BUTTON": drinklistName,
     "TRANSACTION_LIMIT": 1000,
-    "OIDC_BUTTON": null
+    "OIDC_BUTTON_TEXT": null
 };

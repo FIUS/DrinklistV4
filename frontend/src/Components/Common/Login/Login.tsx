@@ -45,7 +45,7 @@ const Login = (props: Props) => {
     }
 
     const oidcButton = () => {
-        if (window.globalTS.OIDC_BUTTON === null) {
+        if (window.globalTS.OIDC_BUTTON_TEXT === null) {
             return
         }
 
@@ -58,7 +58,7 @@ const Login = (props: Props) => {
                 }}
                 disabled={disableLoginButton}
             >
-                {window.globalTS.OIDC_BUTTON}
+                {window.globalTS.OIDC_BUTTON_TEXT}
             </Button></>
     }
 
