@@ -44,6 +44,24 @@ const Login = (props: Props) => {
         })
     }
 
+    const oidcButton = () => {
+        if (window.globalTS.OIDC_BUTTON === null) {
+            return
+        }
+
+        return <><Spacer vertical={20} />
+            <Button
+                size='large'
+                variant='contained'
+                onClick={() => {
+                    loginOidc()
+                }}
+                disabled={disableLoginButton}
+            >
+                {window.globalTS.OIDC_BUTTON}
+            </Button></>
+    }
+
     return (
         <div className={style.outterContainer}>
             <Typography variant="h3">{!searchParams.get("originalPath")?.includes("admin") ? window.globalTS.WELCOME_TEXT_0 : window.globalTS.WELCOME_TEXT_0_ADMIN}</Typography>
@@ -79,17 +97,7 @@ const Login = (props: Props) => {
                     >
                         {LOGIN}
                     </Button>
-                    <Spacer vertical={20} />
-                    <Button
-                        size='large'
-                        variant='contained'
-                        onClick={() => {
-                            loginOidc()
-                        }}
-                        disabled={disableLoginButton}
-                    >
-                        {"Login with provider"}
-                    </Button>
+                    {oidcButton()}
                 </FormControl>
             </form>
         </div>

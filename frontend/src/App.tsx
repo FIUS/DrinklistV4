@@ -29,7 +29,8 @@ declare global {
       WELCOME_TEXT_0_ADMIN: string,
       WELCOME_TEXT_1: string,
       HOME_BUTTON: string,
-      TRANSACTION_LIMIT: number
+      TRANSACTION_LIMIT: number,
+      OIDC_BUTTON: null | string
     };
   }
 }

@@ -12,5 +12,6 @@ window.globalTS = {
     "WELCOME_TEXT_0_ADMIN": drinklistName + " Admin-Interface",
     "WELCOME_TEXT_1": "Bitte logge dich ein!",
     "HOME_BUTTON": drinklistName,
-    "TRANSACTION_LIMIT": 1000
+    "TRANSACTION_LIMIT": 1000,
+    "OIDC_BUTTON": null
 };
