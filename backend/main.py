@@ -701,10 +701,14 @@ class oidc_redirect(Resource):
         if user is None:
             # create user
             new_member = db.add_user(userinfo["username"],
-                                     0, util.standard_user_password, alias=userinfo["name"], hidden=True)
+                                     0, util.standard_user_password, alias=userinfo["name"], hidden=util.OIDC_USER_NEEDS_VERIFICATION)
             mail.send_welcome_mail(new_member.name)
 
-            return flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE+"/message/new-user", code=302)
+            if util.OIDC_USER_NEEDS_VERIFICATION:
+                return flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE+"/message/new-user", code=302)
+            
+            user_id = new_member.id
+            login_token = token_manager.create_token(user_id)
 
         else:
             if user.hidden:
@@ -714,13 +718,13 @@ class oidc_redirect(Resource):
             user_id = user.id
             login_token = token_manager.create_token(user_id)
 
-            r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
-            r.set_cookie("memberID", str(user_id),
-                         domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
-            r.set_cookie("token", login_token,
-                         domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+        r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
+        r.set_cookie("memberID", str(user_id),
+                        domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+        r.set_cookie("token", login_token,
+                        domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
 
-            return r
+        return r
 
 
 @api.route('/login/admin/check')

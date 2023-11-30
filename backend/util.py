@@ -65,7 +65,8 @@ OIDC_AUTH_REDIRECT = os.environ.get(
     "OIDC_AUTH_REDIRECT") if os.environ.get("OIDC_AUTH_REDIRECT") else "http://127.0.0.1:5000/api/oidc-redirect"
 OIDC_USER_INFO = os.environ.get(
     "OIDC_USER_INFO") if os.environ.get("OIDC_USER_INFO") else None
-
+OIDC_USER_NEEDS_VERIFICATION = os.environ.get(
+    "OIDC_USER_NEEDS_VERIFICATION")=="true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
