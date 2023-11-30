@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { openToast } from '../../../Actions/CommonAction';
 import { FALSCHES_PASSWORT, FEHLER, LOGIN, NAME, PASSWORT } from '../Internationalization/i18n';
 import Spacer from '../Spacer';
-import { doPostRequest } from '../StaticFunctions';
+import { doGetRequest, doPostRequest } from '../StaticFunctions';
 import style from './login.module.scss'
 
 type Props = {}
@@ -32,6 +32,36 @@ const Login = (props: Props) => {
             setdisableLoginButton(false)
         })
     }
+
+    const loginOidc = async () => {
+        setdisableLoginButton(true)
+        doGetRequest("start-oidc").then(value => {
+            if (value.code === 200) {
+                console.log(value.content)
+                window.location.href = value.content
+            }
+            setdisableLoginButton(false)
+        })
+    }
+
+    const oidcButton = () => {
+        if (window.globalTS.OIDC_BUTTON_TEXT === null) {
+            return
+        }
+
+        return <><Spacer vertical={20} />
+            <Button
+                size='large'
+                variant='contained'
+                onClick={() => {
+                    loginOidc()
+                }}
+                disabled={disableLoginButton}
+            >
+                {window.globalTS.OIDC_BUTTON_TEXT}
+            </Button></>
+    }
+
     return (
         <div className={style.outterContainer}>
             <Typography variant="h3">{!searchParams.get("originalPath")?.includes("admin") ? window.globalTS.WELCOME_TEXT_0 : window.globalTS.WELCOME_TEXT_0_ADMIN}</Typography>
@@ -67,6 +97,7 @@ const Login = (props: Props) => {
                     >
                         {LOGIN}
                     </Button>
+                    {oidcButton()}
                 </FormControl>
             </form>
         </div>

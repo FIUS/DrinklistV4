@@ -59,7 +59,7 @@ class Queries:
 
         output.sort(key=lambda transaction: transaction['id'])
         output.reverse()
-        
+
         return output
 
     def add_user_favorite(self, member_id, drink_id):
@@ -90,9 +90,11 @@ class Queries:
 
     def add_user(self, name, money, password, alias="", hidden=False):
         pw_hash, salt = TokenManager.hashPassword(password)
-        self.session.add(
-            Member(name=name.lower(), balance=money, password=pw_hash, salt=salt, alias=alias, hidden=hidden))
+        new_member = Member(name=name.lower(), balance=money,
+                            password=pw_hash, salt=salt, alias=alias, hidden=hidden)
+        self.session.add(new_member)
         self.session.commit()
+        return new_member
 
     def get_drinks(self):
         drinks = self.session.query(Drink).all()
@@ -328,6 +330,12 @@ class Queries:
             return member.id
         else:
             return None
+
+    def check_user(self, name):
+        member: Member = self.session.query(
+            Member).filter_by(name=name.lower()).first()
+
+        return member
 
     def get_most_bought_drink_name(self, member_id: int, timestamp: datetime):
         # Round timestamp down to nearest 15-minute interval
@@ -703,7 +711,6 @@ class Queries:
                 except:
                     self.session.rollback()
                     print("Failed to import drink", d['name'])
-            
 
         print("Added drinks")
 

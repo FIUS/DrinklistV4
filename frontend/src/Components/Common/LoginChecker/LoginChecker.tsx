@@ -16,6 +16,8 @@ const LoginChecker = (props: Props) => {
         let requestString = ""
         if (location.pathname.startsWith("/admin")) {
             requestString = "login/admin/check"
+        } else if (location.pathname.startsWith("/message")) {
+            return
         } else if (!location.pathname.startsWith("/login")) {
             requestString = "login/check"
         } else {
