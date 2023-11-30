@@ -3,6 +3,8 @@ import json
 import os
 import datetime
 import time
+import requests
+
 cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
     60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
 domain = os.environ.get("DOMAIN") if os.environ.get(
@@ -49,6 +51,22 @@ mail_password = os.environ.get(
 mail_postfix = os.environ.get(
     "MAIL_POSTFIX") if os.environ.get("MAIL_POSTFIX") else None
 
+OIDC_CLIENT_ID = os.environ.get(
+    "OIDC_CLIENT_ID") if os.environ.get("OIDC_CLIENT_ID") else None
+OIDC_CLIENT_SECRET = os.environ.get(
+    "OIDC_CLIENT_SECRET") if os.environ.get("OIDC_CLIENT_SECRET") else None
+OIDC_REDIRECT_MAIN_PAGE = os.environ.get(
+    "OIDC_REDIRECT_MAIN_PAGE") if os.environ.get("OIDC_REDIRECT_MAIN_PAGE") else "http://127.0.0.1:3000"
+OIDC_AUTH_PATH = os.environ.get(
+    "OIDC_AUTH_PATH") if os.environ.get("OIDC_AUTH_PATH") else None
+OIDC_AUTH_TOKEN = os.environ.get(
+    "OIDC_AUTH_TOKEN") if os.environ.get("OIDC_AUTH_TOKEN") else None
+OIDC_AUTH_REDIRECT = os.environ.get(
+    "OIDC_AUTH_REDIRECT") if os.environ.get("OIDC_AUTH_REDIRECT") else "http://127.0.0.1:5000/api/oidc-redirect"
+OIDC_USER_INFO = os.environ.get(
+    "OIDC_USER_INFO") if os.environ.get("OIDC_USER_INFO") else None
+
+
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
 
@@ -77,6 +95,23 @@ def log(prefix, message):
         with open("log.txt", 'a+') as f:
             f.write(f"{output_string}\n")
 
+
+def get_oidc_token(token_url, code, redirect_uri):
+    client_auth = requests.auth.HTTPBasicAuth(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET)
+    post_data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": redirect_uri
+    }
+    response = requests.post(token_url, auth=client_auth, data=post_data)
+    token_json = response.json()
+    return token_json["access_token"]
+
+
+def get_user_info(access_token, resource_url):
+    headers = {'Authorization': 'Bearer ' + access_token}
+    response = requests.get(resource_url, headers=headers)
+    return response.json()
 
 checkout_mail_text = """Hallo {name},
 eine Getränkelisten abrechnung wurde durchgeführt, wir möchten dich hiermit über deinen aktuellen Kontostand informieren.

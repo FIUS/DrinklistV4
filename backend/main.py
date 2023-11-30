@@ -18,6 +18,7 @@ from flask_restx import fields, Resource, Api
 from flask_restx import reqparse
 import flask
 import mail
+import secrets
 
 api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
 api = Api(api_bp, doc='/docu/', base_url='/api')
@@ -313,9 +314,9 @@ class add_user(Resource):
         else:
             db.add_user(request.json["name"],
                         request.json["money"], request.json["password"])
-            
+
         mail.send_welcome_mail(request.json["name"])
-        
+
         return util.build_response("User added")
 
 
@@ -661,6 +662,62 @@ class login_Check(Resource):
         Check if your login token is valid
         """
         return util.build_response("OK")
+
+
+@api.route('/start-oidc')
+class start_oidc(Resource):
+    def get(self):
+        """
+        Start oidc flow
+        """
+
+        return util.build_response(f"{util.OIDC_AUTH_PATH}?client_id={util.OIDC_CLIENT_ID}&response_type=code&scope=email%20profile%20openid&state={secrets.token_urlsafe(32)}")
+
+
+@api.route('/oidc-redirect')
+class oidc_redirect(Resource):
+    def get(self):
+        """
+        Handle redirect of auth provider
+        """
+
+        # get query parameters
+        code = request.args.get('code')
+        #state = request.args.get('state')
+        #scope = request.args.get('scope')
+
+        token_endpoint = util.OIDC_AUTH_TOKEN
+        redirect_uri = util.OIDC_AUTH_REDIRECT
+
+        token = util.get_oidc_token(token_endpoint, code, redirect_uri)
+        userinfo = util.get_user_info(access_token=token,
+                                      resource_url=util.OIDC_USER_INFO)
+
+        # check if user exists
+        user = db.check_user(userinfo["username"])
+        login_token = None
+        user_id = None
+
+        if user is None:
+            # create user
+            new_member = db.add_user(userinfo["username"],
+                                     0, util.standard_user_password, alias=userinfo["name"])
+            mail.send_welcome_mail(new_member.name)
+
+            user_id = new_member.id
+            login_token = token_manager.create_token(user_id)
+
+        else:
+            # log user in
+            user_id = user.id
+            login_token = token_manager.create_token(user_id)
+
+        r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
+        r.set_cookie("memberID", str(user_id),
+                     domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+        r.set_cookie("token", login_token,
+                     domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+        return r
 
 
 @api.route('/login/admin/check')
