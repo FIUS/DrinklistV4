@@ -9,6 +9,7 @@ import Transactions from '../Admin/Transactions/Transactions';
 import Login from '../Common/Login/Login';
 import Details from '../User/Details/Details';
 import UserOverview from '../User/Overview/Overview';
+import Message from '../Common/Message/Message';
 
 type Props = {}
 
@@ -19,6 +20,7 @@ const Routing = (props: Props) => {
                 <Route path="/" element={<UserOverview />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/user/:userid" element={<Details />} />
+                <Route path="/message/:message" element={<Message />} />
                 <Route path="/admin" element={<AdminOverview />} />
                 <Route path="/admin/members" element={<Members />} />
                 <Route path="/admin/transactions" element={<Transactions />} />
