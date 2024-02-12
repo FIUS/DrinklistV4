@@ -41,6 +41,9 @@
 
 .textfieldForm {
     width: 100%;
+    max-width: 900px;
+    padding-left: $padding;
+    padding-right: $padding;
     display: flex;
     justify-content: center;
 }
