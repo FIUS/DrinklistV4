@@ -1,4 +1,4 @@
-import { Box, Fab, Grow, Slide, TextField, Typography } from '@mui/material'
+import { Box, Fab, FormControl, Grow, Slide, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
@@ -11,6 +11,7 @@ import { NAME, WER_BIST_DU } from '../../Common/Internationalization/i18n';
 import { Member, Transaction } from '../../../types/ResponseTypes';
 import HistoryIcon from '@mui/icons-material/History';
 import Spacer from '../../Common/Spacer';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {}
 
@@ -20,7 +21,8 @@ const Overview = (props: Props) => {
     const [searchfield, setsearchfield] = useState("")
     const anchor = React.useRef(null);
     const [history, sethistory] = useState<Array<Transaction> | null>(null)
-
+    const navigate = useNavigate()
+    
     const memberHistoryName = () => {
         const member = common.members?.find((member) => historyItemToDisplay?.memberID === member.id)
         if (member?.alias !== "") {
@@ -119,24 +121,40 @@ const Overview = (props: Props) => {
         }
     }
 
+    const redirectToUser = () => {
+        const visibleUsers = common.members?.filter(value => {
+            if (!value.hidden && (exactSearchMatch(value) || userVisible(value))) {
+                console.log(value.name + " " + !value.hidden + " " + exactSearchMatch(value))
+                return true
+            }
+            return false
+        })
+        if (visibleUsers?.length === 1) {
+            navigate("/user/" + visibleUsers[0].id)
+        }
+    }
+
     return (
         <>
             <div className={style.outterContainer}>
                 <div className={style.headline}>
                     <Typography variant='h4'>{WER_BIST_DU}</Typography>
                 </div>
-
-                <TextField
-                    className={style.input}
-                    placeholder={NAME}
-                    type="search"
-                    value={searchfield}
-                    autoFocus
-                    onChange={
-                        (value) => { setsearchfield(value.target.value) }
-                    }
-                />
-
+                <form className={style.textfieldForm} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); redirectToUser() }}>
+                    <FormControl className={style.form}>
+                        <TextField
+                            className={style.input}
+                            placeholder={NAME}
+                            type="search"
+                            value={searchfield}
+                            autoFocus
+                            fullWidth
+                            onChange={
+                                (value) => { setsearchfield(value.target.value) }
+                            }
+                        />
+                    </FormControl>
+                </form>
                 <div className={style.buttonArea}>
                     {common.members?.sort((value1, value2) => {
                         const name1 = value1.alias !== "" ? value1.alias : value1.name
