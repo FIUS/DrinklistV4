@@ -524,6 +524,10 @@ class undo_transaction(Resource):
                 'date'], "%Y-%m-%dT%H:%M:%SZ")
             if transaction_date+timedelta(minutes=util.undo_timelimit) < datetime.now():
                 return util.build_response("Too late", code=412)
+            
+            if "Transfer money" in db.get_transaction(transaction_id)["description"]:
+                if not is_self_or_admin(request,request.cookies.get('memberID')):
+                    return util.build_response("This is not your transaction", code=412)
 
         db.delete_transaction(transaction_id)
         return util.build_response("Transaction undone")
