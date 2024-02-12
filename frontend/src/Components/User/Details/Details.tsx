@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { dateToString, doGetRequest, doPostRequest, getmemberIDCookie, timeToString } from '../../Common/StaticFunctions';
 import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
@@ -25,6 +25,7 @@ const Details = (props: Props) => {
 
     const params = useParams()
     const dispatch = useDispatch()
+    const navigate=useNavigate()
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchField, setsearchField] = useState("")
     const [dialogOpen, setdialogOpen] = useState(false)
@@ -246,6 +247,10 @@ const Details = (props: Props) => {
         </TableContainer>
     </div >
 
+    const checkUser = () => {
+        return parseInt(Cookies.get("memberID") as string)
+    }
+
     return (
         <>
             <TransferDialog
@@ -253,7 +258,11 @@ const Details = (props: Props) => {
                 close={() => setdialogOpen(false)}
                 member={currentMember}
             />
-            <div className={style.details}>
+            <div className={style.details} onKeyUp={(event) => {
+                if (event.key === "Escape") {
+                    navigate(checkUser() !== 1 && checkUser() !== 2 ? "/user/" + checkUser() : "/")
+                }
+            }}>
                 <div className={style.balanceContainer}>
                     {balancePaper()}
                     {window.innerWidth > mobileHistroyThreshold ? extraFunctions() : <></>}
