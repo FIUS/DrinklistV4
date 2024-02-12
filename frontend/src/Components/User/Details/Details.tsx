@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -116,7 +116,7 @@ const Details = (props: Props) => {
 
         const saveValue = value ? value : 0;
         const saveLastValue = lastValue ? lastValue : 0;
-        
+
         return <>
             <Paper className={style.balanceTop}>
                 <Typography variant='h3'>{KONTOSTAND}:</Typography>
@@ -177,12 +177,21 @@ const Details = (props: Props) => {
                             }
                         })
                     } else if (innerValue.code === 412) {
-                        dispatch(openToast({
-                            message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
-                            headline: ZEITLIMIT_ABGELAUFEN,
-                            duration: 10000,
-                            type: "error"
-                        }))
+                        if (innerValue.content === "TooLate") {
+                            dispatch(openToast({
+                                message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
+                                headline: ZEITLIMIT_ABGELAUFEN,
+                                duration: 10000,
+                                type: "error"
+                            }))
+                        } else if (innerValue.content === "NotYourTransaction") {
+                            dispatch(openToast({
+                                message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
+                                headline: NICHT_DEINE_TRANSAKTION,
+                                duration: 10000,
+                                type: "error"
+                            }))
+                        }
                     } else {
                         dispatch(openErrorToast())
                     }

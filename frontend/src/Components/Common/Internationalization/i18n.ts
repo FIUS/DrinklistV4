@@ -101,6 +101,7 @@ export const NEUER_KASSENSTAND = "Neuer Kassenstand";
 export const NEUER_PREIS = "Neuer Preis";
 export const NEUES_PASSWORT_FESTLEGEN = "Neues Passwort festlegen";
 export const NEUES_PASSWORT_FUER_NUTZER = "Gebe hier das neue passwort für den nutzer '{0}' ein";
+export const NICHT_DEINE_TRANSAKTION = "Dies ist nicht deine Transaction";
 export const NICHT_MEHR_ABGESTRICHEN = "{0} nicht mehr abgestrichen";
 export const NO_USERS = "Keine Nutzer";
 export const NUTZER_AENDERN = "Nutzer ändern";
