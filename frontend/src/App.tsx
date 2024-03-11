@@ -30,7 +30,8 @@ declare global {
       WELCOME_TEXT_1: string,
       HOME_BUTTON: string,
       TRANSACTION_LIMIT: number,
-      OIDC_BUTTON_TEXT: null | string
+      OIDC_BUTTON_TEXT: null | string,
+      AUTH_COOKIE_PREFIX: string
     };
   }
 }

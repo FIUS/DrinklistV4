@@ -96,7 +96,7 @@ const TopBar = (props: Props) => {
     }
 
     const isUser = () => {
-        return parseInt(Cookies.get("memberID") as string)
+        return parseInt(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID") as string)
     }
 
     return (

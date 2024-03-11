@@ -21,7 +21,7 @@ const NewMessagesPopup = (props: Props) => {
     const location = useLocation()
 
     useEffect(() => {
-        const cookie = Cookies.get("memberID")
+        const cookie = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
         const memberID = cookie ? cookie : "-1"
         if (messages.length === 0) {
             getAndStore(format("users/{0}/messages", memberID), setmessages)
@@ -53,7 +53,7 @@ const NewMessagesPopup = (props: Props) => {
 
                             {value.request ?
                                 <ListItemButton onClick={() => {
-                                    const cookie = Cookies.get("memberID")
+                                    const cookie = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
                                     const memberID = parseInt(cookie ? cookie : "-1");
                                     const from = memberID;
                                     const to = value.request?.to ? value.request?.to : -1;
@@ -96,7 +96,7 @@ const NewMessagesPopup = (props: Props) => {
                 {ERINNERE_SPAETER}
             </Button>
             <Button onClick={() => {
-                const cookie = Cookies.get("memberID")
+                const cookie = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
                 const memberID = cookie ? cookie : "-1"
 
                 doRequest("DELETE", format("users/{0}/messages", memberID), {}).then(value => {

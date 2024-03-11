@@ -39,13 +39,13 @@ with app.app_context():
 
 
 def is_admin():
-    return int(request.cookies.get('memberID')) == 1 and token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token'))
+    return int(request.cookies.get(f"{util.auth_cookie_memberID}memberID")) == 1 and token_manager.check_token(request.cookies.get(f"{util.auth_cookie_memberID}memberID"), request.cookies.get(f"{util.auth_cookie_memberID}token"))
 
 
 def authenticated(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if not token_manager.check_token(request.cookies.get('memberID'), request.cookies.get('token')):
+        if not token_manager.check_token(request.cookies.get(f"{util.auth_cookie_memberID}memberID"), request.cookies.get(f"{util.auth_cookie_memberID}token")):
             return util.build_response("Unauthorized", 403)
         return fn(*args, **kwargs)
     wrapper.__name__ = fn.__name__
@@ -63,7 +63,7 @@ def admin(fn):
 
 
 def is_self_or_admin(request, member_id):
-    return str(member_id) == str(request.cookies.get('memberID')) or str(request.cookies.get('memberID')) == "1"
+    return str(member_id) == str(request.cookies.get(f"{util.auth_cookie_memberID}memberID")) or str(request.cookies.get(f"{util.auth_cookie_memberID}memberID")) == "1"
 
 
 model_amount = api.model('Amount', {
@@ -763,10 +763,10 @@ class oidc_redirect(Resource):
             login_token = token_manager.create_token(user_id)
 
         r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
-        r.set_cookie("memberID", str(user_id),
-                     domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
-        r.set_cookie("token", login_token,
-                     domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+        r.set_cookie(f"{util.auth_cookie_memberID}memberID", str(user_id),
+                      max_age=util.cookie_expire, samesite='Strict')
+        r.set_cookie(f"{util.auth_cookie_memberID}token", login_token,
+                      max_age=util.cookie_expire, samesite='Strict')
 
         return r
 
@@ -815,7 +815,7 @@ class cookie(Resource):
         Get the memberID and token for using the api
         """
 
-        return util.build_response({"memberID": request.cookies.get('memberID'), "token": request.cookies.get('token')})
+        return util.build_response({"memberID": request.cookies.get(f"{util.auth_cookie_memberID}memberID"), "token": request.cookies.get(f"{util.auth_cookie_memberID}token")})
 
 
 @api.route('/logout')
@@ -825,8 +825,8 @@ class logout(Resource):
         """
         Invalidates the current token
         """
-        token_manager.delete_token(request.cookies.get('token'))
-        util.log("Logout", f"MemberID: {request.cookies.get('memberID')}")
+        token_manager.delete_token(request.cookies.get(f"{util.auth_cookie_memberID}token"))
+        util.log("Logout", f"MemberID: {request.cookies.get(f'{util.auth_cookie_memberID}memberID')}")
         return util.build_response("OK")
 
 

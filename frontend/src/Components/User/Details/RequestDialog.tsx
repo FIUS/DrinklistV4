@@ -163,7 +163,7 @@ const RequestDialog = (props: Props) => {
                 <Button
                     disabled={selectedUsers.length === 0 || !(amount > 0)}
                     onClick={() => {
-                        const memberID = Cookies.get("memberID");
+                        const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
                         const notUndefinedMemberID = memberID !== undefined ? parseInt(memberID) : 0;
 
                         resetInput();

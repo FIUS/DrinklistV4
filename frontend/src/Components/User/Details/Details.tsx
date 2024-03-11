@@ -86,7 +86,7 @@ const Details = (props: Props) => {
     }, [dispatch, params.userid])
 
     useEffect(() => {
-        const memberID = Cookies.get("memberID");
+        const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
         const notUndefined = memberID !== undefined ? parseInt(memberID) : 0;
 
         if (notUndefined > 2) {
@@ -253,7 +253,7 @@ const Details = (props: Props) => {
     </div >
 
     const checkUser = () => {
-        return parseInt(Cookies.get("memberID") as string)
+        return parseInt(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID") as string)
     }
 
     return (

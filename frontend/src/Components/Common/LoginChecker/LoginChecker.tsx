@@ -23,7 +23,7 @@ const LoginChecker = (props: Props) => {
         } else {
             return
         }
-
+        console.log(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID"))
         doGetRequest(requestString).then((value) => {
             if (value.code !== 200) {
                 navigate("/login?originalPath=" + location.pathname)
@@ -31,11 +31,11 @@ const LoginChecker = (props: Props) => {
             } else {
                 dispatch(setLoginState(true))
 
-                const memberID = Cookies.get("memberID");
+                const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
                 const notUndefined = memberID !== undefined ? parseInt(memberID) : 0;
 
                 if (notUndefined > 2) {
-                    navigate("/user/" + Cookies.get("memberID"))
+                    navigate("/user/" + Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID"))
                 }
             }
         })

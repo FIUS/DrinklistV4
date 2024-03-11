@@ -37,6 +37,8 @@ auto_hide_days = int(os.environ.get(
 password_hash_rounds = max(10000, int(os.environ.get(
     "PASSSWORD_HASH_ROUNDS"))) if os.environ.get("PASSSWORD_HASH_ROUNDS") else 500000
 
+auth_cookie_memberID=os.environ.get(
+    "AUTH_COOKIE_PREFIX") if os.environ.get("AUTH_COOKIE_PREFIX") else ""
 
 mail_server = os.environ.get(
     "MAIL_SERVER") if os.environ.get("MAIL_SERVER") else None
@@ -81,9 +83,9 @@ def build_response(message: object, code: int = 200, type: str = "application/js
     """
     r = Response(response=json.dumps(message), status=code, mimetype=type)
     if cookieMemberID and cookieToken:
-        r.set_cookie("memberID", str(cookieMemberID),
+        r.set_cookie(f"{auth_cookie_memberID}memberID", str(cookieMemberID),
                      max_age=cookie_expire, samesite='Strict')
-        r.set_cookie("token", cookieToken,
+        r.set_cookie(f"{auth_cookie_memberID}token", cookieToken,
                      max_age=cookie_expire, samesite='Strict')
 
     return r
