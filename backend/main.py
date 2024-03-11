@@ -230,7 +230,7 @@ class request_transfer(Resource):
             mail_body = util.money_request_mail_test.format(
                 name=safeNameFrom, requester=safeNameTo, money=f"{amount:.2f}", url=util.domain)
             mail.send_mail("Überweisungsanfrage",
-                           mail.mail_from_username(username),mail_body)
+                           mail.mail_from_username(username), mail_body)
             db.add_message(user, outputDescription, f"von {safeNameTo}", request=json.dumps({
                            "to": toUser, "amount": amount}))
 
@@ -330,16 +330,18 @@ class user_messages(Resource):
             return util.build_response(db.remove_messages(member_id))
         return util.build_response("Unauthorized", code=403)
 
+
 @api.route('/users/<int:member_id>/messages/<int:message_id>')
 class user_messages(Resource):
     @authenticated
-    def delete(self, member_id,message_id):
+    def delete(self, member_id, message_id):
         """
         Removes all messages of a user
         """
         if is_self_or_admin(request, member_id):
             return util.build_response(db.remove_message(message_id))
         return util.build_response("Unauthorized", code=403)
+
 
 model = api.model('Add User', {
     'name': fields.String(description='Name of the new user', required=True),
@@ -774,9 +776,9 @@ class oidc_redirect(Resource):
 
         r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
         r.set_cookie(f"{util.auth_cookie_memberID}memberID", str(user_id),
-                      max_age=util.cookie_expire, samesite='Strict')
+                     max_age=util.cookie_expire, samesite='Strict', secure=not util.logging_enabled)
         r.set_cookie(f"{util.auth_cookie_memberID}token", login_token,
-                      max_age=util.cookie_expire, samesite='Strict')
+                     max_age=util.cookie_expire, samesite='Strict', secure=not util.logging_enabled)
 
         return r
 
@@ -835,8 +837,10 @@ class logout(Resource):
         """
         Invalidates the current token
         """
-        token_manager.delete_token(request.cookies.get(f"{util.auth_cookie_memberID}token"))
-        util.log("Logout", f"MemberID: {request.cookies.get(f'{util.auth_cookie_memberID}memberID')}")
+        token_manager.delete_token(request.cookies.get(
+            f"{util.auth_cookie_memberID}token"))
+        util.log(
+            "Logout", f"MemberID: {request.cookies.get(f'{util.auth_cookie_memberID}memberID')}")
         return util.build_response("OK")
 
 
