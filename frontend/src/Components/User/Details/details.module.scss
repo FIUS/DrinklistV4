@@ -95,6 +95,7 @@
     flex-direction: column;
     flex-wrap: nowrap;
     padding: $flex-gap;
+    width: 100%;
 }
 
 .headline{
@@ -115,4 +116,8 @@
 
 em-emoji-picker {
     max-width: 60vw;
+}
+
+.userList{
+    width: 100%;
 }

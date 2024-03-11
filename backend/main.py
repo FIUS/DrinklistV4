@@ -198,6 +198,45 @@ class transfer_money(Resource):
         return util.build_response(f"{amount}€ transfered")
 
 
+model_requestTransfer = api.model('Transfer request', {
+    'fromUser': fields.List(fields.Integer),
+    'toUser': fields.Integer(required=True),
+    'amount': fields.Float(description="Amount per user"),
+    'description': fields.String()
+})
+
+
+@api.route('/users/request/transfer')
+class request_transfer(Resource):
+    @authenticated
+    @api.doc(body=model_requestTransfer)
+    def post(self):
+        """
+        Request money from users
+        """
+
+        fromUser = request.json['fromUser']
+        toUser = request.json['toUser']
+        amount = request.json['amount']
+        description = request.json['description']
+
+        safeNameTo = db.get_safe_name(toUser)
+
+        outputDescription = f"Es wurden {amount:.2f}€ von dir angefordert" if description is None else f"Es wurden {amount:.2f}€ von dir angefordert, wegen {description}"
+
+        for user in fromUser:
+            username, alias = db.get_username_alias(user)
+            safeNameFrom = db.get_safe_name(user)
+            mail_body = util.money_request_mail_test.format(
+                name=safeNameFrom, requester=safeNameTo, money=f"{amount:.2f}", url=util.domain)
+            mail.send_mail("Überweisungsanfrage",
+                           mail.mail_from_username(username),mail_body)
+            db.add_message(user, outputDescription, f"von {safeNameTo}", request=json.dumps({
+                           "to": toUser, "amount": amount}))
+
+        return util.build_response("Ok")
+
+
 @api.route('/users/<int:member_id>/visibility/toggle')
 class toggle_user_visibility(Resource):
     @admin
@@ -520,14 +559,14 @@ class undo_transaction(Resource):
         Undo the given transaction
         """
         if not is_admin():
-            transaction=db.get_transaction(transaction_id)
-            transaction_date = datetime.strptime(transaction['date'], "%Y-%m-%dT%H:%M:%SZ")
+            transaction = db.get_transaction(transaction_id)
+            transaction_date = datetime.strptime(
+                transaction['date'], "%Y-%m-%dT%H:%M:%SZ")
             if transaction_date+timedelta(minutes=util.undo_timelimit) < datetime.now():
                 return util.build_response("TooLate", code=412)
-            
-            
+
             if "Transfer money" in transaction["description"]:
-                if not is_self_or_admin(request,transaction['memberID']):
+                if not is_self_or_admin(request, transaction['memberID']):
                     return util.build_response("NotYourTransaction", code=412)
 
         db.delete_transaction(transaction_id)
@@ -711,7 +750,7 @@ class oidc_redirect(Resource):
 
             if util.OIDC_USER_NEEDS_VERIFICATION:
                 return flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE+"/message/new-user", code=302)
-            
+
             user_id = new_member.id
             login_token = token_manager.create_token(user_id)
 
@@ -725,9 +764,9 @@ class oidc_redirect(Resource):
 
         r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
         r.set_cookie("memberID", str(user_id),
-                        domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+                     domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
         r.set_cookie("token", login_token,
-                        domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
+                     domain=util.domain, max_age=util.cookie_expire, samesite='Strict')
 
         return r
 

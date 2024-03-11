@@ -7,6 +7,8 @@ import requests
 
 cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
     60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
+domain = os.environ.get("DOMAIN") if os.environ.get(
+    "DOMAIN") else "127.0.0.1:3000"
 logging_enabled = os.environ.get(
     "DEBUG") == "true" if os.environ.get("DEBUG") else False
 
@@ -119,4 +121,8 @@ eine Getränkelisten abrechnung wurde durchgeführt, wir möchten dich hiermit �
 Aktuell hast du ein Guthaben von {balance}€.
 
 Viele Grüße
+"""
+
+money_request_mail_test="""Hallo {name},
+{requester} möchte eine Ausgabe von {money}€ mit dir teilen, gehe jetzt auf {url} um die Zahlung zu bestätigen.
 """
