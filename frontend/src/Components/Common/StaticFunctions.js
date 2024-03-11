@@ -179,7 +179,7 @@ export const timeTupleToString = (times) => {
 }
 
 export const getmemberIDCookie = () => {
-    const rawMemberID = Cookies.get("memberID")
+    const rawMemberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
 
     return rawMemberID ? parseInt(rawMemberID) : null
 }

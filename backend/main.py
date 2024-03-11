@@ -330,6 +330,16 @@ class user_messages(Resource):
             return util.build_response(db.remove_messages(member_id))
         return util.build_response("Unauthorized", code=403)
 
+@api.route('/users/<int:member_id>/messages/<int:message_id>')
+class user_messages(Resource):
+    @authenticated
+    def delete(self, member_id,message_id):
+        """
+        Removes all messages of a user
+        """
+        if is_self_or_admin(request, member_id):
+            return util.build_response(db.remove_message(message_id))
+        return util.build_response("Unauthorized", code=403)
 
 model = api.model('Add User', {
     'name': fields.String(description='Name of the new user', required=True),

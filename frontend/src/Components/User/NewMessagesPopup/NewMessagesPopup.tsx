@@ -17,6 +17,7 @@ const NewMessagesPopup = (props: Props) => {
 
     const [messages, setmessages] = useState<Array<Message>>([])
     const [dialogOpen, setdialogOpen] = useState(false)
+    const [requestInProgress, setrequestInProgress] = useState(false)
     const dispatch = useDispatch()
     const location = useLocation()
 
@@ -53,6 +54,7 @@ const NewMessagesPopup = (props: Props) => {
 
                             {value.request ?
                                 <ListItemButton onClick={() => {
+                                    setrequestInProgress(true)
                                     const cookie = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
                                     const memberID = parseInt(cookie ? cookie : "-1");
                                     const from = memberID;
@@ -77,12 +79,15 @@ const NewMessagesPopup = (props: Props) => {
                                                 dispatch(setMembers(value.content))
                                             }
                                         })
-                                        setmessages(messages.filter(filterValue => filterValue.text !== value.text))
+                                        doRequest("DELETE", format("users/{0}/messages/{1}", memberID, value.id), {}).then(() => {
+                                            getAndStore(format("users/{0}/messages", memberID), setmessages)
+                                            setrequestInProgress(false)
+                                        })
                                     })
-                                }}>
+                                }} disabled={requestInProgress}>
                                     {UEBERWEISEN}
                                 </ListItemButton>
-                             : <></>}
+                                : <></>}
                         </ListItem>
                     </>
                 })}

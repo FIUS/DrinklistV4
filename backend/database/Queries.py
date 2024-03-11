@@ -583,6 +583,16 @@ class Queries:
 
         self.session.commit()
 
+    def remove_message(self, message_id):
+        reminder: Reminder = self.session.query(
+            Reminder).filter_by(id=message_id).first()
+
+        
+        self.session.delete(reminder)
+
+        self.session.commit()
+
+
     def get_username_alias(self, member_id):
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()

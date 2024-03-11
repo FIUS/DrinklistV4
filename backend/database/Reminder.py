@@ -18,7 +18,7 @@ class Reminder(db.Model):
 
     def to_dict(self):
         output = {"text": self.text, "memberNameFrom": self.member_name_from,
-                  "emoji": self.emoji, "request": None}
+                  "emoji": self.emoji, "request": None, "id": self.id}
         if self.request is not None:
             output["request"] = json.loads(self.request)
 

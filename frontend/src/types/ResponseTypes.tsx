@@ -32,6 +32,7 @@ export type Checkout = {
 }
 
 export type Message = {
+    id: number,
     text: string,
     memberNameFrom: string,
     emoji: string,
