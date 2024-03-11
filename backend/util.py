@@ -7,8 +7,6 @@ import requests
 
 cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
     60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
-domain = os.environ.get("DOMAIN") if os.environ.get(
-    "DOMAIN") else "127.0.0.1:3000"
 logging_enabled = os.environ.get(
     "DEBUG") == "true" if os.environ.get("DEBUG") else False
 
@@ -66,7 +64,7 @@ OIDC_AUTH_REDIRECT = os.environ.get(
 OIDC_USER_INFO = os.environ.get(
     "OIDC_USER_INFO") if os.environ.get("OIDC_USER_INFO") else None
 OIDC_USER_NEEDS_VERIFICATION = os.environ.get(
-    "OIDC_USER_NEEDS_VERIFICATION")=="true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
+    "OIDC_USER_NEEDS_VERIFICATION") == "true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
@@ -82,9 +80,9 @@ def build_response(message: object, code: int = 200, type: str = "application/js
     r = Response(response=json.dumps(message), status=code, mimetype=type)
     if cookieMemberID and cookieToken:
         r.set_cookie("memberID", str(cookieMemberID),
-                     domain=domain, max_age=cookie_expire, samesite='Strict')
+                     max_age=cookie_expire, samesite='Strict')
         r.set_cookie("token", cookieToken,
-                     domain=domain, max_age=cookie_expire, samesite='Strict')
+                     max_age=cookie_expire, samesite='Strict')
 
     return r
 
@@ -98,7 +96,8 @@ def log(prefix, message):
 
 
 def get_oidc_token(token_url, code, redirect_uri):
-    client_auth = requests.auth.HTTPBasicAuth(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET)
+    client_auth = requests.auth.HTTPBasicAuth(
+        OIDC_CLIENT_ID, OIDC_CLIENT_SECRET)
     post_data = {
         "grant_type": "authorization_code",
         "code": code,
@@ -113,6 +112,7 @@ def get_user_info(access_token, resource_url):
     headers = {'Authorization': 'Bearer ' + access_token}
     response = requests.get(resource_url, headers=headers)
     return response.json()
+
 
 checkout_mail_text = """Hallo {name},
 eine Getränkelisten abrechnung wurde durchgeführt, wir möchten dich hiermit über deinen aktuellen Kontostand informieren.
