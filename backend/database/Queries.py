@@ -560,9 +560,9 @@ class Queries:
 
         return member_from.name
 
-    def add_message(self, member_id, message, from_name=None, emoji=None):
+    def add_message(self, member_id, message, from_name=None, emoji=None, request=None):
         self.session.add(Reminder(member_id=member_id, text=message,
-                         member_name_from=from_name, emoji=emoji))
+                         member_name_from=from_name, emoji=emoji, request=request))
         self.session.commit()
 
     def get_messages(self, member_id):
@@ -587,6 +587,11 @@ class Queries:
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
         return member.name, member.alias
+
+    def get_safe_name(self, member_id):
+        name, alias = self.get_username_alias(member_id)
+        output = alias if alias is not None and alias != "" else name
+        return output
 
     def hide_inactive(self):
         if util.auto_hide_days is None:

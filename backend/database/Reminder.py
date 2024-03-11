@@ -1,6 +1,7 @@
 import sqlalchemy as sql
 from web import sql_database as db
 from sqlalchemy.orm import relationship
+import json
 
 
 class Reminder(db.Model):
@@ -11,8 +12,14 @@ class Reminder(db.Model):
         'database.Member.Member', lazy="joined")
 
     text = sql.Column(sql.String(256), nullable=False)
+    request = sql.Column(sql.String(256), nullable=True)
     member_name_from = sql.Column(sql.String(256), nullable=True)
     emoji = sql.Column(sql.String(1), nullable=True)
 
     def to_dict(self):
-        return {"text": self.text, "memberNameFrom": self.member_name_from, "emoji": self.emoji}
+        output = {"text": self.text, "memberNameFrom": self.member_name_from,
+                  "emoji": self.emoji, "request": None}
+        if self.request is not None:
+            output["request"] = json.loads(self.request)
+
+        return output

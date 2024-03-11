@@ -34,5 +34,9 @@ export type Checkout = {
 export type Message = {
     text: string,
     memberNameFrom: string,
-    emoji: string
+    emoji: string,
+    request?: {
+        to: number,
+        amount: number
+    }
 }

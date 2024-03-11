@@ -1,13 +1,13 @@
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material'
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material'
 import Cookies from 'js-cookie'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { format } from 'react-string-format'
-import { openErrorToast } from '../../../Actions/CommonAction'
+import { openErrorToast, setHistory, setMembers } from '../../../Actions/CommonAction'
 import { Message } from '../../../types/ResponseTypes'
-import { ALLES_KLAR, ERINNERE_SPAETER, ES_GIBT_NEUIGKEITEN, WAEHREND_DU_WEG_WARST } from '../../Common/Internationalization/i18n'
-import { doRequest, getAndStore } from '../../Common/StaticFunctions'
+import { ALLES_KLAR, ERINNERE_SPAETER, ES_GIBT_NEUIGKEITEN, UEBERWEISEN, WAEHREND_DU_WEG_WARST } from '../../Common/Internationalization/i18n'
+import { doGetRequest, doPostRequest, doRequest, getAndStore } from '../../Common/StaticFunctions'
 
 type Props = {
 
@@ -46,10 +46,43 @@ const NewMessagesPopup = (props: Props) => {
                         <ListItem>
                             <ListItemAvatar>
                                 <Avatar>
-                                    {value.emoji}
+                                    {!value.request ? value.emoji : "💸"}
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText primary={value.text} secondary={value.memberNameFrom} />
+
+                            {value.request ?
+                                <ListItemButton onClick={() => {
+                                    const cookie = Cookies.get("memberID")
+                                    const memberID = parseInt(cookie ? cookie : "-1");
+                                    const from = memberID;
+                                    const to = value.request?.to ? value.request?.to : -1;
+                                    const amount = value.request?.amount ? value.request?.amount : 0;
+                                    const reason = value.text;
+                                    const emoji = "💸";
+
+                                    let payload: { amount: number, emoji: string } | { amount: number, reason: string, emoji: string } = { amount: amount, emoji: emoji }
+                                    if (reason !== null && reason !== "") {
+                                        payload = { ...payload, reason: reason }
+                                    }
+
+                                    doPostRequest(format("users/{0}/transfer/{1}", from, to), payload).then(() => {
+                                        doGetRequest("users/" + memberID + "/history").then((value) => {
+                                            if (value.code === 200) {
+                                                dispatch(setHistory(value.content))
+                                            }
+                                        })
+                                        doGetRequest("users").then((value) => {
+                                            if (value.code === 200) {
+                                                dispatch(setMembers(value.content))
+                                            }
+                                        })
+                                        setmessages(messages.filter(filterValue => filterValue.text !== value.text))
+                                    })
+                                }}>
+                                    {UEBERWEISEN}
+                                </ListItemButton>
+                             : <></>}
                         </ListItem>
                     </>
                 })}
