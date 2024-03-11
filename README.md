@@ -54,6 +54,9 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
 * `PASSSWORD_HASH_ROUNDS`
   * Number of hash rounds for pbkdf2_hmac.
   * Minimum is 10 000. It is recommended to use at least 100 000
+* `AUTH_COOKIE_PREFIX`
+  * Prefix of the cookies used for authentication
+  * Defaults to empty string
   
 ### Email environment variables
 * `MAIL_SERVER`
