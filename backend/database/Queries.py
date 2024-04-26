@@ -16,6 +16,7 @@ import constants
 import os
 from sqlalchemy import extract
 from difflib import SequenceMatcher
+from sqlalchemy import inspect, text
 import database.Migrations
 
 
