@@ -60,6 +60,7 @@
   "devDependencies": {
     "@types/js-cookie": "^3.0.5",
     "redux-devtools-extension": "^2.13.9",
-    "typescript-plugin-css-modules": "^5.0.2"
+    "typescript-plugin-css-modules": "^5.0.2",
+    "@babel/plugin-proposal-private-property-in-object":"^7.21.11"
   }
 }

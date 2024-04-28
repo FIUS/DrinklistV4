@@ -6,13 +6,13 @@ import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { dateToString, doGetRequest, doPostRequest, getmemberIDCookie, timeToString } from '../../Common/StaticFunctions';
+import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
 import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers, setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
 import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, GELD_ANFORDERN, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -30,8 +30,6 @@ const Details = (props: Props) => {
     const navigate = useNavigate()
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchField, setsearchField] = useState("")
-    const [dialogOpen, setdialogOpen] = useState(false)
-    const [requestDialogOpen, setrequestDialogOpen] = useState(false)
     const [confirmationDialogOpen, setconfirmationDialogOpen] = useState(false)
     const [isUser, setisUser] = useState(false)
     const [historyExpanded, sethistoryExpanded] = useState(false)
