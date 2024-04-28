@@ -7,7 +7,7 @@ import Spacer from '../../Common/Spacer'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { dateToString, doGetRequest, doPostRequest, getmemberIDCookie, timeToString } from '../../Common/StaticFunctions';
-import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
+import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers, setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
 import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
@@ -137,15 +137,7 @@ const Details = (props: Props) => {
     }
 
     const extraFunctions = () => {
-        const pageMemberID = params.userid ? parseInt(params.userid) : null
-
         return <Paper className={style.balanceTop}>
-            {getmemberIDCookie() === pageMemberID || getmemberIDCookie() === 1 ? <>
-                <Typography variant='h5'>{SONDERFUNKTIONEN}:</Typography>
-                <Button onClick={() => setdialogOpen(true)} variant='outlined'>{UEBERWEISEN}</Button>
-                <Button onClick={() => setrequestDialogOpen(true)} variant='outlined'>{GELD_ANFORDERN}</Button>
-            </> : <></>}
-
             {history}
         </Paper>
     }
@@ -259,13 +251,13 @@ const Details = (props: Props) => {
     return (
         <>
             <TransferDialog
-                isOpen={dialogOpen}
-                close={() => setdialogOpen(false)}
+                isOpen={common.transferDialogOpen}
+                close={() => dispatch(setTransferDialogOpen(false))}
                 member={currentMember}
             />
             <RequestDialog
-                isOpen={requestDialogOpen}
-                close={() => setrequestDialogOpen(false)}
+                isOpen={common.requestDialogOpen}
+                close={() => dispatch(setRequestDialogOpen(false))}
                 showConfirmation={() => {
                     setconfirmationDialogOpen(true);
                 }}
@@ -275,7 +267,7 @@ const Details = (props: Props) => {
             <RequestConfirmation
                 isOpen={confirmationDialogOpen}
                 close={() => setconfirmationDialogOpen(false)}
-                
+
             />
             <div className={style.details} onKeyUp={(event) => {
                 if (event.key === "Escape") {

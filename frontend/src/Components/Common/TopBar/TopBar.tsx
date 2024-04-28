@@ -3,7 +3,7 @@ import { AppBar, Button, IconButton, Slide, Toolbar } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Spacer from '../Spacer'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { doPostRequest } from '../StaticFunctions';
 import Divider from '@mui/material/Divider';
@@ -23,8 +23,10 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
-import { ABRECHNUNGEN, EINSTELLUNGEN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN } from '../Internationalization/i18n';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import { ABRECHNUNGEN, EINSTELLUNGEN, GELD_ANFORDERN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN, UEBERWEISEN } from '../Internationalization/i18n';
 import Cookies from 'js-cookie';
+import { setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
 
 type Props = {}
 
@@ -34,9 +36,14 @@ const TopBar = (props: Props) => {
     const location = useLocation();
     const drawerWidth = 240;
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
+    const dispatch = useDispatch()
     const [drawerOpen, setdrawerOpen] = useState(true)
     const [drawerVisible, setdrawerVisible] = useState(true)
     const [aboutDialogOpen, setaboutDialogOpen] = useState(false)
+
+    const showDrawerButton = () => {
+        return location.pathname.startsWith("/admin") || location.pathname.startsWith("/user")
+    }
 
     useEffect(() => {
         if (location.pathname.startsWith("/admin") && window.innerWidth > window.globalTS.MOBILE_THRESHOLD) {
@@ -62,7 +69,7 @@ const TopBar = (props: Props) => {
     }
 
     const getIcon = () => {
-        if (location.pathname.startsWith("/admin")) {
+        if (showDrawerButton()) {
             return <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -99,6 +106,106 @@ const TopBar = (props: Props) => {
         return parseInt(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID") as string)
     }
 
+    const adminDrawer = () => {
+        return <Box sx={{ overflow: 'auto' }}>
+            <List>
+
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/")}>
+                        <ListItemIcon>
+                            <Person />
+                        </ListItemIcon>
+                        <ListItemText primary={NUTZER_DASHBOARD} />
+                    </ListItemButton>
+                </ListItem>
+
+            </List>
+            <Divider />
+            <List>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/drinks")}>
+                        <ListItemIcon>
+                            <SportsBarIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={GETRAENKE} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/members")}>
+                        <ListItemIcon>
+                            <PersonIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={MITGLIEDER} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/transactions")}>
+                        <ListItemIcon>
+                            <ReceiptLongIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={TRANSAKTIONEN} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/checkout")}>
+                        <ListItemIcon>
+                            <AccountBalanceIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={ABRECHNUNGEN} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/settings")}>
+                        <ListItemIcon>
+                            <Settings />
+                        </ListItemIcon>
+                        <ListItemText primary={EINSTELLUNGEN} />
+                    </ListItemButton>
+                </ListItem>
+
+            </List>
+        </Box>
+    }
+
+    const userDrawer = () => {
+        return <Box sx={{ overflow: 'auto' }}>
+            <List>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => {
+                        setdrawerOpen(false)
+                        hideDrawer()
+                        dispatch(setTransferDialogOpen(true))
+                    }}>
+                        <ListItemIcon>
+                            <AccountBalanceIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={UEBERWEISEN} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => {
+                        setdrawerOpen(false)
+                        hideDrawer()
+                        dispatch(setRequestDialogOpen(true))
+                    }}>
+                        <ListItemIcon>
+                            <RequestQuoteIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={GELD_ANFORDERN} />
+                    </ListItemButton>
+                </ListItem>
+            </List>
+        </Box>
+    }
+
+    const displayDrawer = () => {
+        if (location.pathname.startsWith("/admin")) {
+            return adminDrawer()
+        } else if (location.pathname.startsWith("/user/")) {
+            return userDrawer()
+        }
+        return <></>
+    }
     return (
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -148,64 +255,7 @@ const TopBar = (props: Props) => {
                     }}
                 >
                     <Toolbar />
-                    <Box sx={{ overflow: 'auto' }}>
-                        <List>
-
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate("/")}>
-                                    <ListItemIcon>
-                                        <Person />
-                                    </ListItemIcon>
-                                    <ListItemText primary={NUTZER_DASHBOARD} />
-                                </ListItemButton>
-                            </ListItem>
-
-                        </List>
-                        <Divider />
-                        <List>
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate("/admin/drinks")}>
-                                    <ListItemIcon>
-                                        <SportsBarIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={GETRAENKE} />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate("/admin/members")}>
-                                    <ListItemIcon>
-                                        <PersonIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={MITGLIEDER} />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate("/admin/transactions")}>
-                                    <ListItemIcon>
-                                        <ReceiptLongIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={TRANSAKTIONEN} />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate("/admin/checkout")}>
-                                    <ListItemIcon>
-                                        <AccountBalanceIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={ABRECHNUNGEN} />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate("/admin/settings")}>
-                                    <ListItemIcon>
-                                        <Settings />
-                                    </ListItemIcon>
-                                    <ListItemText primary={EINSTELLUNGEN} />
-                                </ListItemButton>
-                            </ListItem>
-
-                        </List>
-                    </Box>
+                    {displayDrawer()}
                 </Drawer>
             </Slide>
         </>
