@@ -34,7 +34,7 @@ const DrinkButton = (props: Props) => {
             }}
             sx={{
                 '& .MuiBadge-badge': {
-                    width: 40,
+                    width: 29,
                 },
             }}
             invisible={!props.isGeneratedFavorite}
