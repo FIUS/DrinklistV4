@@ -42,7 +42,18 @@ const TopBar = (props: Props) => {
     const [aboutDialogOpen, setaboutDialogOpen] = useState(false)
 
     const showDrawerButton = () => {
-        return location.pathname.startsWith("/admin") || location.pathname.startsWith("/user")
+        if (location.pathname.startsWith("/admin")) {
+            return true
+        } else if (location.pathname.startsWith("/user")) {
+            const memberIDCookie = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
+            const memberIDCookieSafe = memberIDCookie ? parseInt(memberIDCookie) : -1
+            const isAdmin = memberIDCookieSafe === 1
+            const isCorrectUser = location.pathname.endsWith(memberIDCookieSafe.toString())
+            if (isAdmin || isCorrectUser) {
+                return true
+            }
+        }
+        return false
     }
 
     useEffect(() => {
