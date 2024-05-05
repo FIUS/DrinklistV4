@@ -683,6 +683,70 @@ class change_kiosk_password(Resource):
         return util.build_response("ok")
 
 
+config_model = api.model('Config state', {
+    'state': fields.Integer
+})
+
+
+@api.route('/config/status')
+class check_config_state(Resource):
+    @api.doc()
+    def get(self):
+        """
+        get the config state of the drinklist
+        """
+        return util.build_response(db.get_config_state())
+
+    @api.doc(body=config_model)
+    def post(self):
+        """
+        change the config state of the drinklist
+        """
+        if db.get_config_state() != 0 and not is_admin():
+            return util.build_response("unauthorized", code=401)
+        state = request.json['state']
+        db.set_config_state(state)
+        return util.build_response("ok")
+
+
+config_model = api.model('Drinklist init', {
+    'adminName': fields.String,
+    'adminPassword': fields.String,
+    'modName': fields.String,
+    'modPassword': fields.String,
+    'users': fields.List(fields.String)
+})
+
+
+@api.route('/config/init')
+class check_config_state(Resource):
+    @api.doc(body=config_model)
+    def post(self):
+        """
+        config the drinklist
+        """
+        if db.get_config_state() != 0 and not is_admin():
+            return util.build_response("unauthorized", code=401)
+        adminName = request.json['adminName']
+        adminPassword = request.json['adminPassword']
+        modName = request.json['modName']
+        modPassword = request.json['modPassword']
+        usernames = request.json['users']
+
+        db.set_config_state(1)
+        db.change_user_name(1, adminName)
+        db.change_user_password(1, adminPassword)
+
+        db.change_user_name(2, modName)
+        db.change_user_password(2, modPassword)
+
+        for user in usernames:
+            db.add_user(name=user, money=0,
+                        password=util.standard_user_password, alias=user)
+
+        return util.build_response("ok")
+
+
 @api.route('/webhooks/releases')
 class webhook_releases(Resource):
     @api.doc()

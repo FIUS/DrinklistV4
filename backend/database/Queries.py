@@ -587,11 +587,9 @@ class Queries:
         reminder: Reminder = self.session.query(
             Reminder).filter_by(id=message_id).first()
 
-        
         self.session.delete(reminder)
 
         self.session.commit()
-
 
     def get_username_alias(self, member_id):
         member: Member = self.session.query(
@@ -663,6 +661,18 @@ class Queries:
 
     def load_tokens(self):
         return self.session.query(Session).all()
+
+    def get_config_state(self):
+        admin: Member = self.session.query(Member).filter_by(
+            name=util.admin_username).first()
+        
+        return admin.balance
+
+    def set_config_state(self, state):
+        admin: Member = self.session.query(Member).filter_by(
+            name=util.admin_username).first()
+        admin.balance = state
+        self.session.commit()
 
     def restore_database(self, imported_data):
         checkouts: list[Checkout] = self.session.query(Checkout).all()

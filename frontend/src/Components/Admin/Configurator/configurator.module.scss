@@ -1,0 +1,14 @@
+@import "../../Common/variables.module.scss";
+
+.inputBox {
+    width: 100%;
+}
+
+.outterBox {
+    width: fit-content;
+}
+
+.fullWidth {
+    width: 100%;
+    padding: $padding;
+}

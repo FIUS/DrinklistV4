@@ -10,6 +10,8 @@ import Login from '../Common/Login/Login';
 import Details from '../User/Details/Details';
 import UserOverview from '../User/Overview/Overview';
 import Message from '../Common/Message/Message';
+import MainConfigurator from '../Admin/Configurator/MainConfigurator';
+import MainConfiguratorInit from '../Admin/Configurator/MainConfiguratorInit';
 
 type Props = {}
 
@@ -21,6 +23,8 @@ const Routing = (props: Props) => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/user/:userid" element={<Details />} />
                 <Route path="/message/:message" element={<Message />} />
+                <Route path="/config/start" element={<MainConfigurator />} />
+                <Route path="/config/init" element={<MainConfiguratorInit />} />
                 <Route path="/admin" element={<AdminOverview />} />
                 <Route path="/admin/members" element={<Members />} />
                 <Route path="/admin/transactions" element={<Transactions />} />
