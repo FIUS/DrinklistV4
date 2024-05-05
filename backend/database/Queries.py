@@ -17,6 +17,7 @@ import os
 from sqlalchemy import extract
 from difflib import SequenceMatcher
 from sqlalchemy import inspect, text
+import database.Migrations
 
 
 class Queries:
@@ -27,6 +28,7 @@ class Queries:
         self.db.create_all()
         if self.session.query(Member).first() is None:
             self.create_dummy_data()
+        database.Migrations.migrate(self.session)
 
     def get_users(self):
         members = self.session.query(Member).all()
@@ -839,7 +841,8 @@ class Queries:
             util.moderator_password)
         self.session.add(
             Member(name=util.moderator_username, password=hashedPassword, salt=salt))
-
+        self.session.add(
+            KeyValue(key="version", value=util.CURRENT_VERSION))
         self.session.commit()
 
         if util.token is not None and util.old_domain is not None:

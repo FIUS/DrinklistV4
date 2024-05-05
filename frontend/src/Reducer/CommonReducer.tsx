@@ -16,8 +16,9 @@ const initialState: CommonReducerType = {
         headline: undefined,
         message: "",
         type: defaultAlertType
-    }
-
+    },
+    transferDialogOpen: false,
+    requestDialogOpen: false,
 }
 
 export type CommonReducerType = {
@@ -33,7 +34,9 @@ export type CommonReducerType = {
         headline: string | undefined,
         message: string,
         type: AlertColor
-    }
+    },
+    transferDialogOpen: boolean,
+    requestDialogOpen: boolean,
 }
 
 const reducer = (state = initialState, { type, payload }: any) => {
@@ -74,6 +77,12 @@ const reducer = (state = initialState, { type, payload }: any) => {
 
         case "CLOSE_TOAST":
             newState.toast.open = false;
+            return newState
+        case "SET_TRANSFER_DIALOG":
+            newState.transferDialogOpen = payload
+            return newState
+        case "SET_REQUEST_DIALOG":
+            newState.requestDialogOpen = payload
             return newState
         default:
             return state

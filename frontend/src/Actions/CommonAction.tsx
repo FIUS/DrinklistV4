@@ -63,6 +63,20 @@ export const closeToast = () => {
     }
 }
 
+export const setTransferDialogOpen = (open: boolean) => {
+    return {
+        type: "SET_TRANSFER_DIALOG",
+        payload: open
+    }
+}
+
+export const setRequestDialogOpen = (open: boolean) => {
+    return {
+        type: "SET_REQUEST_DIALOG",
+        payload: open
+    }
+}
+
 export const openErrorToast = () => {
     return openToast({ message: ERROR_MESSAGE, type: "error" })
 }

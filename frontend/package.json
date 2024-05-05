@@ -7,9 +7,9 @@
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.14.14",
+    "@mui/icons-material": "^5.15.15",
     "@mui/lab": "^5.0.0-alpha.149",
-    "@mui/material": "^5.14.14",
+    "@mui/material": "^5.15.15",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.5.1",
@@ -60,6 +60,7 @@
   "devDependencies": {
     "@types/js-cookie": "^3.0.5",
     "redux-devtools-extension": "^2.13.9",
-    "typescript-plugin-css-modules": "^5.0.2"
+    "typescript-plugin-css-modules": "^5.0.2",
+    "@babel/plugin-proposal-private-property-in-object":"^7.21.11"
   }
 }

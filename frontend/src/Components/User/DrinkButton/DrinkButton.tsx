@@ -32,6 +32,11 @@ const DrinkButton = (props: Props) => {
                 vertical: 'top',
                 horizontal: 'right',
             }}
+            sx={{
+                '& .MuiBadge-badge': {
+                    width: 29,
+                },
+            }}
             invisible={!props.isGeneratedFavorite}
         >
             <Box className={style.container} >

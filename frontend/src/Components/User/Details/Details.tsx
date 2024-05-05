@@ -6,13 +6,13 @@ import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { dateToString, doGetRequest, doPostRequest, getmemberIDCookie, timeToString } from '../../Common/StaticFunctions';
-import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
+import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
+import { openErrorToast, openToast, setDrinkCategories, setDrinks, setFavorites, setHistory, setMembers, setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
 import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, GELD_ANFORDERN, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SONDERFUNKTIONEN, SUCHE_DOT_DOT_DOT, UEBERWEISEN, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -30,8 +30,6 @@ const Details = (props: Props) => {
     const navigate = useNavigate()
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchField, setsearchField] = useState("")
-    const [dialogOpen, setdialogOpen] = useState(false)
-    const [requestDialogOpen, setrequestDialogOpen] = useState(false)
     const [confirmationDialogOpen, setconfirmationDialogOpen] = useState(false)
     const [isUser, setisUser] = useState(false)
     const [historyExpanded, sethistoryExpanded] = useState(false)
@@ -137,15 +135,7 @@ const Details = (props: Props) => {
     }
 
     const extraFunctions = () => {
-        const pageMemberID = params.userid ? parseInt(params.userid) : null
-
         return <Paper className={style.balanceTop}>
-            {getmemberIDCookie() === pageMemberID || getmemberIDCookie() === 1 ? <>
-                <Typography variant='h5'>{SONDERFUNKTIONEN}:</Typography>
-                <Button onClick={() => setdialogOpen(true)} variant='outlined'>{UEBERWEISEN}</Button>
-                <Button onClick={() => setrequestDialogOpen(true)} variant='outlined'>{GELD_ANFORDERN}</Button>
-            </> : <></>}
-
             {history}
         </Paper>
     }
@@ -259,13 +249,13 @@ const Details = (props: Props) => {
     return (
         <>
             <TransferDialog
-                isOpen={dialogOpen}
-                close={() => setdialogOpen(false)}
+                isOpen={common.transferDialogOpen}
+                close={() => dispatch(setTransferDialogOpen(false))}
                 member={currentMember}
             />
             <RequestDialog
-                isOpen={requestDialogOpen}
-                close={() => setrequestDialogOpen(false)}
+                isOpen={common.requestDialogOpen}
+                close={() => dispatch(setRequestDialogOpen(false))}
                 showConfirmation={() => {
                     setconfirmationDialogOpen(true);
                 }}
@@ -275,7 +265,7 @@ const Details = (props: Props) => {
             <RequestConfirmation
                 isOpen={confirmationDialogOpen}
                 close={() => setconfirmationDialogOpen(false)}
-                
+
             />
             <div className={style.details} onKeyUp={(event) => {
                 if (event.key === "Escape") {
