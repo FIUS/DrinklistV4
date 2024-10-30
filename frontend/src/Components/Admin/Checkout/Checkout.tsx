@@ -329,13 +329,16 @@ const Checkout = (props: Props) => {
         if (checkouts.length === 0) {
             return []
         }
-        const entries = [<CheckoutEntry checkout={checkouts[0]} />]
+        const entries = [[<CheckoutEntry checkout={checkouts[0]} />,checkouts[0].id]]
         let lastEntry = checkouts[0]
         checkouts.slice(1).forEach(value => {
-            entries.push(<CheckoutEntry prevCheckout={lastEntry} checkout={value} />);
+            entries.push([<CheckoutEntry prevCheckout={lastEntry} checkout={value} />,value.id]);
             lastEntry = value;
         })
-        return entries.reverse()
+
+        entries.sort((a:any,b:any) => a[1] - b[1])
+
+        return entries.map(value => value[0])
     }
 
 
