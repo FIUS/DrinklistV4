@@ -336,7 +336,7 @@ const Checkout = (props: Props) => {
             lastEntry = value;
         })
 
-        entries.sort((a:any,b:any) => a[1] - b[1])
+        entries.sort((a:any,b:any) => b[1] - a[1])
 
         return entries.map(value => value[0])
     }
