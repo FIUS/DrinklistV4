@@ -123,7 +123,7 @@ const Overview = (props: Props) => {
 
     const redirectToUser = () => {
         const visibleUsers = common.members?.filter(value => {
-            if (!value.hidden && (exactSearchMatch(value) || userVisible(value))) {
+            if (exactSearchMatch(value) || userVisible(value)) {
                 return true
             }
             return false
