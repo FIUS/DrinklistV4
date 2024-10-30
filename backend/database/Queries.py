@@ -282,7 +282,7 @@ class Queries:
 
         self.session.commit()
 
-    def get_checkout_mail(self):
+    def get_checkout_mail(self,memberIDs):
         members: list[Member] = self.session.query(Member).all()
         checkouts = self.get_checkouts()
         if len(checkouts) > 2:
@@ -292,6 +292,9 @@ class Queries:
             "{price,income,paid,name}"
             member_dict = {}
             for m in members:
+                if m.id not in memberIDs:
+                    continue
+                
                 transactions: list[Transaction] = self.session.query(Transaction).filter(
                     Transaction.date > last_date, Transaction.member_id == m.id).all()
                 temp_dict = {}

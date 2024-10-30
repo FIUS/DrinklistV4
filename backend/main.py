@@ -611,13 +611,12 @@ class do_checkout(Resource):
         Create a checkout
         """
         db.do_checkout(request.json)
-        mail_infos = db.get_checkout_mail()
+        memberids = [m["memberID"] for m in request.json['members']]
+        mail_infos = db.get_checkout_mail(memberids)
+        
         if util.mail_server is not None:
-            memberids = [m["memberID"] for m in request.json['members']]
+            mail.send_checkout_mails(mail_infos)
 
-            filtered_mail_infos = [x for x in mail_infos if x['id'] in memberids]
-
-            mail.send_checkout_mails(filtered_mail_infos)
         return util.build_response("")
 
     @admin
