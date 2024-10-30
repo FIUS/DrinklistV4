@@ -22,7 +22,7 @@ const Overview = (props: Props) => {
     const anchor = React.useRef(null);
     const [history, sethistory] = useState<Array<Transaction> | null>(null)
     const navigate = useNavigate()
-    
+
     const memberHistoryName = () => {
         const member = common.members?.find((member) => historyItemToDisplay?.memberID === member.id)
         if (member?.alias !== "") {
@@ -123,7 +123,7 @@ const Overview = (props: Props) => {
 
     const redirectToUser = () => {
         const visibleUsers = common.members?.filter(value => {
-            if (exactSearchMatch(value) || userVisible(value)) {
+            if ((!value.hidden || (exactSearchMatch(value))) && (userVisible(value) || exactSearchMatch(value))) {
                 return true
             }
             return false
