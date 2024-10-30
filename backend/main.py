@@ -613,7 +613,11 @@ class do_checkout(Resource):
         db.do_checkout(request.json)
         mail_infos = db.get_checkout_mail()
         if util.mail_server is not None:
-            mail.send_checkout_mails(mail_infos)
+            memberids = [m["memberID"] for m in request.json['members']]
+
+            filtered_mail_infos = [x for x in mail_infos if x['id'] in memberids]
+
+            mail.send_checkout_mails(filtered_mail_infos)
         return util.build_response("")
 
     @admin

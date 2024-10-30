@@ -297,7 +297,7 @@ class Queries:
                 temp_dict = {}
                 temp_dict["balance"] = m.balance
                 temp_dict["name"] = m.alias if m.alias != "" else m.name
-
+                temp_dict["id"] = m.id
                 income_transactions = []
                 paid_transactions = []
 
@@ -667,7 +667,7 @@ class Queries:
     def get_config_state(self):
         admin: Member = self.session.query(Member).filter_by(
             name=util.admin_username).first()
-        
+
         return admin.balance
 
     def set_config_state(self, state):
