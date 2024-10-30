@@ -29,6 +29,8 @@ const Checkout = (props: Props) => {
     const [invoiceAmount, setinvoiceAmount] = useState(0)
     const [countedCash, setcountedCash] = useState(0)
     const [cashCheckboxChecked, setcashCheckboxChecked] = useState(false)
+    const [tempValue, settempValue] = useState(0)
+    const [buttonDisabled, setbuttonDisabled] = useState(false)
 
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const dispatch = useDispatch()
@@ -114,15 +116,29 @@ const Checkout = (props: Props) => {
                                 <TableCell>
                                 </TableCell>
                                 <TableCell>
+                                    <TextField
+                                        label={VALUE}
+                                        type="number"
+                                        value={tempValue}
+                                        onChange={(textValue) => {
+                                            settempValue(parseFloat(textValue.target.value))
+                                        }
+                                        }
+                                        className={style.textfield} />
                                 </TableCell>
                                 <TableCell>
                                     <Button
-                                        disabled={checkCanAddUser() === null}
+                                        disabled={checkCanAddUser() === null || tempValue === 0}
                                         onClick={() => {
-                                            const toAdd = checkCanAddUser()
-                                            if (toAdd !== null) {
-                                                settoCheckout([...toCheckout, { member: toAdd, amount: 0 }].sort((a, b) => a.member.id - b.member.id))
-                                                setselectedUser("")
+                                            if (tempValue === 0 || Number.isNaN(tempValue)) {
+                                                dispatch(openToast({ message: "Bitte Betrag eingeben", type: "error" }))
+                                            } else {
+                                                const toAdd = checkCanAddUser()
+                                                if (toAdd !== null) {
+                                                    settoCheckout([...toCheckout, { member: toAdd, amount: tempValue }].sort((a, b) => a.member.id - b.member.id))
+                                                    setselectedUser("")
+                                                    settempValue(0)
+                                                }
                                             }
                                         }
                                         }
@@ -264,12 +280,13 @@ const Checkout = (props: Props) => {
                 }
                 <Button
                     disabled={
-                        toCheckout.find(checkout => {
+                        (toCheckout.find(checkout => {
                             return checkout.amount === 0 || Number.isNaN(checkout.amount)
                         }
-                        ) !== undefined || toCheckout.length === 0
+                        ) !== undefined || toCheckout.length === 0) && !buttonDisabled
                     }
                     onClick={() => {
+                        setbuttonDisabled(true)
                         if (toCheckout.find(checkout => checkout.amount === 0) === undefined) {
                             doRequest("PUT", "checkout",
                                 {
@@ -295,6 +312,7 @@ const Checkout = (props: Props) => {
                                 }
                             })
                         }
+                        setbuttonDisabled(false)
                     }}
                 >
                     {ABRECHNUNG_ABSCHLIESSEN}
