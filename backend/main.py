@@ -35,6 +35,9 @@ with app.app_context():
 
     taskScheduler = TaskScheduler.TaskScheduler()
     taskScheduler.add_Daily_Task(db.hide_inactive)
+    if util.pretix_url is not None:
+        db.enable_disable_pretix_user()
+        taskScheduler.add_5min_Task(db.enable_disable_pretix_user)
     taskScheduler.start()
 
 
