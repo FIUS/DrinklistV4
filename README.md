@@ -102,6 +102,24 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Flag if users need to be activated by an admin when using openid connect for the first time
   * Defaults to: `true`
 
+### Integrating users from Pretix
+* `PRETIX_URL`
+  * The url of the pretix instance
+  * Defaults to: `None`
+* `CHECKIN_LIST_ID`
+  * The id of the checkin list in pretix
+  * Defaults to: `None`
+* `ORGANIZER`
+  * The organizer shot name of the event in pretix
+  * Defaults to: `None`
+* `EVENT`
+  * The event slug of the event in pretix
+  * Defaults to: `None`
+* `API_TOKEN`
+  * The api token of the pretix instance
+  * Defaults to: `None`
+
+
 ### Importing from old Drinklist
 * `X_AUTH_TOKEN`
   * If you need to import data from an old drinklist provide an admin api token and this drinklist will fetch all data from the old drinklist
