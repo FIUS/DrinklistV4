@@ -626,6 +626,78 @@ class Queries:
 
         self.session.commit()
 
+    def get_checkin_status_from_pretix(self):
+        # Define the endpoint
+        endpoint = f"{util.pretix_url}/api/v1/organizers/{util.pretix_organizer}/events/{util.pretix_event}/checkinlists/{util.pretix_checkin_list_id}/positions/"
+        headers = {
+            "Authorization": f"Token {util.pretix_api_token}",
+            "Content-Type": "application/json"
+        }
+
+        try:
+            # Send the request
+            response = requests.get(endpoint, headers=headers)
+            response.raise_for_status()  # Raise an error for unsuccessful requests
+
+            # Parse JSON response
+            data = response.json()
+
+            # Extract and print attendee name and check-in state
+            attendees = []
+
+            for position in data.get("results", []):
+                name = position.get("attendee_name", "No Name Provided")
+                checkin_state = position.get("checkins", [])
+
+                if len(checkin_state) > 0:
+                    checkin_state = checkin_state[0].get(
+                        "type", "exit") == "entry"
+                else:
+                    checkin_state = False
+                attendees.append((name, checkin_state))
+
+            nextPage = data.get("next")
+            while nextPage is not None:
+                response = requests.get(nextPage, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+                for position in data.get("results", []):
+                    name = position.get("attendee_name", "No Name Provided")
+                    checkin_state = position.get("checkins", [])
+
+                    if len(checkin_state) > 0:
+                        checkin_state = checkin_state[0].get(
+                            "type", "exit") == "entry"
+                    else:
+                        checkin_state = False
+                    attendees.append((name, checkin_state))
+                nextPage = data.get("next")
+
+            return attendees
+
+        except requests.exceptions.RequestException as e:
+            print("Error fetching check-in data:", e)
+            return []
+
+    def enable_disable_pretix_user(self):
+        print("Checking pretix check-in")
+        attendee_list = self.get_checkin_status_from_pretix()
+
+        for attendee in attendee_list:
+            name, checked_in = attendee
+            member: Member | None = self.session.query(
+                Member).filter_by(name=name.lower()).first()
+            if member is not None:
+                if checked_in:
+                    self.change_user_visibility(member.id, visibility=False)
+                else:
+                    self.change_user_visibility(member.id, visibility=True)
+            else:
+                print(f"User {name} not found in database")
+                # Add user to database
+                self.add_user(name, 0, util.standard_user_password,
+                              name, hidden=not checked_in)
+
     def add_token(self, token, member_id, time):
         session: Session = self.session.query(
             Session).filter_by(member_id=member_id).first()

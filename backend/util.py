@@ -68,6 +68,18 @@ OIDC_USER_INFO = os.environ.get(
 OIDC_USER_NEEDS_VERIFICATION = os.environ.get(
     "OIDC_USER_NEEDS_VERIFICATION")=="true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
 
+pretix_url = os.environ.get("PRETIX_URL") if os.environ.get(
+    "PRETIX_URL") else None
+pretix_checkin_list_id = os.environ.get("CHECKIN_LIST_ID") if os.environ.get(
+    "CHECKIN_LIST_ID") else None
+pretix_organizer = os.environ.get("ORGANIZER") if os.environ.get(
+    "ORGANIZER") else None
+pretix_event = os.environ.get("EVENT") if os.environ.get(
+    "EVENT") else None
+pretix_api_token = os.environ.get("API_TOKEN") if os.environ.get(
+    "API_TOKEN") else None
+
+
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
 
