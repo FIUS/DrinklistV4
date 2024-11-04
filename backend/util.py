@@ -74,14 +74,14 @@ CURRENT_VERSION = 0
 
 pretix_url = os.environ.get("PRETIX_URL") if os.environ.get(
     "PRETIX_URL") else None
-pretix_checkin_list_id = os.environ.get("CHECKIN_LIST_ID") if os.environ.get(
-    "CHECKIN_LIST_ID") else None
-pretix_organizer = os.environ.get("ORGANIZER") if os.environ.get(
-    "ORGANIZER") else None
-pretix_event = os.environ.get("EVENT") if os.environ.get(
-    "EVENT") else None
-pretix_api_token = os.environ.get("API_TOKEN") if os.environ.get(
-    "API_TOKEN") else None
+pretix_checkin_list_id = os.environ.get("PRETIX_CHECKIN_LIST_ID") if os.environ.get(
+    "PRETIX_CHECKIN_LIST_ID") else None
+pretix_organizer = os.environ.get("PRETIX_ORGANIZER") if os.environ.get(
+    "PRETIX_ORGANIZER") else None
+pretix_event = os.environ.get("PRETIX_EVENT") if os.environ.get(
+    "PRETIX_EVENT") else None
+pretix_api_token = os.environ.get("PRETIX_API_TOKEN") if os.environ.get(
+    "PRETIX_API_TOKEN") else None
 
 
 tempfile_path = "tempfiles"

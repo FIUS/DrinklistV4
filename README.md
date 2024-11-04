@@ -109,16 +109,16 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
 * `PRETIX_URL`
   * The url of the pretix instance
   * Defaults to: `None`
-* `CHECKIN_LIST_ID`
+* `PRETIX_CHECKIN_LIST_ID`
   * The id of the checkin list in pretix
   * Defaults to: `None`
-* `ORGANIZER`
+* `PRETIX_ORGANIZER`
   * The organizer shot name of the event in pretix
   * Defaults to: `None`
-* `EVENT`
+* `PRETIX_EVENT`
   * The event slug of the event in pretix
   * Defaults to: `None`
-* `API_TOKEN`
+* `PRETIX_API_TOKEN`
   * The api token of the pretix instance
   * Defaults to: `None`
 
