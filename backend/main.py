@@ -33,7 +33,7 @@ with app.app_context():
     db.convert_usernames_to_lower()
     db.add_aliases_if_non_existend()
 
-    taskScheduler = TaskScheduler.TaskScheduler()
+    taskScheduler = TaskScheduler.TaskScheduler(app)
     taskScheduler.add_Daily_Task(db.hide_inactive)
     if util.pretix_url is not None:
         db.enable_disable_pretix_user()
