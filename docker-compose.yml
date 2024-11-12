@@ -32,6 +32,11 @@ services:
       #- MAIL_USERNAME=
       #- MAIL_PASSWORD=
       #- MAIL_POSTFIX=
+      #- PRETIX_URL=
+      #- PRETIX_CHECKIN_LIST_ID=
+      #- PRETIX_ORGANIZER=
+      #- PRETIX_EVENT=
+      #- PRETIX_API_TOKEN=
   
   db:
     image: postgres
