@@ -17,9 +17,16 @@ const Login = (props: Props) => {
     const [disableLoginButton, setdisableLoginButton] = useState(false)
     const [username, setusername] = useState("")
     const [password, setpassword] = useState("")
+    
+    const clearCookies = () => {
+        //clear only username and password cookies
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "memberID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
 
     const login = () => {
         setdisableLoginButton(true);
+        clearCookies();
         (function () {
             var cookies = document.cookie.split("; ");
             for (var c = 0; c < cookies.length; c++) {
@@ -51,6 +58,7 @@ const Login = (props: Props) => {
 
     const loginOidc = async () => {
         setdisableLoginButton(true)
+        clearCookies();
         doGetRequest("start-oidc").then(value => {
             if (value.code === 200) {
                 console.log(value.content)
