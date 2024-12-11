@@ -161,10 +161,10 @@ const CheckoutEntry = (props: Props) => {
                 <Spacer vertical={40} />
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        {KASSE_NACH_ABRECHNUNG}: {props.checkout.currentCash}€
+                        {KASSE_NACH_ABRECHNUNG}: {props.checkout.currentCash.toFixed(2)}€
                     </Typography>
                     <Typography variant="h5">
-                        {EINNAHMEN}: {props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0)}€
+                        {EINNAHMEN}: {(props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0)).toFixed(2)}€
                     </Typography>
                     <Typography variant="h5">
                         {KASSE_DIFFERENZ}: {lostMoney().toFixed(2)}€

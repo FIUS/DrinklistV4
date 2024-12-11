@@ -269,11 +269,11 @@ const Checkout = (props: Props) => {
                                 variant='outlined'
                                 type='number'
                                 value={countedCash}
-                                onChange={(value) => { setcountedCash(parseFloat(value.target.value)) }}
+                                onChange={(value) => { setcountedCash(parseFloat(parseFloat(value.target.value).toFixed(2))) }}
                                 className={style.textfield}
                             />
                             <Typography variant="h5">
-                                {DIFFERENZ}: {countedCash - getNewCash()}€
+                                {DIFFERENZ}: {(countedCash - getNewCash()).toFixed(2)}€
                             </Typography>
                         </div>
                     </> : <></>
@@ -283,7 +283,7 @@ const Checkout = (props: Props) => {
                         (toCheckout.find(checkout => {
                             return checkout.amount === 0 || Number.isNaN(checkout.amount)
                         }
-                        ) !== undefined || toCheckout.length === 0) && !buttonDisabled
+                        ) !== undefined || (toCheckout.length === 0 && invoices.length === 0)) && !buttonDisabled
                     }
                     onClick={() => {
                         setbuttonDisabled(true)
@@ -329,14 +329,14 @@ const Checkout = (props: Props) => {
         if (checkouts.length === 0) {
             return []
         }
-        const entries = [[<CheckoutEntry checkout={checkouts[0]} />,checkouts[0].id]]
+        const entries = [[<CheckoutEntry checkout={checkouts[0]} />, checkouts[0].id]]
         let lastEntry = checkouts[0]
         checkouts.slice(1).forEach(value => {
-            entries.push([<CheckoutEntry prevCheckout={lastEntry} checkout={value} />,value.id]);
+            entries.push([<CheckoutEntry prevCheckout={lastEntry} checkout={value} />, value.id]);
             lastEntry = value;
         })
 
-        entries.sort((a:any,b:any) => b[1] - a[1])
+        entries.sort((a: any, b: any) => b[1] - a[1])
 
         return entries.map(value => value[0])
     }
