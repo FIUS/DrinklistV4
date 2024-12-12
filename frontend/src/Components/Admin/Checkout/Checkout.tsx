@@ -31,11 +31,14 @@ const Checkout = (props: Props) => {
     const [cashCheckboxChecked, setcashCheckboxChecked] = useState(false)
     const [tempValue, settempValue] = useState(0)
     const [buttonDisabled, setbuttonDisabled] = useState(false)
-
+    const [reloadCheckouts, setreloadCheckouts] = useState(false)
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const dispatch = useDispatch()
 
     useEffect(() => {
+        if (reloadCheckouts) {
+            setreloadCheckouts(false)
+        }
         doGetRequest("checkout").then(value => {
             if (value.code === 200) {
                 setcheckouts(value.content)
@@ -48,7 +51,7 @@ const Checkout = (props: Props) => {
                     dispatch(setMembers(value.content))
                 }
             })
-    }, [dispatch, common.members])
+    }, [dispatch, common.members, reloadCheckouts])
 
     const resetAdd = () => {
         setselectedUser("")
@@ -338,10 +341,10 @@ const Checkout = (props: Props) => {
         if (checkouts.length === 0) {
             return []
         }
-        const entries: Array<[JSX.Element, number]> = [[<CheckoutEntry checkout={checkouts[0]} />, checkouts[0].id]]
+        const entries: Array<[JSX.Element, number]> = [[<CheckoutEntry checkout={checkouts[0]} reload={() => { setreloadCheckouts(true) }} />, checkouts[0].id]]
         let lastEntry = checkouts[0]
         checkouts.slice(1).forEach(value => {
-            entries.push([<CheckoutEntry prevCheckout={lastEntry} checkout={value} />, value.id]);
+            entries.push([<CheckoutEntry prevCheckout={lastEntry} checkout={value} reload={() => { setreloadCheckouts(true) }} />, value.id]);
             lastEntry = value;
         })
 

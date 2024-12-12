@@ -6,13 +6,16 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import style from './checkout.module.scss';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { doGetRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doRequest } from '../../Common/StaticFunctions';
 import { Checkout } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
-import { EINNAHMEN, EINZAHLUNGEN, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, RUECKGAENGIG, VALUE } from '../../Common/Internationalization/i18n';
+import { EINNAHMEN, EINZAHLUNGEN, ERFOLGREICH_RUECKGAENIG_GEMACHT, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, RUECKGAENGIG, VALUE } from '../../Common/Internationalization/i18n';
+import { useDispatch } from 'react-redux';
+import { openErrorToast, openToast } from '../../../Actions/CommonAction';
 
 type Props = {
     checkout: Checkout,
+    reload: () => void,
     prevCheckout?: Checkout,
     firstElement?: boolean
 }
@@ -21,6 +24,8 @@ const CheckoutEntry = (props: Props) => {
 
     const [isExpanded, setisExpanded] = useState(false)
     const [loadedCheckout, setloadedCheckout] = useState<Checkout>()
+    const [undoInProgress, setundoInProgress] = useState(false)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if (isExpanded) {
@@ -171,7 +176,18 @@ const CheckoutEntry = (props: Props) => {
                     <Typography variant="h5">
                         {KASSE_DIFFERENZ}: {lostMoney().toFixed(2)}€
                     </Typography>
-                    <Button variant='outlined' color='error' disabled={!props.firstElement}>
+                    <Button variant='outlined' color='error' disabled={!props.firstElement || undoInProgress} onClick={() => {
+                        setundoInProgress(true)
+                        doRequest("DELETE", "checkout/" + props.checkout.id, "").then(value => {
+                            if (value.code === 200) {
+                                props.reload()
+                                dispatch(openToast({ message: ERFOLGREICH_RUECKGAENIG_GEMACHT }))
+                            } else {
+                                dispatch(openErrorToast())
+                            }
+                            setundoInProgress(false)
+                        })
+                    }}>
                         {RUECKGAENGIG}
                     </Button>
                 </div>

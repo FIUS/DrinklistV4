@@ -641,6 +641,14 @@ class get_checkout_expanded(Resource):
         """
         return util.build_response(db.get_checkout_expanded(checkout_id))
 
+    @admin
+    def delete(self, checkout_id):
+        """
+        Delete a checkout
+        """
+        db.delete_checkout(checkout_id)
+        return util.build_response("Checkout deleted")
+
 
 @api.route('/settings/backup')
 class get_backup(Resource):

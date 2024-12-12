@@ -238,6 +238,18 @@ class Queries:
             output.append(checkout.dict())
         return output
 
+    def delete_checkout(self, checkout_id):
+        checkout: Checkout = self.session.query(
+            Checkout).filter_by(id=checkout_id).first()
+        transactions: list[Transaction] = self.session.query(
+            Transaction).filter_by(checkout_id=checkout_id).all()
+
+        for t in transactions:
+            self.session.delete(t)
+
+        self.session.delete(checkout)
+        self.session.commit()
+
     def get_checkout_expanded(self, id):
         checkout: Checkout = self.session.query(
             Checkout).filter_by(id=id).first()
