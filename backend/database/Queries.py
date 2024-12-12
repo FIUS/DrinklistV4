@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import session
 from sqlalchemy.sql import func
 from database.Models import *
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from typing import List
 import constants
 import os
@@ -18,6 +18,7 @@ from sqlalchemy import extract
 from difflib import SequenceMatcher
 from sqlalchemy import inspect, text
 import database.Migrations
+import math
 
 
 class Queries:
@@ -241,7 +242,9 @@ class Queries:
         if checkouts['newCash'] is not None:
             checkout: Checkout = Checkout(current_cash=checkouts['newCash'])
         else:
-            db_checkouts: Checkout = self.session.query(Checkout).all()
+            db_checkouts: Checkout = self.session.query(Checkout).order_by(
+                asc(Checkout.id)).all()
+
             last_db_checkout_cash = None
             if len(db_checkouts) > 0:
                 last_db_checkout_cash = db_checkouts[-1].current_cash
@@ -258,6 +261,8 @@ class Queries:
 
             last_db_checkout_cash += sum_members
             last_db_checkout_cash -= sum_invoice
+
+            last_db_checkout_cash = math.floor(last_db_checkout_cash*100)/100
 
             checkout: Checkout = Checkout(current_cash=last_db_checkout_cash)
         self.session.add(checkout)
@@ -282,7 +287,7 @@ class Queries:
 
         self.session.commit()
 
-    def get_checkout_mail(self,memberIDs):
+    def get_checkout_mail(self, memberIDs):
         members: list[Member] = self.session.query(Member).all()
         checkouts = self.get_checkouts()
         if len(checkouts) > 2:
@@ -294,7 +299,7 @@ class Queries:
             for m in members:
                 if m.id not in memberIDs:
                     continue
-                
+
                 transactions: list[Transaction] = self.session.query(Transaction).filter(
                     Transaction.date > last_date, Transaction.member_id == m.id).all()
                 temp_dict = {}
