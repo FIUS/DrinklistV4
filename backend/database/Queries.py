@@ -286,7 +286,7 @@ class Queries:
 
         for c in checkouts['invoices']:
             amount = c["amount"]
-            name = c["name"]
+            name = "Rechnung: "+c["name"]
             self.session.add(Transaction(
                 description=name, member_id=1, amount=amount, checkout_id=checkout.id))
 
