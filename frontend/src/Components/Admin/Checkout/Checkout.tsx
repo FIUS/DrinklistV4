@@ -267,9 +267,18 @@ const Checkout = (props: Props) => {
                             <TextField
                                 label={NEUER_KASSENSTAND}
                                 variant='outlined'
-                                type='number'
+                                type='text'
                                 value={countedCash}
-                                onChange={(value) => { setcountedCash(parseFloat(parseFloat(value.target.value).toFixed(2))) }}
+                                onChange={(value) => {
+                                    if (value.target.value === "-") {
+                                        setcountedCash(-1)
+                                    } else if (Number.isNaN(parseFloat(value.target.value))) {
+                                        setcountedCash(0)
+                                    } else {
+                                        setcountedCash(parseFloat(parseFloat(value.target.value).toFixed(2)))
+                                    }
+
+                                }}
                                 className={style.textfield}
                             />
                             <Typography variant="h5">
