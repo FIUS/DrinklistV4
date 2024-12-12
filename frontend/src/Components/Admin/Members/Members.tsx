@@ -1,6 +1,6 @@
-import { Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
+import { ArrowDownward, ArrowUpward, Delete, Money, Person, VisibilityOff } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer';
@@ -35,6 +35,7 @@ const Members = (props: Props) => {
     const [userToDelete, setuserToDelete] = useState<{ name: string, id: number }>({ name: "", id: -1 })
     const [memberChangeOpen, setmemberChangeOpen] = useState(false)
     const [memberToChange, setmemberToChange] = useState<Member | null>(null)
+    const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' | null }>({ key: null, direction: null });
 
     useEffect(() => {
 
@@ -67,6 +68,49 @@ const Members = (props: Props) => {
             (value.id.toString().toLowerCase().includes(searchID.toLowerCase()) || searchID === "")) ||
             (searchName === "" && searchID === "")
     })
+
+    const filteredAndSortedMembers = filteredMembers ? [...filteredMembers].sort((a: any, b: any) => {
+        if (sortConfig.key) {
+            const aValue = a[sortConfig.key];
+            const bValue = b[sortConfig.key];
+
+            if (aValue === bValue) return 0;
+
+            const sortDirection = sortConfig.direction === 'asc' ? 1 : -1;
+            return aValue > bValue ? sortDirection : -sortDirection;
+        }
+        // Default sorting by startNumber when no column is actively sorted
+        return format("{0} ({1})", a.name, a.alias) > format("{0} ({1})", b.name, b.alias) ? 1 : -1;
+    }) : [];
+
+    const handleSort = (key: string) => {
+        if (sortConfig.key === key) {
+            if (sortConfig.direction === 'asc') {
+                // Change from asc to desc
+                setSortConfig({ key, direction: 'desc' });
+            } else if (sortConfig.direction === 'desc') {
+                // Change from desc to default (startNumber sorting)
+                setSortConfig({ key: null, direction: null });
+            } else {
+                // Reset to asc
+                setSortConfig({ key, direction: 'asc' });
+            }
+        } else {
+            // Initial sort is ascending
+            setSortConfig({ key, direction: 'asc' });
+        }
+    };
+
+    const renderSortIcon = (key: string) => {
+        if (sortConfig.key === key) {
+            if (sortConfig.direction === 'asc') {
+                return <ArrowUpward fontSize="small" />;
+            } else if (sortConfig.direction === 'desc') {
+                return <ArrowDownward fontSize="small" />;
+            }
+        }
+        return <ArrowDownward fontSize="small" style={{ visibility: "hidden" }} />
+    };
 
     return (
         <>
@@ -167,10 +211,27 @@ const Members = (props: Props) => {
                     <Table aria-label="simple table" size='small'>
                         <TableHead>
                             <TableRow>
-                                <TableCell className={style.searchID}>#</TableCell>
-                                <TableCell>{NAME}</TableCell>
-                                <TableCell>{KONTO}</TableCell>
-                                <TableCell>{MODIFIZIEREN}</TableCell>
+                                <TableCell className={style.searchID} onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
+                                    <Stack flexDirection="row" alignItems="center" gap={1}>
+                                        <div>#</div>
+                                        {renderSortIcon('id')}
+                                    </Stack>
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                                    <Stack flexDirection="row" alignItems="center" gap={1}>
+                                        <div>{NAME}</div>
+                                        {renderSortIcon('name')}
+                                    </Stack>
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('balance')} style={{ cursor: 'pointer' }}>
+                                    <Stack flexDirection="row" alignItems="center" gap={1}>
+                                        <div>{KONTO}</div>
+                                        {renderSortIcon('balance')}
+                                    </Stack>
+                                </TableCell>
+                                <TableCell>
+                                    {MODIFIZIEREN}
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -203,7 +264,7 @@ const Members = (props: Props) => {
                                 <TableCell></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
-                            {filteredMembers?.map(value => {
+                            {filteredAndSortedMembers?.map(value => {
                                 return <TableRow
                                     key={value.id}
                                     className={value.hidden ? style.hidden : ""}
