@@ -584,8 +584,10 @@ class undo_transaction(Resource):
                 if not is_self_or_admin(request, transaction['memberID']):
                     return util.build_response("NotYourTransaction", code=412)
 
-        db.delete_transaction(transaction_id)
-        return util.build_response("Transaction undone")
+        if db.delete_transaction(transaction_id):
+            return util.build_response("Transaction undone")
+        else:
+            return util.build_response("Transaction cannot be deleted", code=403)
 
 
 member_model = api.model('Member-Checkout', {
@@ -616,7 +618,7 @@ class do_checkout(Resource):
         db.do_checkout(request.json)
         memberids = [m["memberID"] for m in request.json['members']]
         mail_infos = db.get_checkout_mail(memberids)
-        
+
         if util.mail_server is not None:
             mail.send_checkout_mails(mail_infos)
 

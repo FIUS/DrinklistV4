@@ -193,6 +193,10 @@ class Queries:
     def delete_transaction(self, transaction_id):
         transaction: Transaction = self.session.query(
             Transaction).filter_by(id=transaction_id).first()
+        if transaction.checkout_id is not None:
+            # Cannot delete a transaction that is part of a checkout
+            return False
+
         member: Member = self.session.query(Member).filter_by(
             id=transaction.member_id).first()
         member.balance -= transaction.amount
@@ -209,6 +213,7 @@ class Queries:
         self.session.delete(transaction)
 
         self.session.commit()
+        return True
 
     def delete_user(self, member_id):
         self.session.delete(self.session.query(
