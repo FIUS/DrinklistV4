@@ -5,15 +5,16 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import style from './checkout.module.scss';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { doGetRequest } from '../../Common/StaticFunctions';
 import { Checkout } from '../../../types/ResponseTypes';
 import Spacer from '../../Common/Spacer';
-import { EINNAHMEN, EINZAHLUNGEN, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, VALUE } from '../../Common/Internationalization/i18n';
+import { EINNAHMEN, EINZAHLUNGEN, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, RUECKGAENGIG, VALUE } from '../../Common/Internationalization/i18n';
 
 type Props = {
     checkout: Checkout,
-    prevCheckout?: Checkout
+    prevCheckout?: Checkout,
+    firstElement?: boolean
 }
 
 const CheckoutEntry = (props: Props) => {
@@ -160,6 +161,7 @@ const CheckoutEntry = (props: Props) => {
                 </TableContainer>
                 <Spacer vertical={40} />
                 <div className={style.entryBottomInfo}>
+
                     <Typography variant="h5">
                         {KASSE_NACH_ABRECHNUNG}: {props.checkout.currentCash.toFixed(2)}€
                     </Typography>
@@ -169,6 +171,9 @@ const CheckoutEntry = (props: Props) => {
                     <Typography variant="h5">
                         {KASSE_DIFFERENZ}: {lostMoney().toFixed(2)}€
                     </Typography>
+                    <Button variant='outlined' color='error' disabled={!props.firstElement}>
+                        {RUECKGAENGIG}
+                    </Button>
                 </div>
             </AccordionDetails>
         </Accordion>

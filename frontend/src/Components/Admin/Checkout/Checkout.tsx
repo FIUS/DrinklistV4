@@ -338,7 +338,7 @@ const Checkout = (props: Props) => {
         if (checkouts.length === 0) {
             return []
         }
-        const entries = [[<CheckoutEntry checkout={checkouts[0]} />, checkouts[0].id]]
+        const entries: Array<[JSX.Element, number]> = [[<CheckoutEntry checkout={checkouts[0]} />, checkouts[0].id]]
         let lastEntry = checkouts[0]
         checkouts.slice(1).forEach(value => {
             entries.push([<CheckoutEntry prevCheckout={lastEntry} checkout={value} />, value.id]);
@@ -346,7 +346,8 @@ const Checkout = (props: Props) => {
         })
 
         entries.sort((a: any, b: any) => b[1] - a[1])
-
+        const firstElement = React.cloneElement(entries[0][0], { ...entries[0][0].props, firstElement: true })
+        entries[0][0] = firstElement
         return entries.map(value => value[0])
     }
 
