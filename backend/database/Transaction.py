@@ -28,7 +28,8 @@ class Transaction(db.Model):
             "memberID": self.member_id,
             "amount": self.amount,
             "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            "revertable": self.date+timedelta(minutes=util.undo_timelimit) >= datetime.now()
+            "revertable": self.date+timedelta(minutes=util.undo_timelimit) >= datetime.now(),
+            "partOfCheckout": self.checkout_id is not None
         }
 
         if self.member is not None:

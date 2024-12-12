@@ -69,7 +69,7 @@ const Transactions = (props: Props) => {
                                 }
                             )
                             setwarningOpen(true)
-                        }}>
+                        }} disabled={value.partOfCheckout}>
                             <Undo />
                         </Button>
                     </TableCell>
