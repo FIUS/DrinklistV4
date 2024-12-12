@@ -229,8 +229,10 @@ class Queries:
         self.session.commit()
 
     def get_checkouts(self):
-        checkouts = self.session.query(Checkout).all()
+        checkouts = self.session.query(Checkout).order_by(
+            asc(Checkout.id)).all()
         output = []
+
         for c in checkouts:
             checkout: Checkout = c
             output.append(checkout.dict())
