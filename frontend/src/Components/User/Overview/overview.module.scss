@@ -1,15 +1,15 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .outterContainer {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .headline {
-    padding-top: $padding;
+    padding-top: variables.$padding;
 }
 
 .input {
@@ -19,16 +19,16 @@
 
 .buttonArea {
     display: grid;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
     justify-content: center;
     width: 100%;
-    padding: $padding;
+    padding: variables.$padding;
 
-    @media (min-width:$PHONE_SIZE_THRESHOLD) {
+    @media (min-width:variables.$PHONE_SIZE_THRESHOLD) {
         grid-template-columns: repeat(auto-fill, 200px);
     }
 
-    @media (max-width:$PHONE_SIZE_THRESHOLD) {
+    @media (max-width:variables.$PHONE_SIZE_THRESHOLD) {
         grid-template-columns: repeat(auto-fill, 100%);
     }
 
@@ -36,14 +36,14 @@
 
 .historyContainer {
     overflow: hidden;
-    padding: $padding;
+    padding: variables.$padding;
 }
 
 .textfieldForm {
     width: 100%;
     max-width: 900px;
-    padding-left: $padding;
-    padding-right: $padding;
+    padding-left: variables.$padding;
+    padding-right: variables.$padding;
     display: flex;
     justify-content: center;
 }

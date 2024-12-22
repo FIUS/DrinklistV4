@@ -1,14 +1,14 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .editMemberRow {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .editMemberContainer {
     display: flex;
     flex-direction: column;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }

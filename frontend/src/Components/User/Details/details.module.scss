@@ -1,25 +1,25 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .balanceContainer {
     width: fit-content;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .balanceTop {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    padding: $padding;
-    gap: $flex-gap;
+    padding: variables.$padding;
+    gap: variables.$flex-gap;
     max-width: 440px;
 }
 
 .drinkButtonContainer {
     display: flex;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 65vw;
@@ -28,13 +28,13 @@
 .balanceBoxContainer {
     display: flex;
     flex-direction: column;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .buyDrinkContainer {
     display: flex;
     flex-direction: column;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
     min-width: 330px;
     flex-grow: 1;
 }
@@ -42,20 +42,20 @@
 .buyDrinkContainerInner {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    grid-gap: $flex-gap;
+    grid-gap: variables.$flex-gap;
 }
 
 .details {
     display: flex;
-    gap: calc(3 * $flex-gap);
-    padding: $padding;
+    gap: calc(3 * variables.$flex-gap);
+    padding: variables.$padding;
     flex-wrap: wrap;
 }
 
 .historyContainer {
     display: flex;
     flex-direction: column;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
     min-width: 340px;
     max-width: 410px;
 }
@@ -66,7 +66,7 @@
     display: flex;
     justify-content: space-around;
     width: 100%;
-    padding: calc($padding/2);
+    padding: calc(variables.$padding/2);
 }
 
 .footerButton {
@@ -87,14 +87,14 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .transferBox{
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    padding: $flex-gap;
+    padding: variables.$flex-gap;
     width: 100%;
 }
 

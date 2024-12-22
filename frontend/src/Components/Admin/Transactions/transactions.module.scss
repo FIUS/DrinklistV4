@@ -1,7 +1,7 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .table{
-    padding: $padding;
+    padding: variables.$padding;
 }
 
 .firstRowAlign{

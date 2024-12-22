@@ -1,4 +1,4 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .footer {
     position: fixed;
@@ -6,7 +6,7 @@
     display: flex;
     justify-content: space-around;
     width: 100%;
-    padding: $padding;
+    padding: variables.$padding;
     z-index: 20000000;
 }
 
