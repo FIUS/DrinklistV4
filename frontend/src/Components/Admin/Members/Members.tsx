@@ -178,7 +178,7 @@ const Members = (props: Props) => {
                         />
                     </div>
                     <Spacer vertical={10} />
-                    <Button variant='outlined' onClick={(value) => {
+                    <Button variant='outlined' onClick={() => {
                         if (name !== "" && password !== "") {
                             doPostRequest("users/add",
                                 {

@@ -88,7 +88,7 @@ const Overview = (props: Props) => {
         })
 
         const dataList: Array<{ date: Date, "Anzahl Transaktionen": number }> = []
-        output.forEach((value, key) => dataList.push({ date: value.date, "Anzahl Transaktionen": value.number }))
+        output.forEach((value, _) => dataList.push({ date: value.date, "Anzahl Transaktionen": value.number }))
 
         const sortedList = dataList.sort((value1, value2) => {
             const a = new Date(value1.date).valueOf();

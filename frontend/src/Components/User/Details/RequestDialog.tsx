@@ -68,7 +68,7 @@ const RequestDialog = (props: Props) => {
         }).splice(0, 5)
 
         const memberNames: [string, number][] | undefined = common.members?.map(member => [safeMemberName(member), member.id])
-        let transactionCount: { [key: string]: [number, number] } = {}
+        const transactionCount: { [key: string]: [number, number] } = {}
         memberNames?.forEach(member => transactionCount[member[0]] = [member[1], 0])
         transactions?.forEach(t => {
             memberNames?.forEach(m => {

@@ -22,7 +22,7 @@ export default [
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
-          "argsIgnorePattern": "^props$"
+          "argsIgnorePattern": "^props$|^_$",
         }
       ],
       "@typescript-eslint/triple-slash-reference": 'off',

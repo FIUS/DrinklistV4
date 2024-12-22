@@ -55,7 +55,7 @@ const reducer = (state = initialState, { type, payload }: {
     }
 }) => {
 
-    let newState = { ...state }
+    const newState = { ...state }
     switch (type) {
         case "ADD_DAY_TO_EVENT_CREATION":
             newState.timeslots.days.push(payload)

@@ -26,34 +26,34 @@ const AvailableDrinkCard = (props: Props) => {
             <Spacer vertical={10} />
             {props.drinks?.map(drink => {
                 return <><Button variant='outlined' className={style.button}>
-                    <div className={style.clickable}  onClick={(value) => {
-                    doPostRequest("drinks/buy",
-                        {
-                            drinkID: drink.id,
-                            memberID: props.memberID
-                        }).then(value => {
-                            if (value.code === 200) {
-                                dispatch(openToast({ message: format(ABGESTRICHEN, drink.name) }))
-                                doGetRequest("drinks").then((value) => {
-                                    if (value.code === 200) {
-                                        dispatch(setDrinks(value.content))
-                                    }
-                                })
-                                doGetRequest("users/" + props.memberID + "/history").then((value) => {
-                                    if (value.code === 200) {
-                                        dispatch(setHistory(value.content))
-                                    }
-                                })
-                                doGetRequest("users").then((value) => {
-                                    if (value.code === 200) {
-                                        dispatch(setMembers(value.content))
-                                    }
-                                })
-                            } else {
-                                dispatch(openErrorToast())
-                            }
-                        })
-                }}>
+                    <div className={style.clickable} onClick={() => {
+                        doPostRequest("drinks/buy",
+                            {
+                                drinkID: drink.id,
+                                memberID: props.memberID
+                            }).then(value => {
+                                if (value.code === 200) {
+                                    dispatch(openToast({ message: format(ABGESTRICHEN, drink.name) }))
+                                    doGetRequest("drinks").then((value) => {
+                                        if (value.code === 200) {
+                                            dispatch(setDrinks(value.content))
+                                        }
+                                    })
+                                    doGetRequest("users/" + props.memberID + "/history").then((value) => {
+                                        if (value.code === 200) {
+                                            dispatch(setHistory(value.content))
+                                        }
+                                    })
+                                    doGetRequest("users").then((value) => {
+                                        if (value.code === 200) {
+                                            dispatch(setMembers(value.content))
+                                        }
+                                    })
+                                } else {
+                                    dispatch(openErrorToast())
+                                }
+                            })
+                    }}>
                         <div>{drink.name}</div><Spacer horizontal={10} /> <div className={style.dots}>{drink.price.toFixed(2)}€</div>
                     </div>
                     <Spacer horizontal={5} />
@@ -62,7 +62,7 @@ const AvailableDrinkCard = (props: Props) => {
                         value={common.favorites?.includes(drink.id) ? 1 : 0}
                         max={1}
                         onChange={
-                            (value) => {
+                            () => {
                                 let url = "add"
                                 let method = "PUT"
                                 if (common.favorites?.includes(drink.id)) {
@@ -82,7 +82,7 @@ const AvailableDrinkCard = (props: Props) => {
                             }
                         } />
                 </Button>
-                <Spacer vertical={5} />
+                    <Spacer vertical={5} />
                 </>
             })}
         </Paper>

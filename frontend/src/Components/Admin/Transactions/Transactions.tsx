@@ -59,7 +59,7 @@ const Transactions = (props: Props) => {
                         {datetimeToString(new Date(value.date))}
                     </TableCell>
                     <TableCell>
-                        <Button onClick={(s_value) => {
+                        <Button onClick={() => {
                             settransactionToDelete(
                                 {
                                     id: value.id,

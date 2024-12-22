@@ -42,7 +42,7 @@ const DrinkButton = (props: Props) => {
             <Box className={style.container} >
 
                 <Button className={style.button} variant='contained'>
-                    <div className={style.innerbutton} onClick={(value) => {
+                    <div className={style.innerbutton} onClick={() => {
                         doPostRequest("drinks/buy",
                             {
                                 drinkID: props.drink.id,
@@ -93,7 +93,7 @@ const DrinkButton = (props: Props) => {
                         value={common.favorites?.includes(props.drink.id) ? 1 : 0}
                         max={1}
                         onChange={
-                            (value) => {
+                            () => {
                                 let url = "add"
                                 let method = "PUT"
                                 if (common.favorites?.includes(props.drink.id)) {
