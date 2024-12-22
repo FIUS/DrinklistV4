@@ -21,6 +21,7 @@ declare global {
       DOMAIN: string,
       MOBILE_THRESHOLD: number,
       ICON_COLOR: string,
+      ICON_COLOR_SECONDARY: string,
       ORGANISATION_NAME: string,
       ABOUT_LINK: string,
       PRIVACY_LINK: string,

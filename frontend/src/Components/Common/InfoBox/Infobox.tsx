@@ -5,14 +5,15 @@ import style from './infobox.module.scss';
 type Props = {
     headline: string,
     children: JSX.Element,
-    noPadding?: boolean
+    noPadding?: boolean,
+    width?: string
 }
 
 const Infobox = (props: Props) => {
     return (
-        <div className={props.noPadding ? style.tableContainerNoPadding : style.tableContainer}>
+        <div className={props.noPadding ? style.tableContainerNoPadding : style.tableContainer} >
             <TableContainer component={Paper} className={style.table}>
-                <Table aria-label="simple table">
+                <Table aria-label="simple table" style={{ width: props.width }}>
                     <TableHead >
                         <TableRow >
                             <TableCell><Typography variant='h5'>{props.headline}</Typography></TableCell>
