@@ -24,9 +24,10 @@ import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
-import { ABRECHNUNGEN, EINSTELLUNGEN, GELD_ANFORDERN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, TRANSAKTIONEN, UEBERWEISEN } from '../Internationalization/i18n';
+import { ABRECHNUNGEN, EINSTELLUNGEN, GELD_ANFORDERN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, STATISTIKEN, TRANSAKTIONEN, UEBERWEISEN } from '../Internationalization/i18n';
 import Cookies from 'js-cookie';
 import { setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 type Props = {}
 
@@ -163,6 +164,14 @@ const TopBar = (props: Props) => {
                             <AccountBalanceIcon />
                         </ListItemIcon>
                         <ListItemText primary={ABRECHNUNGEN} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/statistics")}>
+                        <ListItemIcon>
+                            < InsertChartIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={STATISTIKEN} />
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
