@@ -10,11 +10,11 @@ import { ABBRECHEN, ANFRAGE_SENDEN, BETRAG, GELD_ANFORDERN, OPTIONAL, SCHLIESSE_
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import {  doPostRequest } from '../../Common/StaticFunctions';
+import { doPostRequest } from '../../Common/StaticFunctions';
 
 import Typography from '@mui/material/Typography';
 
-// eslint-disable-next-line
+
 import style from './details.module.scss'
 import { safeMemberName } from '../../Common/StaticFunctionsTyped';
 import UserBox from './UserBox';
@@ -46,7 +46,7 @@ const RequestDialog = (props: Props) => {
             setselectedUsers([...selectedUsers, selectedUser])
             setselectedUser({ "name": "", "id": -1 })
         }
-    }, [selectedUser,selectedUsers])
+    }, [selectedUser, selectedUsers])
 
     const resetInput = () => {
         setselectedUser({ "name": "", "id": -1 })
@@ -60,7 +60,7 @@ const RequestDialog = (props: Props) => {
             member.alias.toLowerCase().includes(search.toLowerCase())
     }
 
-    const userAmountDivide=(!includeUser?selectedUsers.length:selectedUsers.length+1)
+    const userAmountDivide = (!includeUser ? selectedUsers.length : selectedUsers.length + 1)
 
     const filterTransactions = () => {
         const transactions = common.history?.filter(transaction => transaction.memberID === props.member.id).filter(t => {
@@ -68,7 +68,7 @@ const RequestDialog = (props: Props) => {
         }).splice(0, 5)
 
         const memberNames: [string, number][] | undefined = common.members?.map(member => [safeMemberName(member), member.id])
-        var transactionCount: { [key: string]: [number, number] } = {}
+        let transactionCount: { [key: string]: [number, number] } = {}
         memberNames?.forEach(member => transactionCount[member[0]] = [member[1], 0])
         transactions?.forEach(t => {
             memberNames?.forEach(m => {

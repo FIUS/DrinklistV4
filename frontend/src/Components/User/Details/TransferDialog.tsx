@@ -19,7 +19,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Picker from '@emoji-mart/react'
-// eslint-disable-next-line
+
 import style from './details.module.scss'
 import { safeMemberName } from '../../Common/StaticFunctionsTyped';
 import UserBox from './UserBox';
@@ -58,10 +58,10 @@ const TransferDialog = (props: Props) => {
     const filterTransactions = () => {
         const transactions = common.history?.filter(transaction => transaction.memberID === props.member.id).filter(t => {
             return t.description.toLocaleLowerCase().includes("transfer")
-        }).splice(0,5)
-        
+        }).splice(0, 5)
+
         const memberNames: [string, number][] | undefined = common.members?.map(member => [safeMemberName(member), member.id])
-        var transactionCount: { [key: string]: [number, number] } = {}
+        let transactionCount: { [key: string]: [number, number] } = {}
         memberNames?.forEach(member => transactionCount[member[0]] = [member[1], 0])
         transactions?.forEach(t => {
             memberNames?.forEach(m => {
@@ -74,7 +74,7 @@ const TransferDialog = (props: Props) => {
         const transactionCountArray: Array<[string, number, number]> = Object.keys(transactionCount).map((key) => [key, ...transactionCount[key]]);
         // Sort the array based on the second element (high to low)
         transactionCountArray.sort((first, second) => second[2] - first[2]);
-        
+
         // Return the first 2 elements
         return transactionCountArray.slice(0, 2)
     }

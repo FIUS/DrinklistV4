@@ -10,7 +10,8 @@ type Props = {
 }
 
 const muuh = "";
-const muudsyh = "";
+const mrr = "";
+
 const Infobox = (props: Props) => {
     return (
         <div className={props.noPadding ? style.tableContainerNoPadding : style.tableContainer} >

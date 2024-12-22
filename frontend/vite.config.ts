@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { defineConfig, loadEnv, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
-
+import eslint from 'vite-plugin-eslint';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -19,6 +19,11 @@ export default defineConfig(({ mode }) => {
 			basePlugin(),
 			importPrefixPlugin(),
 			htmlPlugin(mode),
+			eslint({
+				cache: false, // Disable cache to see errors in real-time during development
+				include: ['src/**/*.ts', 'src/**/*.tsx'], // Ensure it checks TypeScript files,
+				failOnError: false, // Enable error messages in the console
+			}),
 		],
 	};
 });
@@ -32,8 +37,8 @@ function setEnv(mode: string) {
 	const { homepage } = JSON.parse(readFileSync("package.json", "utf-8"));
 	process.env.PUBLIC_URL ||= homepage
 		? `${homepage.startsWith("http") || homepage.startsWith("/")
-				? homepage
-				: `/${homepage}`
+			? homepage
+			: `/${homepage}`
 			}`.replace(/\/$/, "")
 		: "";
 }

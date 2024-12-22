@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Spacer from '../../Common/Spacer';
 import { Button } from '@mui/material';
 
-// eslint-disable-next-line
+
 import style from './details.module.scss'
 import { ANFRAGE_GESENDET, PERSONEN_HABEN_BENACHRICHTIGUNG_BEKOMMEN, SCHLIESSEN } from '../../Common/Internationalization/i18n';
 
@@ -22,7 +22,7 @@ const RequestConfirmation = (props: Props) => {
                 <DialogContentText>
                     {PERSONEN_HABEN_BENACHRICHTIGUNG_BEKOMMEN}
                 </DialogContentText>
-                
+
                 <Spacer vertical={30} />
                 <Button onClick={() => { props.close() }}>
                     {SCHLIESSEN}
