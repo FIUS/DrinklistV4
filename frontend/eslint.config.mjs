@@ -20,7 +20,7 @@ export default [
     rules: {
       "react/react-in-jsx-scope": 'off',
       "@typescript-eslint/no-unused-vars": [
-        "error",
+        "warn",
         {
           "argsIgnorePattern": "^props$|^_$",
         }
@@ -29,7 +29,6 @@ export default [
       "@typescript-eslint/no-empty-object-type": 'off',
       "@typescript-eslint/no-wrapper-object-types": 'off',
       "react/jsx-key": 'off',
-      //"no-var": 'off',
       "@typescript-eslint/no-explicit-any": 'off',
     },
 

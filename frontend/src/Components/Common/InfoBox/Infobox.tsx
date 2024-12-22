@@ -9,8 +9,6 @@ type Props = {
     width?: string
 }
 
-const muuh = "";
-const mrr = "";
 
 const Infobox = (props: Props) => {
     return (
