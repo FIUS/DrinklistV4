@@ -9,6 +9,7 @@ import eslint from 'vite-plugin-eslint';
 export default defineConfig(({ mode }) => {
 	setEnv(mode);
 	return {
+		base: "/",
 		plugins: [
 			react(),
 			tsconfigPaths(),
@@ -25,6 +26,18 @@ export default defineConfig(({ mode }) => {
 				failOnError: false, // Enable error messages in the console
 			}),
 		],
+		build: {
+			rollupOptions: {
+				output: {
+					// Add chunking behavior if needed
+				},
+			},
+		},
+		resolve: {
+			alias: {
+				'@': '/src',
+			},
+		},
 	};
 });
 

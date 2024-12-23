@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build-stage
 
 # set working directory
 WORKDIR /app
@@ -10,12 +10,17 @@ ENV PATH=/app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install
-RUN npm install -g serve
 
 # add app
 COPY . ./
+RUN rm public/environment/env.js
 
 RUN npm run build 
+
+FROM node:20-alpine AS production-stage
+WORKDIR /app
+COPY --from=build-stage /app/build /app/build
+RUN npm install -g serve
 
 # start app
 CMD ["serve", "-s", "build", "-l", "80"]

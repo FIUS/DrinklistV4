@@ -47,7 +47,7 @@ function App() {
 
   return (
     <ThemeProvider theme={themes[themeCookie]}>
-      <Router>
+      <Router basename='/'>
 
         <ScopedCssBaseline>
           <div className="App">
