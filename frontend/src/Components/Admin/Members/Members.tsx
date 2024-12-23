@@ -18,6 +18,7 @@ import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 import MemberNameEditDialog from './MemberNameEditDialog';
 import { Member } from '../../../types/ResponseTypes';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 type Props = {}
 
@@ -297,7 +298,7 @@ const Members = (props: Props) => {
                                                     }
                                                 })
                                             }}>
-                                                <VisibilityOff />
+                                                {value.hidden ? <VisibilityOff /> : <VisibilityIcon />}
                                             </Button>
                                         </Tooltip>
                                         <Tooltip title={NUTZER_LEOSCHEN}>
