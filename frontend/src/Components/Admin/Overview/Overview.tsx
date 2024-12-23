@@ -17,7 +17,7 @@ import Infobox from '../../Common/InfoBox/Infobox';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, LETZE_100_KAEUFE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, LETZTE_100_KAEUFE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import { Transaction } from '../../../types/ResponseTypes';
 
 
@@ -136,7 +136,7 @@ const Overview = (props: Props) => {
                         <Area type="monotone" dataKey="Guthaben" stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
                     </AreaChart >
                 </Infobox>
-                <Infobox headline={LETZE_100_KAEUFE} >
+                <Infobox headline={LETZTE_100_KAEUFE} >
                     <BarChart width={window.innerWidth / 3} height={200} data={getDiagramData()}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <YAxis dataKey="Anzahl Transaktionen" />
