@@ -94,7 +94,7 @@ const AddDrink = (props: Props) => {
                 </div>
                 <Button
                     variant='outlined'
-                    onClick={(value) => {
+                    onClick={() => {
                         if (drinkname !== "") {
                             let requestBody = null;
                             if (categoryname !== "") {

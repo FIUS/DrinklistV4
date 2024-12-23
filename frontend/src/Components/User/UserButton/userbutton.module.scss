@@ -1,8 +1,8 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .button{
     width: 200px;
-    @media (max-width:$PHONE_SIZE_THRESHOLD){
+    @media (max-width:variables.$PHONE_SIZE_THRESHOLD){
         width: 100%;
     }
 }

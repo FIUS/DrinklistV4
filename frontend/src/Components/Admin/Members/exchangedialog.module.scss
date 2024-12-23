@@ -1,9 +1,9 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .outter{
     display: flex;
     flex-wrap: wrap;
-    gap: calc(3*$flex-gap);
+    gap: calc(3*variables.$flex-gap);
 }
 
 .inner{

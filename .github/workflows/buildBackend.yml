@@ -31,4 +31,4 @@ jobs:
           tags: fius/drinklistv4-backend:dev
           file: backend/Dockerfile
           context: ./backend
-          platforms: linux/amd64,linux/arm/v7
+          platforms: linux/amd64

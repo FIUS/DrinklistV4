@@ -1,11 +1,11 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .title {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .actions {
@@ -13,5 +13,5 @@
     flex-direction: row-reverse;
     flex-wrap: wrap;
     justify-content: space-between !important;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }

@@ -1,4 +1,4 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .inputBox {
     width: 100%;
@@ -10,5 +10,5 @@
 
 .fullWidth {
     width: 100%;
-    padding: $padding;
+    padding: variables.$padding;
 }

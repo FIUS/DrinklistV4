@@ -1,10 +1,10 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .overview{
-    padding: $padding;
+    padding: variables.$padding;
     display: flex;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .button{

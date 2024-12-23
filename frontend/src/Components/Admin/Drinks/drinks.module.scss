@@ -1,15 +1,15 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .drinksContainer {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .drinksContainerInner {
     @extend .drinksContainer;
-    margin-top: $padding;
+    margin-top: variables.$padding;
     width: 100%;
 }
 
@@ -20,8 +20,8 @@
     min-height: 60px;
     width: fit-content;
     min-width: 300px;
-    padding: $padding;
-    @media screen and (max-width: $PHONE_SIZE_THRESHOLD) {
+    padding: variables.$padding;
+    @media screen and (max-width: variables.$PHONE_SIZE_THRESHOLD) {
         width: 100%;
     }
 }
@@ -38,15 +38,15 @@
 .buttonsContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .drinksOutterContainer {
-    padding: $padding;
+    padding: variables.$padding;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .smallTextField {
@@ -67,24 +67,24 @@
     flex-direction: row;
     align-items: flex-end;
     justify-content: flex-end;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .topContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .editDrinkRow {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .editDrinkContainer {
     display: flex;
     flex-direction: column;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }

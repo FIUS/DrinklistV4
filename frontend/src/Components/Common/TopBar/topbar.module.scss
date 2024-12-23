@@ -1,4 +1,4 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .aboutDialogRow {
     display: flex;
@@ -6,7 +6,7 @@
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: flex-start;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .aboutDialogContainer {
@@ -14,5 +14,5 @@
     flex-direction: column;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: calc(1.5 * $flex-gap);
+    gap: calc(1.5 * variables.$flex-gap);
 }

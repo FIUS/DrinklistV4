@@ -1,7 +1,7 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .container {
-    padding: $padding;
+    padding: variables.$padding;
 }
 
 .entryBottomInfo {
@@ -13,7 +13,7 @@
 
 .newCheckoutContainer {
     display: flex;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
     flex-direction: column;
     align-items: flex-start;
     flex-wrap: wrap;
@@ -21,7 +21,7 @@
 
 .newCheckoutContainerHeadline {
     display: flex;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
     flex-direction: row;
     align-items: center;
 }
@@ -44,5 +44,5 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }

@@ -1,12 +1,12 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .container {
-    padding: $padding;
+    padding: variables.$padding;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .uploadContainer {
@@ -14,7 +14,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .fileInput {
@@ -27,5 +27,5 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }

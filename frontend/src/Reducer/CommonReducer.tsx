@@ -41,7 +41,7 @@ export type CommonReducerType = {
 
 const reducer = (state = initialState, { type, payload }: any) => {
 
-    var newState = { ...state }
+    const newState = { ...state }
     switch (type) {
         case "SET_DRINKS":
             newState.drinks = payload

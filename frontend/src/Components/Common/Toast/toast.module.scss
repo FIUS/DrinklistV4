@@ -1,9 +1,9 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .container {
     position: fixed;
     bottom: 0px;
-    left: $padding;
+    left: variables.$padding;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;

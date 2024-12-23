@@ -1,12 +1,12 @@
-@import "../../Common/variables.module.scss";
+@use "../../Common/variables.module.scss";
 
 .table {
-    padding: $padding;
+    padding: variables.$padding;
 }
 
 .newMemberContainer{
-    margin-left: $padding !important;
-    margin-right: $padding !important;
+    margin-left: variables.$padding !important;
+    margin-right: variables.$padding !important;
     max-width: max-content;
 }
 
@@ -26,7 +26,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .searchID {
@@ -41,5 +41,5 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }

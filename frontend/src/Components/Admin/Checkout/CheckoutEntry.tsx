@@ -63,7 +63,7 @@ const CheckoutEntry = (props: Props) => {
 
 
     return (
-        <Accordion expanded={isExpanded} onChange={value => {
+        <Accordion expanded={isExpanded} onChange={() => {
             setisExpanded(!isExpanded)
         }}>
             <AccordionSummary

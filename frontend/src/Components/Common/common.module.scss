@@ -1,4 +1,4 @@
-@import "./variables.module.scss";
+@use "variables.module.scss";
 
 .flexMiddle {
     display: flex;
@@ -13,16 +13,16 @@
 
 .errorButton {
     color: white !important;
-    background-color: $error-color !important;
+    background-color: variables.$error-color !important;
 }
 
 .successButton {
     color: white !important;
-    background-color: $success-color !important;
+    background-color: variables.$success-color !important;
 }
 
 .errorText {
-    color: $error-color;
+    color: variables.$error-color;
 }
 
 .paperHeadline {
@@ -31,9 +31,9 @@
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    gap: $flex-gap;
+    gap: variables.$flex-gap;
 }
 
 .pickerDay {
-    background-color: $success-color !important;
+    background-color: variables.$success-color !important;
 }
