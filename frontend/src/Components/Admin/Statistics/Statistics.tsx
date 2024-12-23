@@ -52,7 +52,7 @@ const Statistics = (props: Props) => {
     }
 
     const getTransactionHistoryDiagramData = () => {
-        const sortedTransactions = transactions.sort((value1, value2) => new Date(value2.date).valueOf() - new Date(value1.date).valueOf())
+        const sortedTransactions = transactions.sort((value1, value2) => new Date(value2.date).valueOf() - new Date(value1.date).valueOf()).slice(-100, transactions.length)
         const output = new Map<string, { date: Date, number: number }>()
 
         sortedTransactions.forEach(value => {
@@ -128,12 +128,13 @@ const Statistics = (props: Props) => {
             output.set(drinkName, currentValue !== undefined ? currentValue + 1 : 1)
         })
 
-        const dataList: Array<{ name: string, "Anzahl Transaktionen": number }> = []
-        output.forEach((value, key) => dataList.push({ name: key, "Anzahl Transaktionen": value }))
+        const dataList: Array<{ name: string, "amount": number }> = []
+        output.forEach((value, key) => dataList.push({ name: key, "amount": value }))
 
         const sortedList = dataList.sort((value1, value2) => {
-            return value1["Anzahl Transaktionen"] - value2["Anzahl Transaktionen"]
+            return value2["amount"] - value1["amount"]
         }).slice(0, 10)
+        console.log(sortedList)
         return sortedList
     }
 
@@ -201,13 +202,13 @@ const Statistics = (props: Props) => {
                 </Infobox>
                 <Infobox headline={TOP_10_GETRAENKE} width={window.innerWidth / 3 + "px"}>
                     <ResponsiveContainer width="95%" height={400}>
-                        <BarChart width={window.innerWidth / 3} height={200} data={getMostBoughtDrinks()} layout="vertical">
+                        <BarChart data={getMostBoughtDrinks().reverse()} layout="vertical" >
                             <CartesianGrid strokeDasharray="3 3" />
                             <YAxis dataKey="name" type="category" reversed />
-                            <XAxis dataKey="Anzahl Transaktionen" />
+                            <XAxis name="Anzahl Transaktionen" />
                             <Tooltip contentStyle={{ color: "black" }} />
                             <Legend />
-                            <Bar dataKey="Anzahl Transaktionen" fill={window.globalTS.ICON_COLOR} />
+                            <Bar name="Anzahl Transaktionen" dataKey="amount" fill={window.globalTS.ICON_COLOR} />
                         </BarChart >
                     </ResponsiveContainer>
                 </Infobox>
