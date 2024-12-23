@@ -1,4 +1,4 @@
-FROM node:20-alpine AS build-stage
+FROM node:23-alpine AS build-stage
 
 # set working directory
 WORKDIR /app
@@ -17,7 +17,7 @@ RUN rm public/environment/env.js
 
 RUN npm run build 
 
-FROM node:20-alpine AS production-stage
+FROM node:23-alpine AS production-stage
 WORKDIR /app
 COPY --from=build-stage /app/build /app/build
 RUN npm install -g serve
