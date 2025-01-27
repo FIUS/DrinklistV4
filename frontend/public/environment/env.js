@@ -15,5 +15,7 @@ window.globalTS = {
     "HOME_BUTTON": drinklistName,
     "TRANSACTION_LIMIT": 1000,
     "AUTH_COOKIE_PREFIX": "",
-    "OIDC_BUTTON_TEXT": null
+    "OIDC_BUTTON_TEXT": null,
+    "DEFAULT_THEME": 3,
+    "SHOW_THEME_SWITCH": false,
 };
