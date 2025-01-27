@@ -32,7 +32,9 @@ declare global {
       HOME_BUTTON: string,
       TRANSACTION_LIMIT: number,
       OIDC_BUTTON_TEXT: null | string,
-      AUTH_COOKIE_PREFIX: string
+      AUTH_COOKIE_PREFIX: string,
+      SHOW_THEME_SWITCH: boolean,
+      DEFAULT_THEME: number,
     };
   }
 }
@@ -42,7 +44,20 @@ function App() {
   const store = createStore(allReducer, composeWithDevTools())
 
   useEffect(() => {
-    setthemeCookie(Cookies.get("theme") !== undefined ? Number(Cookies.get("theme")) : 3)
+    // Get current theme from cookie
+    const theme = Cookies.get("theme");
+    if (theme) {
+      setthemeCookie(Number(theme))
+    } else {
+      let themeToSet = 0;
+      if (window.globalTS.DEFAULT_THEME) {
+        themeToSet = window.globalTS.DEFAULT_THEME;
+      } else {
+        themeToSet = 3;
+      }
+      setthemeCookie(themeToSet)
+      Cookies.set("theme", themeToSet.toString());
+    }
   }, [])
 
   return (

@@ -28,6 +28,8 @@ import { ABRECHNUNGEN, EINSTELLUNGEN, GELD_ANFORDERN, GETRAENKE, MITGLIEDER, NUT
 import Cookies from 'js-cookie';
 import { setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
+import { themes } from '../Theme';
 
 type Props = {}
 
@@ -226,6 +228,26 @@ const TopBar = (props: Props) => {
         }
         return <></>
     }
+
+    const shouldDisplayThemeSwitch = () => {
+        return window.globalTS.SHOW_THEME_SWITCH !== undefined && window.globalTS.SHOW_THEME_SWITCH
+    }
+
+    const toggleTheme = () => {
+        // Check if cookie 'theme' exists
+        if (Cookies.get("theme") === undefined) {
+            Cookies.set("theme", "3");
+        }
+
+        // Get cookie 'theme' and increment it by 1
+        let themeCookie = parseInt(Cookies.get("theme") as string);
+        console.log(themeCookie);
+        themeCookie = (themeCookie + 1) % themes.length;
+        Cookies.set("theme", themeCookie.toString());
+        // Reload page
+        window.location.reload();
+    }
+
     return (
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -244,6 +266,13 @@ const TopBar = (props: Props) => {
                         </Button>
                     </div>
                     <div style={{ display: "flex" }}>
+                        <Spacer horizontal={20} />
+                        {shouldDisplayThemeSwitch() ? <IconButton color="inherit" onClick={() => {
+                            toggleTheme();
+                        }}>
+                            <ColorLensIcon />
+                        </IconButton> : <></>}
+
                         {shouldDisplayAbout() ? <IconButton
                             color="inherit"
                             onClick={() => {
