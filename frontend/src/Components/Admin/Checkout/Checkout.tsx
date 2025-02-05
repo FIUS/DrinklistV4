@@ -295,7 +295,7 @@ const Checkout = (props: Props) => {
                         (toCheckout.find(checkout => {
                             return checkout.amount === 0 || Number.isNaN(checkout.amount)
                         }
-                        ) !== undefined || (toCheckout.length === 0 && invoices.length === 0)) && !buttonDisabled
+                        ) !== undefined || (toCheckout.length === 0 && invoices.length === 0)) || buttonDisabled
                     }
                     onClick={() => {
                         setbuttonDisabled(true)
