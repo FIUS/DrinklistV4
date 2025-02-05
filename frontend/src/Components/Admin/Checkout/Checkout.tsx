@@ -322,9 +322,9 @@ const Checkout = (props: Props) => {
                                 } else {
                                     dispatch(openErrorToast())
                                 }
+                                setbuttonDisabled(false)
                             })
                         }
-                        setbuttonDisabled(false)
                     }}
                 >
                     {ABRECHNUNG_ABSCHLIESSEN}
