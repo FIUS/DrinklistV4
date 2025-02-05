@@ -224,8 +224,16 @@ class Queries:
         member: Member = self.session.query(
             Member).filter_by(id=member_id).first()
         member.balance += amount
-        self.session.add(Transaction(description=f"Deposit",
-                                     member_id=member_id, amount=amount))
+        deposit_transaction = Transaction(description=f"Deposit",
+                                          member_id=member_id, amount=amount)
+        self.session.add(deposit_transaction)
+        checkouts = self.get_checkouts()
+        if len(checkouts) > 0:
+            most_recent_checkout = self.session.query(
+                Checkout).filter_by(id=checkouts[-1]["id"]).first()
+            most_recent_checkout.current_cash += amount
+            deposit_transaction.checkout_id = most_recent_checkout.id
+
         self.session.commit()
 
     def get_checkouts(self):
@@ -245,6 +253,10 @@ class Queries:
             Transaction).filter_by(checkout_id=checkout_id).all()
 
         for t in transactions:
+            transaction: Transaction = t
+            if transaction.member is not None:
+                transaction.member.balance -= transaction.amount
+
             self.session.delete(t)
 
         self.session.delete(checkout)
