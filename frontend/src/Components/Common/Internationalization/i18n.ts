@@ -23,6 +23,7 @@ export const AUF_SETZEN = "Setzen auf...";
 export const BACKUP_ERFOLG = "Backup wurde erfolgreich eingespielt";
 export const BACKUP_UPLOADING = "Backup wird hochgeladen und eingespielt";
 export const BENUTZER_ZAHL = "Benutzer Anzahl";
+export const BENUTZERNAME = "Benutzername";
 export const BESCHREIBUNG = "Beschreibung";
 export const BETRAG = "Betrag";
 export const BETRAG_NICHT_NEGATIV = "Betrag darf nicht negativ sein";

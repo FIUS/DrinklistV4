@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { openToast } from '../../../Actions/CommonAction';
-import { FALSCHES_PASSWORT, FEHLER, LOGIN, NAME, PASSWORT } from '../Internationalization/i18n';
+import { BENUTZERNAME, FALSCHES_PASSWORT, FEHLER, LOGIN, PASSWORT } from '../Internationalization/i18n';
 import Spacer from '../Spacer';
 import { doGetRequest, doPostRequest } from '../StaticFunctions';
 import style from './login.module.scss'
@@ -98,7 +98,7 @@ const Login = (props: Props) => {
                     <Spacer vertical={40} />
                     <TextField
                         fullWidth
-                        label={NAME}
+                        label={BENUTZERNAME}
                         value={username}
                         onChange={(value) => { setusername(value.target.value) }}
                         autoFocus
