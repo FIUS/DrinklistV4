@@ -22,11 +22,7 @@ const Login = (props: Props) => {
         //clear only username and password cookies
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "memberID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    }
 
-    const login = () => {
-        setdisableLoginButton(true);
-        clearCookies();
         (function () {
             const cookies = document.cookie.split("; ");
             for (let c = 0; c < cookies.length; c++) {
@@ -43,6 +39,11 @@ const Login = (props: Props) => {
                 }
             }
         })();
+    }
+
+    const login = () => {
+        setdisableLoginButton(true);
+
         doPostRequest("login", { name: username, password: password }).then((value) => {
             if (value.code === 200) {
                 const searchParam = searchParams.get("originalPath")
@@ -50,6 +51,7 @@ const Login = (props: Props) => {
 
                 navigate(notNullSeachParam)
             } else {
+                clearCookies();
                 dispatch(openToast({ message: FALSCHES_PASSWORT, type: "error", headline: FEHLER }))
             }
             setdisableLoginButton(false)
@@ -58,12 +60,13 @@ const Login = (props: Props) => {
 
     const loginOidc = async () => {
         setdisableLoginButton(true)
-        clearCookies();
+
         doGetRequest("start-oidc").then(value => {
             if (value.code === 200) {
                 console.log(value.content)
                 window.location.href = value.content
             }
+            clearCookies();
             setdisableLoginButton(false)
         })
     }
