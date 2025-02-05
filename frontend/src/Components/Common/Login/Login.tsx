@@ -43,6 +43,7 @@ const Login = (props: Props) => {
 
     const login = () => {
         setdisableLoginButton(true);
+        clearCookies();
 
         doPostRequest("login", { name: username, password: password }).then((value) => {
             if (value.code === 200) {
@@ -51,7 +52,6 @@ const Login = (props: Props) => {
 
                 navigate(notNullSeachParam)
             } else {
-                clearCookies();
                 dispatch(openToast({ message: FALSCHES_PASSWORT, type: "error", headline: FEHLER }))
             }
             setdisableLoginButton(false)
@@ -60,13 +60,13 @@ const Login = (props: Props) => {
 
     const loginOidc = async () => {
         setdisableLoginButton(true)
-
+        clearCookies();
         doGetRequest("start-oidc").then(value => {
             if (value.code === 200) {
                 console.log(value.content)
                 window.location.href = value.content
             }
-            clearCookies();
+
             setdisableLoginButton(false)
         })
     }
