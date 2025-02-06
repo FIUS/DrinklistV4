@@ -19,6 +19,7 @@ import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { BENUTZER_ZAHL, BUDGET, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, LETZTE_100_KAEUFE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
 import { Transaction } from '../../../types/ResponseTypes';
+import { convertToLocalDate } from '../../Common/StaticFunctionsTyped';
 
 
 type Props = {}
@@ -78,21 +79,21 @@ const Overview = (props: Props) => {
     }
 
     const getDiagramData = () => {
-        const sortedTransactions = transactions.sort((value1, value2) => new Date(value2.date).valueOf() - new Date(value1.date).valueOf())
+        const sortedTransactions = transactions.sort((value1, value2) => convertToLocalDate(value2.date).valueOf() - convertToLocalDate(value1.date).valueOf())
         const output = new Map<string, { date: Date, number: number }>()
 
         sortedTransactions.forEach(value => {
-            const dateString = dateToString(new Date(value.date))
+            const dateString = dateToString(convertToLocalDate(value.date))
             const currentValue = output.get(dateString)
-            output.set(dateString, currentValue !== undefined ? { date: new Date(value.date), number: currentValue.number + 1 } : { date: new Date(value.date), number: 1 })
+            output.set(dateString, currentValue !== undefined ? { date: convertToLocalDate(value.date), number: currentValue.number + 1 } : { date: convertToLocalDate(value.date), number: 1 })
         })
 
         const dataList: Array<{ date: Date, "Anzahl Transaktionen": number }> = []
         output.forEach((value, _) => dataList.push({ date: value.date, "Anzahl Transaktionen": value.number }))
 
         const sortedList = dataList.sort((value1, value2) => {
-            const a = new Date(value1.date).valueOf();
-            const b = new Date(value2.date).valueOf();
+            const a = (value1.date).valueOf();
+            const b = (value2.date).valueOf();
             return a - b;
         }).map((value) => {
             return { date: dateToString(value.date), "Anzahl Transaktionen": value['Anzahl Transaktionen'] }

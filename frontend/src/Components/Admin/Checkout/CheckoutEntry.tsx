@@ -12,6 +12,7 @@ import Spacer from '../../Common/Spacer';
 import { EINNAHMEN, EINZAHLUNGEN, ERFOLGREICH_RUECKGAENIG_GEMACHT, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, RUECKGAENGIG, VALUE } from '../../Common/Internationalization/i18n';
 import { useDispatch } from 'react-redux';
 import { openErrorToast, openToast } from '../../../Actions/CommonAction';
+import { convertToLocalDate } from '../../Common/StaticFunctionsTyped';
 
 type Props = {
     checkout: Checkout,
@@ -70,7 +71,7 @@ const CheckoutEntry = (props: Props) => {
                 expandIcon={<ExpandMoreIcon />}
             >
                 <Typography>
-                    Abrechnung {new Date(props.checkout.date).toLocaleDateString("de-DE")}
+                    Abrechnung {convertToLocalDate(props.checkout.date).toLocaleDateString("de-DE")}
                 </Typography>
             </AccordionSummary>
             <AccordionDetails>
