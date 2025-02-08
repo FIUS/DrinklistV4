@@ -91,18 +91,22 @@ os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
 
 
+def set_cookies(response: Response, cookieMemberID, cookieToken, is_Admin):
+    if cookieMemberID and cookieToken:
+        response.set_cookie(f"{auth_cookie_memberID}memberID", str(cookieMemberID),
+                            max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
+        response.set_cookie(f"{auth_cookie_memberID}token", cookieToken,
+                            max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
+        response.set_cookie(f"{auth_cookie_memberID}isAdmin", str(is_Admin),
+                            max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
+
+
 def build_response(message: object, code: int = 200, type: str = "application/json", cookieMemberID=None, cookieToken=None, is_Admin=False):
     """
     Build a flask response, default is json format
     """
     r = Response(response=json.dumps(message), status=code, mimetype=type)
-    if cookieMemberID and cookieToken:
-        r.set_cookie(f"{auth_cookie_memberID}memberID", str(cookieMemberID),
-                     max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
-        r.set_cookie(f"{auth_cookie_memberID}token", cookieToken,
-                     max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
-        r.set_cookie(f"{auth_cookie_memberID}isAdmin", str(is_Admin),
-                     max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
+    set_cookies(r, cookieMemberID, cookieToken, is_Admin)
 
     return r
 

@@ -889,10 +889,7 @@ class oidc_redirect(Resource):
             login_token = token_manager.create_token(user_id)
 
         r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)
-        r.set_cookie(f"{util.auth_cookie_memberID}memberID", str(user_id),
-                     max_age=util.cookie_expire, samesite='Strict', secure=not util.logging_enabled)
-        r.set_cookie(f"{util.auth_cookie_memberID}token", login_token,
-                     max_age=util.cookie_expire, samesite='Strict', secure=not util.logging_enabled)
+        util.set_cookies(r, user_id, login_token, db.is_admin(user_id))
 
         return r
 
