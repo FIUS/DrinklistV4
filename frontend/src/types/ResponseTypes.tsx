@@ -3,7 +3,8 @@ export type Member = {
     name: string,
     balance: number,
     hidden: boolean,
-    alias: string
+    alias: string,
+    isAdmin?: boolean
 }
 
 export type Drink = {

@@ -12,6 +12,7 @@ class Member(db.Model):
     hidden = sql.Column(sql.Boolean, nullable=False, default=False)
     password = sql.Column(sql.LargeBinary(length=128), nullable=False)
     salt = sql.Column(sql.String(64), nullable=False)
+    is_admin = sql.Column(sql.Boolean, nullable=False, default=False)
 
     def to_dict(self):
         return {
@@ -22,6 +23,16 @@ class Member(db.Model):
             "alias": self.alias if util.use_alias else ""
         }
 
+    def to_dict_with_admin(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "balance": self.balance,
+            "hidden": self.hidden,
+            "alias": self.alias if util.use_alias else "",
+            "isAdmin": self.is_admin
+        }
+
     def to_dict_with_password(self):
         return {
             "id": self.id,
@@ -30,5 +41,6 @@ class Member(db.Model):
             "hidden": self.hidden,
             "alias": self.alias if util.use_alias else "",
             "password": self.password.hex(),
-            "salt": self.salt
+            "salt": self.salt,
+            "isAdmin": self.is_admin
         }
