@@ -2,7 +2,7 @@ import { Button, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { openErrorToast, openToast } from '../../../Actions/CommonAction'
-import { ADMIN_PW, ALTE_DATEN_UEBERSCHRIEBEN, BACKUP_ERFOLG, BACKUP_UPLOADING, DOWNLOAD_BACKUP, EINGESPIELT, KEINE_DATEI, KIOSK_PW, KONNTE_NICHT_EINSPIELEN, PASSWORT_AENDERN, SICHER_ALTE_DATEN_UEBERSCHRIEBEN, UPLOAD, UPLOAD_BACKUP } from '../../Common/Internationalization/i18n'
+import { ADMIN_PW, ALTE_DATEN_UEBERSCHRIEBEN, BACKUP_ERFOLG, BACKUP_UPLOADING, DOWNLOAD_BACKUP, EINGESPIELT, KEINE_DATEI, KIOSK_PW, KONNTE_NICHT_EINSPIELEN, PASSWOERTER_AENDERN, SICHER_ALTE_DATEN_UEBERSCHRIEBEN, UPLOAD, UPLOAD_BACKUP } from '../../Common/Internationalization/i18n'
 import NavigationButton from '../../Common/NavigationButton/NavigationButton'
 import Spacer from '../../Common/Spacer'
 import { doPostRequestRawBody, downloadJSON } from '../../Common/StaticFunctions'
@@ -49,7 +49,7 @@ const Settings = (props: Props) => {
                     />
                 </div>
                 <Spacer vertical={20} />
-                <Typography variant='h5'>{PASSWORT_AENDERN}</Typography>
+                <Typography variant='h5'>{PASSWOERTER_AENDERN}</Typography>
                 <PasswordChange textfielLabel={ADMIN_PW} requestPath='settings/password/admin' />
                 <PasswordChange textfielLabel={KIOSK_PW} requestPath='settings/password/kiosk' />
                 <WarningPopup
