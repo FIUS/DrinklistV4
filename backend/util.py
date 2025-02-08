@@ -102,7 +102,7 @@ def build_response(message: object, code: int = 200, type: str = "application/js
         r.set_cookie(f"{auth_cookie_memberID}token", cookieToken,
                      max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
         r.set_cookie(f"{auth_cookie_memberID}isAdmin", str(is_Admin),
-                     max_age=cookie_expire, samesite='Strict', secure=not logging_enabled, httponly=True)
+                     max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
 
     return r
 
