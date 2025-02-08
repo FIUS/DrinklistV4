@@ -48,7 +48,6 @@ def valid_credentials(request):
 def is_admin():
     cookie_member_id = request.cookies.get(
         f"{util.auth_cookie_memberID}memberID")
-    cookie_token = request.cookies.get(f"{util.auth_cookie_memberID}token")
 
     if not valid_credentials(request):
         # member id does not match token
