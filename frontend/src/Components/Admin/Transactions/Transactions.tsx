@@ -10,6 +10,7 @@ import Spacer from '../../Common/Spacer';
 import { datetimeToString, dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import style from './transactions.module.scss';
+import { convertToLocalDate } from '../../Common/StaticFunctionsTyped';
 
 type Props = {}
 
@@ -34,7 +35,7 @@ const Transactions = (props: Props) => {
     const filteredTransactions = transactions.filter(value => {
         return ((value.description.toLowerCase().includes(searchDescription.toLowerCase()) || searchDescription === "") &&
             (value.memberName?.toLocaleLowerCase().includes(searchName.toLowerCase()) || searchName === "") &&
-            (datetimeToString(new Date(value.date)).toLowerCase().includes(searchDate.toLowerCase()) || searchDate === "")) ||
+            (datetimeToString(convertToLocalDate(value.date)).toLowerCase().includes(searchDate.toLowerCase()) || searchDate === "")) ||
             (searchDescription === "" && searchName === "" && searchDate === "")
     })
 
@@ -56,7 +57,7 @@ const Transactions = (props: Props) => {
                         {value.amount.toFixed(2)}€
                     </TableCell>
                     <TableCell>
-                        {datetimeToString(new Date(value.date))}
+                        {datetimeToString(convertToLocalDate(value.date))}
                     </TableCell>
                     <TableCell>
                         <Button onClick={() => {
@@ -65,7 +66,7 @@ const Transactions = (props: Props) => {
                                     id: value.id,
                                     name: value.description,
                                     by: value.memberName !== undefined ? value.memberName : "???",
-                                    date: format("{0} - {1}", dateToString(new Date(value.date)), timeToString(new Date(value.date)))
+                                    date: format("{0} - {1}", dateToString(convertToLocalDate(value.date)), timeToString(convertToLocalDate(value.date)))
                                 }
                             )
                             setwarningOpen(true)

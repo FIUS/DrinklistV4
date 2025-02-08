@@ -15,6 +15,7 @@ import Infobox from '../../Common/InfoBox/Infobox'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 
 type Props = {}
 
@@ -80,21 +81,21 @@ const Statistics = (props: Props) => {
     const indices = transactionsIndices()
 
     const getTransactionHistoryDiagramData = () => {
-        const sortedTransactions = transactions.slice(indices[0], indices[1]).toSorted((value1, value2) => new Date(value2.date).valueOf() - new Date(value1.date).valueOf())
+        const sortedTransactions = transactions.slice(indices[0], indices[1]).toSorted((value1, value2) => convertToLocalDate(value2.date).valueOf() - convertToLocalDate(value1.date).valueOf())
         const output = new Map<string, { date: Date, number: number }>()
 
         sortedTransactions.forEach(value => {
-            const dateString = dateToString(new Date(value.date))
+            const dateString = dateToString(convertToLocalDate(value.date))
             const currentValue = output.get(dateString)
-            output.set(dateString, currentValue !== undefined ? { date: new Date(value.date), number: currentValue.number + 1 } : { date: new Date(value.date), number: 1 })
+            output.set(dateString, currentValue !== undefined ? { date: convertToLocalDate(value.date), number: currentValue.number + 1 } : { date: convertToLocalDate(value.date), number: 1 })
         })
 
         const dataList: Array<{ date: Date, "Anzahl Transaktionen": number }> = []
         output.forEach((value, _) => dataList.push({ date: value.date, "Anzahl Transaktionen": value.number }))
 
         const sortedList = dataList.sort((value1, value2) => {
-            const a = new Date(value1.date).valueOf();
-            const b = new Date(value2.date).valueOf();
+            const a = (value1.date).valueOf();
+            const b = (value2.date).valueOf();
             return a - b;
         }).map((value) => {
             return { date: dateToString(value.date), "Anzahl Transaktionen": value['Anzahl Transaktionen'] }
@@ -119,7 +120,7 @@ const Statistics = (props: Props) => {
             if (value.description.includes("Checkout") || value.description.includes("Deposit") || value.description.includes("Transfer")) { return }
             if (value.amount > 0) { return }
 
-            const weekdayNumber = new Date(value.date).getDay()
+            const weekdayNumber = convertToLocalDate(value.date).getDay()
 
             //Add the amount to the corresponding weekday
             output[weekdayNumber].total += Math.abs(value.amount)
@@ -183,8 +184,8 @@ const Statistics = (props: Props) => {
         if (transactions.length === 0) {
             return "??? - ???";
         }
-        const startDate = dateToString(new Date(transactions[indices[0]].date));
-        const endDate = dateToString(new Date(transactions[indices[1]].date));
+        const startDate = dateToString(convertToLocalDate(transactions[indices[0]].date));
+        const endDate = dateToString(convertToLocalDate(transactions[indices[1]].date));
         return `Zeitraum ${startDate} - ${endDate}`;
     };
 
@@ -248,10 +249,10 @@ const Statistics = (props: Props) => {
                     if (transactions.length === 0) { return "" }
                     const indices = transactionsIndices()
                     if (value === dateRange[0]) {
-                        return dateToString(new Date(transactions[indices[0]].date))
+                        return dateToString(convertToLocalDate(transactions[indices[0]].date))
                     }
                     if (value === dateRange[1]) {
-                        return dateToString(new Date(transactions[indices[1]].date))
+                        return dateToString(convertToLocalDate(transactions[indices[1]].date))
                     }
 
 

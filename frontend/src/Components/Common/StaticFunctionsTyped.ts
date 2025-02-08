@@ -29,3 +29,12 @@ export const calculateAvatarText = (text: String) => {
 
     return emoji !== "?" ? emoji : short
 }
+
+export const convertToLocalDate = (date: string) => {
+    console.log(date)   
+    //Check if date is already a Date object
+    if ((date as any) instanceof Date) {
+        return new Date(date)
+    }
+    return new Date(date.replace("Z", ""))
+}

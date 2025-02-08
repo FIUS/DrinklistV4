@@ -46,7 +46,21 @@ def valid_credentials(request):
 
 
 def is_admin():
-    return int(request.cookies.get(f"{util.auth_cookie_memberID}memberID")) == 1 and valid_credentials(request)
+    cookie_member_id = request.cookies.get(
+        f"{util.auth_cookie_memberID}memberID")
+    cookie_token = request.cookies.get(f"{util.auth_cookie_memberID}token")
+
+    if not valid_credentials(request):
+        # member id does not match token
+        return False
+
+    is_admin_user = int(cookie_member_id) == 1
+
+    # Check if member has admin flag
+    if not is_admin_user:
+        is_admin_user = db.is_admin(cookie_member_id)
+
+    return is_admin_user
 
 
 def authenticated(fn):
@@ -85,7 +99,10 @@ class GET_USERS(Resource):
         """
         Gets all users
         """
-        return util.build_response(db.get_users())
+        if is_admin():
+            return util.build_response(db.get_users_with_admin())
+        else:
+            return util.build_response(db.get_users())
 
 
 @api.route('/users/<int:member_id>/favorites')
@@ -157,6 +174,17 @@ class change_user_password(Resource):
             return util.build_response("Unauthorized", code=403)
 
         db.change_user_password(member_id, request.json["password"])
+        return util.build_response("Password changed")
+
+
+@api.route('/users/<int:member_id>/admin-privileges')
+class change_user_privileges(Resource):
+    @admin
+    def post(self, member_id):
+        """
+        Change the admin privileges of a user
+        """
+        db.change_user_privileges(member_id, request.json["is_admin"])
         return util.build_response("Password changed")
 
 
@@ -903,7 +931,7 @@ class login(Resource):
         if member_id is not None:
             util.log("Login", "User logged in")
             token = token_manager.create_token(member_id)
-            return util.build_response("Login successfull", cookieToken=token, cookieMemberID=member_id)
+            return util.build_response("Login successfull", cookieToken=token, cookieMemberID=member_id, is_Admin=db.is_admin(member_id))
         return util.build_response("Unauthorized", code=403)
 
 

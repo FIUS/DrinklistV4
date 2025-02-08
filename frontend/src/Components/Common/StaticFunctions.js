@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { convertToLocalDate } from './StaticFunctionsTyped';
 
 export const doPostRequest = async (path, data) => {
     const resp = await fetch(window.globalTS.DOMAIN + path,
@@ -166,7 +167,7 @@ export const timeToString = (date) => {
 }
 
 export const datetimeToString = (date) => {
-    return dateToString(new Date(date)) + " - " + timeToString(new Date(date))
+    return dateToString(convertToLocalDate(date)) + " - " + timeToString(convertToLocalDate(date))
 }
 
 export const timeTupleToString = (times) => {

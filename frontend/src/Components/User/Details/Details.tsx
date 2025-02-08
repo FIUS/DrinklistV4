@@ -20,6 +20,7 @@ import { Drink, Transaction } from '../../../types/ResponseTypes'
 import CountUp from 'react-countup';
 import RequestDialog from './RequestDialog'
 import RequestConfirmation from './RequestConfirmation'
+import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 
 type Props = {}
 
@@ -196,7 +197,7 @@ const Details = (props: Props) => {
                 <Delete />
             </Button>
         } else {
-            return format("{0} - {1}", dateToString(new Date(transaction.date)), timeToString(new Date(transaction.date)))
+            return format("{0} - {1}", dateToString(convertToLocalDate(transaction.date)), timeToString(convertToLocalDate(transaction.date)))
         }
     }
 
