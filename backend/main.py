@@ -41,22 +41,22 @@ with app.app_context():
     taskScheduler.start()
 
 
-def is_admin():
+def valid_credentials(request):
+    return token_manager.check_token(request.cookies.get(f"{util.auth_cookie_memberID}memberID"), request.cookies.get(f"{util.auth_cookie_memberID}token"))
 
+
+def is_admin():
     cookie_member_id = request.cookies.get(
         f"{util.auth_cookie_memberID}memberID")
-    cookie_token = request.cookies.get(f"{util.auth_cookie_memberID}token")
 
-    if not token_manager.check_token(cookie_member_id, cookie_token):
+    if not valid_credentials(request):
         # member id does not match token
-        print("Möglicher Angriff")
         return False
 
     is_admin_user = int(cookie_member_id) == 1
 
     # Check if member has admin flag
     if not is_admin_user:
-        print(db.is_admin(cookie_member_id))
         is_admin_user = db.is_admin(cookie_member_id)
 
     return is_admin_user
@@ -65,7 +65,7 @@ def is_admin():
 def authenticated(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if not token_manager.check_token(request.cookies.get(f"{util.auth_cookie_memberID}memberID"), request.cookies.get(f"{util.auth_cookie_memberID}token")):
+        if not valid_credentials(request):
             return util.build_response("Unauthorized", 403)
         return fn(*args, **kwargs)
     wrapper.__name__ = fn.__name__
@@ -163,12 +163,15 @@ model_password = api.model('Password', {
 
 @api.route('/users/<int:member_id>/password')
 class change_user_password(Resource):
-    @admin
+    @authenticated
     @api.doc(body=model_password)
     def post(self, member_id):
         """
         Change the password of a user
         """
+        if not is_self_or_admin(request, member_id):
+            return util.build_response("Unauthorized", code=403)
+
         db.change_user_password(member_id, request.json["password"])
         return util.build_response("Password changed")
 

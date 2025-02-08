@@ -129,7 +129,7 @@ const MemberNameEditDialog = (props: Props) => {
                             disabled={disableButtons}
                             onChange={value => {
                                 setdisableButtons(true)
-                                doPostRequest(format("users/{0}/admin-privileges", props.member.id), { is_admin: value.target.value === "on" }).then(value => {
+                                doPostRequest(format("users/{0}/admin-privileges", props.member.id), { is_admin: value.currentTarget.checked }).then(value => {
                                     if (value.code === 200) {
                                         setinvertedPrivileges(!invertedPrivileges)
                                         dispatch(openToast({ message: ADMIN_PRIVILEGIEN_GEAENDERT }))
