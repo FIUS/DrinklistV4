@@ -70,7 +70,7 @@ OIDC_USER_INFO = os.environ.get(
 OIDC_USER_NEEDS_VERIFICATION = os.environ.get(
     "OIDC_USER_NEEDS_VERIFICATION") == "true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
 
-CURRENT_VERSION = 0
+CURRENT_VERSION = 1
 
 pretix_url = os.environ.get("PRETIX_URL") if os.environ.get(
     "PRETIX_URL") else None
@@ -91,7 +91,7 @@ os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
 
 
-def build_response(message: object, code: int = 200, type: str = "application/json", cookieMemberID=None, cookieToken=None):
+def build_response(message: object, code: int = 200, type: str = "application/json", cookieMemberID=None, cookieToken=None, is_Admin=False):
     """
     Build a flask response, default is json format
     """
@@ -100,6 +100,8 @@ def build_response(message: object, code: int = 200, type: str = "application/js
         r.set_cookie(f"{auth_cookie_memberID}memberID", str(cookieMemberID),
                      max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
         r.set_cookie(f"{auth_cookie_memberID}token", cookieToken,
+                     max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
+        r.set_cookie(f"{auth_cookie_memberID}isAdmin", str(is_Admin),
                      max_age=cookie_expire, samesite='Strict', secure=not logging_enabled)
 
     return r

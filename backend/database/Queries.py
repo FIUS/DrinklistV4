@@ -27,9 +27,9 @@ class Queries:
         self.db: SQLAlchemy = db
         self.session: session.Session = self.db.session
         self.db.create_all()
-        if self.session.query(Member).first() is None:
+
+        if not database.Migrations.migrate(self.session):
             self.create_dummy_data()
-        database.Migrations.migrate(self.session)
 
     def get_users(self):
         members = self.session.query(Member).all()
@@ -39,6 +39,17 @@ class Queries:
             member: Member = m
             if member.id > 2:
                 output.append(member.to_dict())
+
+        return output
+
+    def get_users_with_admin(self):
+        members = self.session.query(Member).all()
+
+        output = []
+        for m in members:
+            member: Member = m
+            if member.id > 2:
+                output.append(member.to_dict_with_admin())
 
         return output
 
@@ -84,10 +95,18 @@ class Queries:
         user.salt = salt
         self.session.commit()
 
+    def change_user_privileges(self, member_id, is_admin):
+        user: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        user.is_admin = is_admin
+        self.session.commit()
+
     def change_user_visibility(self, member_id, visibility=None):
         user: Member = self.session.query(
             Member).filter_by(id=int(member_id)).first()
         user.hidden = not user.hidden if visibility is None else visibility
+        if user.hidden:
+            user.is_admin = False
         print(user.name, user.hidden, visibility)
         self.session.commit()
 
@@ -752,6 +771,11 @@ class Queries:
                 self.add_user(name, 0, util.standard_user_password,
                               name, hidden=not checked_in)
 
+    def is_admin(self, member_id):
+        member: Member = self.session.query(
+            Member).filter_by(id=member_id).first()
+        return member.is_admin
+
     def add_token(self, token, member_id, time):
         session: Session = self.session.query(
             Session).filter_by(member_id=member_id).first()
@@ -820,7 +844,8 @@ class Queries:
                 hidden=m['hidden'],
                 alias=m['alias'],
                 password=bytes.fromhex(m['password']),
-                salt=m['salt']))
+                salt=m['salt'],
+                is_admin=m['isAdmin'] if 'isAdmin' in m else False))
 
         print("Added members")
 
@@ -947,7 +972,7 @@ class Queries:
     def create_dummy_data(self) -> None:
         hashedPassword, salt = TokenManager.hashPassword(util.admin_password)
         self.session.add(
-            Member(name=util.admin_username, password=hashedPassword, salt=salt))
+            Member(name=util.admin_username, password=hashedPassword, salt=salt, is_admin=True))
         hashedPassword, salt = TokenManager.hashPassword(
             util.moderator_password)
         self.session.add(

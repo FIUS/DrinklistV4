@@ -18,7 +18,7 @@ const LoginChecker = (props: Props) => {
             requestString = "login/admin/check"
         } else if (location.pathname.startsWith("/message")) {
             return
-        }else if (location.pathname.startsWith("/config")) {
+        } else if (location.pathname.startsWith("/config")) {
             return
         } else if (!location.pathname.startsWith("/login")) {
             requestString = "login/check"
@@ -29,7 +29,7 @@ const LoginChecker = (props: Props) => {
         doGetRequest(requestString).then((value) => {
             if (value.code !== 200) {
                 doGetRequest("config/status").then((response) => {
-                    if (response.code === 200&&response.content===0) {
+                    if (response.code === 200 && response.content === 0) {
                         navigate("/config/start" + location.pathname)
                         dispatch(setLoginState(false))
                     } else {
@@ -42,9 +42,10 @@ const LoginChecker = (props: Props) => {
                 dispatch(setLoginState(true))
 
                 const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
-                const notUndefined = memberID !== undefined ? parseInt(memberID) : 0;
+                const memberIDSafe = memberID !== undefined ? parseInt(memberID) : 0;
+                const isAdmin = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "isAdmin") == "True";
 
-                if (notUndefined > 2) {
+                if (memberIDSafe > 2 && !isAdmin) {
                     navigate("/user/" + Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID"))
                 }
             }
