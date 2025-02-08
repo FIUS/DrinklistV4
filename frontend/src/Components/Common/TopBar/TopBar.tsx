@@ -90,6 +90,10 @@ const TopBar = (props: Props) => {
         setTimeout(() => { setdrawerVisible(false) }, 250)
     }
 
+    const showPasswordDialog = () => {
+        setTimeout(() => { setdrawerVisible(false); setpasswordDialogOpen(true) }, 250)
+    }
+
     const getIcon = () => {
         if (showDrawerButton()) {
             return <IconButton
@@ -227,8 +231,7 @@ const TopBar = (props: Props) => {
                 <ListItem disablePadding>
                     <ListItemButton onClick={() => {
                         setdrawerOpen(false)
-                        hideDrawer()
-                        setpasswordDialogOpen(true)
+                        showPasswordDialog()
                     }}>
                         <ListItemIcon>
                             <KeyIcon />

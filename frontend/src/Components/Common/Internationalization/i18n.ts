@@ -93,6 +93,7 @@ export const LASSE_ACCOUNT_ACTIVIEREN = "Bitte wende dich an einen Admin, um dei
 export const LETZTE_100_KAEUFE = "Letze 100 Käufe";
 export const LETZTE_KAEUFE = "Letzte Käufe";
 export const LOGIN = "Login";
+export const LOKALES_PASSWORT_AENDERN = "Hinweis: Das Passwort ändert das lokale Drinklist Passwort, nicht das Passwort des Single Sign On Systems ({0}).";
 export const MEHR_OPTIONEN = "Mehr optionen";
 export const MEISTE_SCHULDEN = "Meiste Schulden";
 export const MEMBER_LOESCHEN = "Benutzer wird gelöscht!";

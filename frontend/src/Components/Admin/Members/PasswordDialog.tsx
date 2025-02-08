@@ -8,8 +8,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { doPostRequest } from '../../Common/StaticFunctions';
 import { Member } from '../../../types/ResponseTypes';
-import { ABBRECHEN, AKTUALISIEREN, NEUES_PASSWORT_FESTLEGEN, NEUES_PASSWORT_FUER_NUTZER, PASSWORT } from '../../Common/Internationalization/i18n';
+import { ABBRECHEN, AKTUALISIEREN, LOKALES_PASSWORT_AENDERN, NEUES_PASSWORT_FESTLEGEN, NEUES_PASSWORT_FUER_NUTZER, PASSWORT } from '../../Common/Internationalization/i18n';
 import { format } from 'react-string-format';
+import Spacer from '../../Common/Spacer';
 
 type Props = {
     isOpen: boolean,
@@ -27,6 +28,14 @@ const PasswordDialog = (props: Props) => {
                 <DialogContentText>
                     {format(NEUES_PASSWORT_FUER_NUTZER, props.member.name)}
                 </DialogContentText>
+                {window.globalTS.OIDC_BUTTON_TEXT !== null && window.globalTS.OIDC_BUTTON_TEXT !== undefined && window.globalTS.OIDC_BUTTON_TEXT !== "" ?
+                    <>
+                        <Spacer vertical={20} />
+                        <DialogContentText>
+                            {format(LOKALES_PASSWORT_AENDERN, window.globalTS.OIDC_BUTTON_TEXT)}
+                        </DialogContentText>
+                    </> : <></>
+                }
                 <TextField
                     fullWidth
                     autoFocus

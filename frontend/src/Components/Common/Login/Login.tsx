@@ -72,7 +72,7 @@ const Login = (props: Props) => {
     }
 
     const oidcButton = () => {
-        if (window.globalTS.OIDC_BUTTON_TEXT === null) {
+        if (window.globalTS.OIDC_BUTTON_TEXT === null || window.globalTS.OIDC_BUTTON_TEXT === undefined) {
             return
         }
 
