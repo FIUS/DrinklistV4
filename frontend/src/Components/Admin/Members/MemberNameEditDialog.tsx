@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { Member } from '../../../types/ResponseTypes';
 import { useDispatch } from 'react-redux';
-import { AENDERE_NAME_ODER_ALIAS, AENDERN, ALIAS_AENDERN, ALIAS_GEAENDERT, FERTIG, NAME_GEAENDERT, NUTZERNAME_AENDERN, NUTZERNAME_NICHT_GEAENDERT, NUTZERNAME_NICHT_LEER, NUTZER_AENDERN } from '../../Common/Internationalization/i18n';
+import { ADMIN_PRIVILEGIEN, ADMIN_PRIVILEGIEN_GEAENDERT, AENDERE_NAME_ODER_ALIAS, AENDERN, ALIAS_AENDERN, ALIAS_GEAENDERT, FERTIG, NAME_GEAENDERT, NUTZERNAME_AENDERN, NUTZERNAME_NICHT_GEAENDERT, NUTZERNAME_NICHT_LEER, NUTZER_AENDERN } from '../../Common/Internationalization/i18n';
 import { format } from 'react-string-format';
 import style from './memberChange.module.scss'
 import Spacer from '../../Common/Spacer';
@@ -118,7 +118,7 @@ const MemberNameEditDialog = (props: Props) => {
                     </div>
                     <Stack className={style.editMemberRow} flexDirection={"row"} spacing={2} alignItems={"baseline"} justifyContent={"space-between"}>
                         <Typography variant="button">
-                            {"Admin privilegien"}
+                            {ADMIN_PRIVILEGIEN}
                         </Typography>
                         <Switch color='success' sx={{
                             '& .MuiSwitch-switchBase': {
@@ -132,7 +132,7 @@ const MemberNameEditDialog = (props: Props) => {
                                 doPostRequest(format("users/{0}/admin-privileges", props.member.id), { is_admin: value.target.value === "on" }).then(value => {
                                     if (value.code === 200) {
                                         setinvertedPrivileges(!invertedPrivileges)
-                                        dispatch(openToast({ message: "Admin privilegien geändert" }))
+                                        dispatch(openToast({ message: ADMIN_PRIVILEGIEN_GEAENDERT }))
                                         doGetRequest("users").then((value) => {
                                             if (value.code === 200) {
                                                 dispatch(setMembers(value.content))
