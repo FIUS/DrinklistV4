@@ -10,7 +10,7 @@ type Props = {
     open: boolean
 }
 
-const drinkBuytimeout = 7000
+const drinkBuytimeout = 5500
 
 
 
