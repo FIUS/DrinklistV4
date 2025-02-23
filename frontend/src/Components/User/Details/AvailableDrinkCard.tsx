@@ -14,7 +14,8 @@ import style from './availableDrinkBox.module.scss'
 type Props = {
     category: string,
     drinks: Drink[] | undefined,
-    memberID: string
+    memberID: string,
+    image:string|null
 }
 
 const AvailableDrinkCard = (props: Props) => {
@@ -27,6 +28,9 @@ const AvailableDrinkCard = (props: Props) => {
             {props.drinks?.map(drink => {
                 return <><Button variant='outlined' className={style.button}>
                     <div className={style.clickable} onClick={() => {
+                        if(props.image!==null){
+                            doPostRequest("drinks/ai/training/user", { drinkID: drink.id, image: props.image })
+                        }
                         doPostRequest("drinks/buy",
                             {
                                 drinkID: drink.id,

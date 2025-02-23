@@ -770,6 +770,22 @@ class Queries:
                 # Add user to database
                 self.add_user(name, 0, util.standard_user_password,
                               name, hidden=not checked_in)
+                
+    def get_drink_id_by_closest_name(self, name):
+        drinks = self.session.query(Drink).all()
+        best_match = None
+        best_ratio = 0
+        for drink in drinks:
+            ratio = SequenceMatcher(None, name, drink.name).ratio()
+            if ratio > best_ratio:
+                best_match = drink
+                best_ratio = ratio
+
+        return best_match.id
+    
+    def get_drink_from_id(self, drink_id):
+        drink: Drink = self.session.query(Drink).filter_by(id=drink_id).first()
+        return drink
 
     def is_admin(self, member_id):
         member: Member = self.session.query(

@@ -9,7 +9,10 @@
 }
 
 .headline {
+    padding-left: variables.$padding;
     padding-top: variables.$padding;
+    padding-right: variables.$padding;
+    width: 100%;
 }
 
 .input {

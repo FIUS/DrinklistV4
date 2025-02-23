@@ -12,7 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { ABGESTRICHEN, BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -21,8 +21,15 @@ import CountUp from 'react-countup';
 import RequestDialog from './RequestDialog'
 import RequestConfirmation from './RequestConfirmation'
 import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import AIDrinkDialog from './AIDrinkDialog'
+import Webcam from 'react-webcam'
 
 type Props = {}
+
+type ScreenshotDimensions = {
+    width: number;
+    height: number;
+};
 
 const Details = (props: Props) => {
 
@@ -38,6 +45,17 @@ const Details = (props: Props) => {
     const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
 
     const mobileHistroyThreshold = 1270;
+
+    const checkIsUser = () => {
+        const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
+        const notUndefined = memberID !== undefined ? parseInt(memberID) : 0;
+
+        if (notUndefined > 2) {
+            return true
+        } else {
+            return false
+        }
+    }
 
     const currentMember = unsafeCurrentMember ? unsafeCurrentMember : {
         id: 0,
@@ -85,12 +103,7 @@ const Details = (props: Props) => {
     }, [dispatch, params.userid])
 
     useEffect(() => {
-        const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
-        const notUndefined = memberID !== undefined ? parseInt(memberID) : 0;
-
-        if (notUndefined > 2) {
-            setisUser(true)
-        }
+        setisUser(checkIsUser())
     }, [])
 
     const getUsername = () => {
@@ -247,8 +260,101 @@ const Details = (props: Props) => {
         return parseInt(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID") as string)
     }
 
+    const webcamRef = React.useRef<Webcam>(null);
+    const [caputedImage, setcaputedImage] = useState("")
+
+    const capture = React.useCallback(() => {
+        const d: ScreenshotDimensions = { width: 500, height: 500 }
+        const imageSrc = webcamRef.current ? webcamRef.current.getScreenshot(d) : null;
+        setcaputedImage(imageSrc ? imageSrc : "")
+        if (imageSrc===null){
+            return
+        }
+        doPostRequest("drinks/ai/recognition", { image: imageSrc }).then((value) => {
+            if (value.code === 200) {
+                const drinks: Array<Number> = value.content
+                if (drinks.length > 0) {
+                    const recognizedDrinks = drinks.map((value) => {
+                        return common.drinks?.find((drink) => {
+                            if (drink.id === value) {
+                                return drink
+                            }
+                        })
+                    })
+
+                    setaiDrinks(recognizedDrinks.filter((drink): drink is Drink => drink !== undefined))
+                    setaiDialogOpen(true)
+                    setcaptureOn(false)
+                }
+            }
+        }
+        )
+    }, [webcamRef, common.drinks]);
+
+
+    //Call every 1 second the capture function if the captureOn is true
+    const [captureOn, setcaptureOn] = useState(window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION)
+    const [aiDialogOpen, setaiDialogOpen] = useState(false)
+    const [aiDrinks, setaiDrinks] = useState<Array<Drink>>([])
+
+    useEffect(() => {
+        if (captureOn) {
+            const interval = setInterval(() => {
+                capture()
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [captureOn, capture])
+
+    const [shouldSendImage, setshouldSendImage] = useState(false)
+
     return (
         <>
+            <AIDrinkDialog drinks={aiDrinks} buyDrink={(drink: Drink | null) => {
+                if (drink) {
+                    doPostRequest("drinks/ai/training/user", { drinkID: drink.id, image: caputedImage })
+                    doPostRequest("drinks/buy",
+                        {
+                            drinkID: drink.id,
+                            memberID: params.userid ? params.userid : ""
+                        }).then(value => {
+                            if (value.code === 200) {
+                                dispatch(openToast({ message: format(ABGESTRICHEN, drink.name) }))
+                                doGetRequest("drinks").then((value) => {
+                                    if (value.code === 200) {
+                                        dispatch(setDrinks(value.content))
+                                    }
+                                })
+                                doGetRequest("users/" + params.userid ? params.userid : "" + "/history").then((value) => {
+                                    if (value.code === 200) {
+                                        dispatch(setHistory(value.content))
+                                    }
+                                })
+                                doGetRequest("users").then((value) => {
+                                    if (value.code === 200) {
+                                        dispatch(setMembers(value.content))
+                                    }
+                                })
+                                navigate(checkUser() !== 1 && checkUser() !== 2 ? "/user/" + checkUser() : "/")
+                            } else {
+                                dispatch(openErrorToast())
+                            }
+
+                        })
+                } else {
+                    setshouldSendImage(true)
+                }
+                setaiDialogOpen(false)
+            }} open={aiDialogOpen} />
+            {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && !checkIsUser() ?
+                <Webcam
+                    width={500}
+                    height={500}
+                    audio={false}
+                    style={{ overflow: "hidden", width: "0px", height: "0px" }}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                /> : <> </>}
             <TransferDialog
                 isOpen={common.transferDialogOpen}
                 close={() => dispatch(setTransferDialogOpen(false))}
@@ -287,7 +393,7 @@ const Details = (props: Props) => {
                         type="search"
                         autoFocus
                     />
-                    <BalanceBox favorites={common.drinks?.filter((value) => {
+                    <BalanceBox image={shouldSendImage ? caputedImage : null} favorites={common.drinks?.filter((value) => {
                         return common.favorites?.includes(value.id)
                     })}
                         memberID={params.userid ? params.userid : ""} />
@@ -298,7 +404,7 @@ const Details = (props: Props) => {
                             })
                             if (drinks?.some((value) => filterSeachDrinks(value))) {
                                 return <>
-                                    <AvailableDrinkCard category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
+                                    <AvailableDrinkCard image={shouldSendImage ? caputedImage : null} category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
                                 </>
                             } else {
                                 return <></>

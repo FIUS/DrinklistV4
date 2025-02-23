@@ -35,6 +35,7 @@ declare global {
       AUTH_COOKIE_PREFIX: string,
       SHOW_THEME_SWITCH: boolean,
       DEFAULT_THEME: number,
+      AI_BOTTLE_DETECTION: boolean,
     };
   }
 }
