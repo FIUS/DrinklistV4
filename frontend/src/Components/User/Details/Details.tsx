@@ -1,4 +1,4 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import BalanceBox from './BalanceBox'
 import style from './details.module.scss'
@@ -23,6 +23,7 @@ import RequestConfirmation from './RequestConfirmation'
 import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 import AIDrinkDialog from './AIDrinkDialog'
 import Webcam from 'react-webcam'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 type Props = {}
 
@@ -267,7 +268,7 @@ const Details = (props: Props) => {
         const d: ScreenshotDimensions = { width: 500, height: 500 }
         const imageSrc = webcamRef.current ? webcamRef.current.getScreenshot(d) : null;
         setcaputedImage(imageSrc ? imageSrc : "")
-        if (imageSrc===null){
+        if (imageSrc === null) {
             return
         }
         doPostRequest("drinks/ai/recognition", { image: imageSrc }).then((value) => {
@@ -302,7 +303,16 @@ const Details = (props: Props) => {
             const interval = setInterval(() => {
                 capture()
             }, 1000);
-            return () => clearInterval(interval);
+
+            const timeout = setTimeout(() => {
+                setcaptureOn(false);
+                clearInterval(interval);
+            }, 20000);
+
+            return () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+            };
         }
     }, [captureOn, capture])
 
@@ -346,7 +356,7 @@ const Details = (props: Props) => {
                 }
                 setaiDialogOpen(false)
             }} open={aiDialogOpen} />
-            {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && !checkIsUser() ?
+            {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && !checkIsUser() && captureOn ?
                 <Webcam
                     width={500}
                     height={500}
@@ -386,6 +396,7 @@ const Details = (props: Props) => {
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
+                    {captureOn ? <Chip icon={<AutoAwesomeIcon />} label="AI Erkennung aktiv" variant="filled" style={{ width: "fit-content" }} color='info' /> : <></>}
                     <TextField
                         placeholder={SUCHE_DOT_DOT_DOT}
                         value={searchField}
