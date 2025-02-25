@@ -511,7 +511,7 @@ class drink_training(Resource):
 
         output = []
 
-        print(predicted_labels)
+        #print(predicted_labels)
 
         if predicted_labels[0][0] == "nothing":
             return util.build_response([], code=404)
