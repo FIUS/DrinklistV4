@@ -356,15 +356,7 @@ const Details = (props: Props) => {
                 }
                 setaiDialogOpen(false)
             }} open={aiDialogOpen} />
-            {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && !checkIsUser() && captureOn ?
-                <Webcam
-                    width={500}
-                    height={500}
-                    audio={false}
-                    style={{ overflow: "hidden", width: "0px", height: "0px" }}
-                    ref={webcamRef}
-                    screenshotFormat="image/jpeg"
-                /> : <> </>}
+
             <TransferDialog
                 isOpen={common.transferDialogOpen}
                 close={() => dispatch(setTransferDialogOpen(false))}
@@ -396,7 +388,19 @@ const Details = (props: Props) => {
 
                 <div className={style.buyDrinkContainer}>
                     <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
-                    {captureOn ? <Chip icon={<AutoAwesomeIcon />} label="AI Erkennung aktiv" variant="filled" style={{ width: "fit-content" }} color='info' /> : <></>}
+                    {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && !checkIsUser() && captureOn ?
+                        <>
+                            <Webcam
+                                width={500}
+                                height={500}
+                                audio={false}
+                                style={{ overflow: "hidden", width: "0px", height: "0px" }}
+                                ref={webcamRef}
+                                screenshotFormat="image/jpeg"
+                            />
+                            <Chip icon={<AutoAwesomeIcon />} label="AI Erkennung aktiv" variant="filled" style={{ width: "fit-content" }} color='info' />
+                        </> : <> </>}
+
                     <TextField
                         placeholder={SUCHE_DOT_DOT_DOT}
                         value={searchField}
