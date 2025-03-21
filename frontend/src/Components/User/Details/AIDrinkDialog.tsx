@@ -8,6 +8,7 @@ type Props = {
     drinks: Array<Drink> | null
     buyDrink: (drink: Drink | null) => void
     open: boolean
+    image: string
 }
 
 const drinkBuytimeout = 5500
@@ -20,7 +21,7 @@ interface RectangularPaperWithLabelProps {
     drinkPrice: number;
     width?: number | string;
     height?: number | string;
-    buyDrink: () => void
+    buyDrink: () => void;
 }
 
 const RectangularPaperWithLabel: React.FC<RectangularPaperWithLabelProps> = ({
@@ -29,7 +30,7 @@ const RectangularPaperWithLabel: React.FC<RectangularPaperWithLabelProps> = ({
     drinkPrice,
     width = 200,
     height = 100,
-    buyDrink
+    buyDrink,
 }) => {
     const progress = value; // progress from 0 to 100
 
@@ -53,7 +54,7 @@ const RectangularPaperWithLabel: React.FC<RectangularPaperWithLabelProps> = ({
                 width,
                 height,
                 overflow: 'hidden',
-                padding: 2,
+                padding: "5px",
             }}
         >
             {/* SVG overlay to render the evolving border */}
@@ -94,9 +95,11 @@ const RectangularPaperWithLabel: React.FC<RectangularPaperWithLabelProps> = ({
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}
-            ><Button variant='text' onClick={() => buyDrink()}>
+            ><Button
+                variant='text'
+                onClick={() => buyDrink()}
+            >
                     <Stack flexDirection={"column"} justifyContent={"center"} alignItems={"center"} gap={1}>
-
                         <Typography
                             variant="h6"
                             component="div"
@@ -161,13 +164,24 @@ const AIDrinkDialog = (props: Props) => {
     }
 
     return (
-        <Dialog open={props.open} onClose={() => { }} sx={{ zIndex: 20000000 }} >
-            <DialogTitle>Getränk erkannt</DialogTitle>
-            <DialogContent className={style.transferBox}>
+        <Dialog open={props.open} onClose={() => { }} sx={{ zIndex: 20000000}} >
+            <div style={{
+                        backgroundImage: `url(${props.image})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        width: '100%',
+                        height: '100%',
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        opacity: '0.4',
+                    }} />
+            <DialogTitle sx={{ zIndex: 20000000}}>Getränk erkannt</DialogTitle>
+            <DialogContent className={style.transferBox} sx={{ zIndex: 20000000}}>
                 <Stack flexDirection={"column"} justifyContent={"center"} alignItems={"center"} gap={2}>
                     <RectangularPaperWithLabel value={progress} buyDrink={() => { closeDialog(0) }} drinkName={props.drinks ? props.drinks[0].name : ""} drinkPrice={props.drinks ? props.drinks[0].price : 0} />
                     <Typography variant='overline'>Alternative Vorschläge</Typography>
-                    <ButtonGroup variant="outlined" aria-label="Basic button group">
+                    <ButtonGroup variant="outlined" aria-label="Basic button group" style={{ backgroundColor: "white" }}>
                         <Button onClick={() => { closeDialog(1) }}>{props.drinks ? props.drinks[1].name : ""}</Button>
                         <Button onClick={() => { closeDialog(2) }}>{props.drinks ? props.drinks[2].name : ""}</Button>
                         <Button onClick={() => { closeDialog(3) }}>{props.drinks ? props.drinks[3].name : ""}</Button>

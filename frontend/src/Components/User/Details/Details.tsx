@@ -317,10 +317,10 @@ const Details = (props: Props) => {
     }, [captureOn, capture])
 
     const [shouldSendImage, setshouldSendImage] = useState(false)
-
+    
     return (
         <>
-            <AIDrinkDialog drinks={aiDrinks} buyDrink={(drink: Drink | null) => {
+            <AIDrinkDialog image={caputedImage} drinks={aiDrinks} buyDrink={(drink: Drink | null) => {
                 if (drink) {
                     doPostRequest("drinks/ai/training/user", { drinkID: drink.id, image: caputedImage })
                     doPostRequest("drinks/buy",
