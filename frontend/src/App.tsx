@@ -59,6 +59,9 @@ function App() {
       setthemeCookie(themeToSet)
       Cookies.set("theme", themeToSet.toString());
     }
+    if (window.globalTS.AUTH_COOKIE_PREFIX === undefined) {
+      window.globalTS.AUTH_COOKIE_PREFIX = "";
+    }
   }, [])
 
   return (
