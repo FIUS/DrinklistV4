@@ -19,6 +19,7 @@ type Props = {
     drink: Drink,
     memberID: string,
     isGeneratedFavorite?: boolean,
+    image: string | null
 }
 
 const DrinkButton = (props: Props) => {
@@ -43,6 +44,9 @@ const DrinkButton = (props: Props) => {
 
                 <Button className={style.button} variant='contained'>
                     <div className={style.innerbutton} onClick={() => {
+                        if(props.image!==null){
+                            doPostRequest("drinks/ai/training/user", { drinkID: props.drink.id, image: props.image })
+                        }
                         doPostRequest("drinks/buy",
                             {
                                 drinkID: props.drink.id,

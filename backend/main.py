@@ -19,6 +19,11 @@ from flask_restx import reqparse
 import flask
 import mail
 import secrets
+import base64
+import secrets
+
+if util.ai_enabled:
+    import ai
 
 api_bp = flask.Blueprint("api", __name__, url_prefix="/api/")
 api = Api(api_bp, doc='/docu/', base_url='/api')
@@ -38,6 +43,8 @@ with app.app_context():
     if util.pretix_url is not None:
         db.enable_disable_pretix_user()
         taskScheduler.add_5min_Task(db.enable_disable_pretix_user)
+    #if util.ai_enabled:
+    #    taskScheduler.add_Weekly_Task(ai.learn_and_set)
     taskScheduler.start()
 
 
@@ -450,6 +457,110 @@ class get_user_categories(Resource):
         Get all categories
         """
         return util.build_response(db.get_drink_categories())
+
+
+@api.route('/drinks/ai/train')
+class drink_training(Resource):
+    @authenticated
+    def post(self):
+        """
+        Receive base64 encoded image and store the image on the server
+        """
+        image = request.json["image"]
+        image = image.split(",")[1]
+        image = image.encode()
+
+        # If directory does not exist, create it
+        if not os.path.exists("ml/training"):
+            os.makedirs("ml/training")
+
+        # current time with milliseconds as filename
+        time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+
+        with open("ml/training/"+time+".jpg", "wb") as fh:
+            fh.write(base64.decodebytes(image))
+            return util.build_response("Image received")
+
+        return util.build_response(code=500)
+
+
+@api.route('/drinks/ai/recognition')
+class drink_training(Resource):
+    @authenticated
+    def post(self):
+        """
+        Receive base64 encoded image and store the image on the server
+        """
+        image = request.json["image"]
+        image = image.split(",")[1]
+        image = image.encode()
+
+        # If directory does not exist, create it
+        if not os.path.exists("ml/recognition"):
+            os.makedirs("ml/recognition")
+
+        image_path = secrets.token_urlsafe(24) + ".jpg"
+
+        with open("ml/recognition/"+image_path, "wb") as fh:
+            fh.write(base64.decodebytes(image))
+
+        predicted_labels = ai.predict_jpg("ml/recognition/"+image_path)
+
+        # Delete the image after prediction
+        os.remove("ml/recognition/"+image_path)
+
+        output = []
+
+        print(predicted_labels)
+
+        if predicted_labels[0][0] == "nothing":
+            return util.build_response([], code=404)
+
+        if predicted_labels[0][1] > 0.9:
+            # Search for all labels the best matching drink
+            for label in predicted_labels:
+                drink_id_to_add = db.get_drink_id_by_closest_name(label[0])
+                if drink_id_to_add is not None:
+                    output.append(drink_id_to_add)
+
+            return util.build_response(output)
+
+        return util.build_response([], code=404)
+
+
+@api.route('/drinks/ai/training/user')
+class user_identified_data(Resource):
+
+    @authenticated
+    def post(self):
+        """
+        Receive base64 encoded image and store the image on the server
+        """
+        image = request.json["image"]
+        image = image.split(",")[1]
+        image = image.encode()
+
+        # If directory does not exist, create it
+        if not os.path.exists("ml/training-user"):
+            os.makedirs("ml/training-user")
+
+        # current time with milliseconds as filename
+        time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+
+        drink_id = request.json["drinkID"]
+        drink: Drink = db.get_drink_from_id(drink_id)
+
+        drink_directory = "ml/training-user/"+drink.name
+
+        # check if drink directory exists
+        if not os.path.exists(drink_directory):
+            os.makedirs(drink_directory)
+
+        with open(drink_directory+"/"+time+".jpg", "wb") as fh:
+            fh.write(base64.decodebytes(image))
+            return util.build_response("Image received")
+
+        return util.build_response(code=500)
 
 
 @api.route('/drinks/<int:drink_id>/price')

@@ -18,4 +18,5 @@ window.globalTS = {
     "OIDC_BUTTON_TEXT": null,
     "DEFAULT_THEME": 3,
     "SHOW_THEME_SWITCH": false,
+    "AI_BOTTLE_DETECTION": true,
 };

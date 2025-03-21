@@ -4,6 +4,7 @@ import os
 import datetime
 import time
 import requests
+import random
 
 cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
     60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
@@ -83,6 +84,10 @@ pretix_event = os.environ.get("PRETIX_EVENT") if os.environ.get(
 pretix_api_token = os.environ.get("PRETIX_API_TOKEN") if os.environ.get(
     "PRETIX_API_TOKEN") else None
 
+ai_enabled = os.environ.get("AI_ENABLED") == "true" if os.environ.get(
+    "AI_ENABLED") else False
+ai_model_path = os.environ.get("AI_MODEL_PATH") if os.environ.get(
+    "AI_MODEL_PATH") else "drinks_bottle_classifier-m6.keras"
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
