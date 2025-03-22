@@ -27,7 +27,7 @@
     "react-router-dom": "^7.1.0",
     "react-string-format": "^1.0.1",
     "recharts": "^2.9.0",
-    "redux": "^4.2.1",
+    "redux": "^5.0.1",
     "rollup": "^4.29.1",
     "sass": "^1.83.0",
     "typescript": "^5.7.2",
