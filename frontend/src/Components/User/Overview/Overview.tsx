@@ -1,10 +1,10 @@
-import { Box, Fab, FormControl, Grow, Slide, TextField, Typography } from '@mui/material'
+import { Box, Fab, FormControl, Grow, Slide, Stack, Switch, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { datetimeToString, doGetRequest } from '../../Common/StaticFunctions';
+import { datetimeToString, doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { NAME, WER_BIST_DU } from '../../Common/Internationalization/i18n';
@@ -12,6 +12,13 @@ import { Member, Transaction } from '../../../types/ResponseTypes';
 import HistoryIcon from '@mui/icons-material/History';
 import Spacer from '../../Common/Spacer';
 import { useNavigate } from 'react-router-dom';
+import Webcam from "react-webcam";
+import Cookies from 'js-cookie';
+
+type ScreenshotDimensions = {
+    width: number;
+    height: number;
+};
 
 type Props = {}
 
@@ -131,14 +138,49 @@ const Overview = (props: Props) => {
         if (visibleUsers?.length === 1) {
             navigate("/user/" + visibleUsers[0].id)
         }
+
     }
+    const webcamRef = React.useRef<Webcam>(null);
+
+    const capture = React.useCallback(() => {
+        const d: ScreenshotDimensions = { width: 500, height: 500 }
+        const imageSrc = webcamRef.current ? webcamRef.current.getScreenshot(d) : null;
+        doPostRequest("drinks/ai/train", { image: imageSrc })
+    }, [webcamRef]);
+
+
+    //Call every 1 second the capture function if the captureOn is true
+    const [caputeOn, setcaputeOn] = useState(false)
+    useEffect(() => {
+        if (caputeOn) {
+            const interval = setInterval(() => {
+                capture()
+            }, 100);
+            return () => clearInterval(interval);
+        }
+    }, [caputeOn, capture])
+
 
     return (
         <>
+            {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && Cookies.get("ai-training") ?
+
+                <Webcam
+                    width={500}
+                    height={500}
+                    audio={false}
+                    style={{ display: caputeOn ? "block" : "none" }}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                /> : <> </>}
+
             <div className={style.outterContainer}>
-                <div className={style.headline}>
+                <Stack className={style.headline} flexDirection={"row"} justifyContent={"space-between"}>
+                    {window.globalTS.AI_BOTTLE_DETECTION !== undefined && window.globalTS.AI_BOTTLE_DETECTION && Cookies.get("ai-training") ?
+                        <Switch checked={caputeOn} onChange={(value) => setcaputeOn(value.target.checked)} /> : <div />}
                     <Typography variant='h4'>{WER_BIST_DU}</Typography>
-                </div>
+                    <div />
+                </Stack>
                 <form className={style.textfieldForm} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); redirectToUser() }}>
                     <FormControl className={style.form}>
                         <TextField

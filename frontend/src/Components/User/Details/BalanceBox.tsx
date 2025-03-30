@@ -12,7 +12,8 @@ import { RootState } from '../../../Reducer/reducerCombiner'
 
 type Props = {
     favorites: Array<Drink> | undefined,
-    memberID: string
+    memberID: string,
+    image: string | null
 }
 
 const BalanceBox = (props: Props) => {
@@ -41,13 +42,16 @@ const BalanceBox = (props: Props) => {
             {props.favorites?.length > 0 || showAdditionalDrink ? <><Typography variant='h4'>{FAVORITEN}</Typography>
                 <div className={style.drinkButtonContainer} ref={containerRef}>
                     {showAdditionalDrink ? <DrinkButton
+                        image={props.image}
                         drink={generatedFavorite !== undefined ? generatedFavorite : common.drinks![0]}
                         memberID={props.memberID}
                         key={props.memberID}
                         isGeneratedFavorite={true}
                     /> : <></>}
                     {props.favorites?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).map((value) => {
-                        return <DrinkButton drink={value}
+                        return <DrinkButton
+                            image={props.image}
+                            drink={value}
                             memberID={props.memberID}
                             key={props.memberID}
                             isGeneratedFavorite={favorite?.drinkID === value.id}

@@ -8,3 +8,9 @@ psycopg2
 waitress
 requests
 werkzeug
+tensorflow
+numpy
+matplotlib
+pillow
+scipy
+autokeras
