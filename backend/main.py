@@ -83,7 +83,11 @@ def admin(fn):
 
 
 def is_self_or_admin(request, member_id):
-    return str(member_id) == str(request.cookies.get(f"{util.auth_cookie_memberID}memberID")) or str(request.cookies.get(f"{util.auth_cookie_memberID}memberID")) == "1"
+    is_self = str(member_id) == str(request.cookies.get(
+        f"{util.auth_cookie_memberID}memberID"))
+    is_admin = db.is_admin(member_id)
+
+    return is_self or is_admin
 
 
 model_amount = api.model('Amount', {
