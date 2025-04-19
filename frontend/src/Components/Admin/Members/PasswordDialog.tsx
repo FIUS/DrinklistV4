@@ -8,9 +8,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { doPostRequest } from '../../Common/StaticFunctions';
 import { Member } from '../../../types/ResponseTypes';
-import { ABBRECHEN, AKTUALISIEREN, LOKALES_PASSWORT_AENDERN, NEUES_PASSWORT_FESTLEGEN, NEUES_PASSWORT_FUER_NUTZER, PASSWORT } from '../../Common/Internationalization/i18n';
+import { ABBRECHEN, AKTUALISIEREN, FEHLER_AUFGETRETEN, LOKALES_PASSWORT_AENDERN, NEUES_PASSWORT_FESTLEGEN, NEUES_PASSWORT_FUER_NUTZER, PASSWORT, PASSWORT_GEAENDERT } from '../../Common/Internationalization/i18n';
 import { format } from 'react-string-format';
 import Spacer from '../../Common/Spacer';
+import { useDispatch } from 'react-redux';
+import { openToast } from '../../../Actions/CommonAction';
 
 type Props = {
     isOpen: boolean,
@@ -19,6 +21,8 @@ type Props = {
 }
 
 const PasswordDialog = (props: Props) => {
+
+    const dispatch = useDispatch()
 
     let newPassword = ""
     return (
@@ -56,7 +60,10 @@ const PasswordDialog = (props: Props) => {
 
                     doPostRequest("users/" + props.member.id + "/password", { password: newPassword }).then(value => {
                         if (value.code === 200) {
+                            dispatch(openToast({ message: PASSWORT_GEAENDERT, type: "success" }))
                             props.close()
+                        } else {
+                            dispatch(openToast({ message: format(FEHLER_AUFGETRETEN, value.code), type: "error" }))
                         }
                     })
 

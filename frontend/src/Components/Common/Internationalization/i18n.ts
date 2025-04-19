@@ -120,6 +120,7 @@ export const NUTZER_DASHBOARD = "Nutzer Dashboard";
 export const NUTZER_LEOSCHEN = "Nutzer löschen";
 export const NUTZERNAME_AENDERN = "Benutzername ändern";
 export const NUTZERNAME_NICHT_GEAENDERT = "Name nicht geändert";
+export const FEHLER_AUFGETRETEN = `Ein Fehler ist aufgetreten - Code: {0}`;
 export const NUTZERNAME_NICHT_LEER = "Nutzername darf nicht leer sein";
 export const OEFFNEN = "Öffnen";
 export const OFFENE_ISSUES = "Offene Issues: {0}";
