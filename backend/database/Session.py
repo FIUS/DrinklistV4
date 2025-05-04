@@ -12,4 +12,4 @@ class Session(db.Model):
     time = sql.Column(sql.DateTime, nullable=False)
 
     def to_dict(self):
-        return (self.token, (self.member_id, self.time))
+        return {"token": self.token, "member_id": self.member_id, "time": self.time}

@@ -876,20 +876,20 @@ class oidc_redirect(Resource):
             # create user
             new_member = db.add_user(userinfo["username"],
                                      0, util.standard_user_password, alias=userinfo["name"], hidden=util.OIDC_USER_NEEDS_VERIFICATION)
-            mail.send_welcome_mail(new_member.name)
+            mail.send_welcome_mail(new_member['name'])
 
             if util.OIDC_USER_NEEDS_VERIFICATION:
                 return flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE+"/message/new-user", code=302)
 
-            user_id = new_member.id
+            user_id = new_member['id']
             login_token = token_manager.create_token(user_id)
 
         else:
-            if user.hidden:
+            if user['hidden']:
                 return flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE+"/message/activate", code=302)
 
             # log user in
-            user_id = user.id
+            user_id = user['id']
             login_token = token_manager.create_token(user_id)
 
         r = flask.redirect(util.OIDC_REDIRECT_MAIN_PAGE, code=302)

@@ -12,15 +12,15 @@ class TokenManager:
 
         sessions = self.queries.load_tokens()
         for s in sessions:
-            self.token_storage[s.token] = {
-                'memberID': s.member_id, 'time': s.time}
+            self.token_storage[s['token']] = {
+                'memberID': s['member_id'], 'time': s['time']}
 
     def check_token(self, memberID, token):
         if token not in self.token_storage:
             sessions = self.queries.load_tokens()
             for s in sessions:
-                self.token_storage[s.token] = {
-                    'memberID': s.member_id, 'time': s.time}
+                self.token_storage[s['token']] = {
+                    'memberID': s['member_id'], 'time':  s['time']}
         if token in self.token_storage:
             stored_token = self.token_storage[token]
             storedMemberID = int(stored_token['memberID'])
@@ -30,7 +30,7 @@ class TokenManager:
             if stored_token['time']+datetime.timedelta(hours=self.cookie_expires) > datetime.datetime.utcnow():
                 return True
             else:
-                del(self.token_storage[token])
+                del (self.token_storage[token])
 
         return False
 
@@ -43,7 +43,7 @@ class TokenManager:
         return token
 
     def delete_token(self, token):
-        del(self.token_storage[token])
+        del (self.token_storage[token])
         self.queries.delete_token(token)
 
     def hashPassword(password, salt=None):
@@ -52,7 +52,8 @@ class TokenManager:
             'sha256',  # The hash digest algorithm for HMAC
             password.encode('utf-8'),  # Convert the password to bytes
             usedSalt.encode('utf-8'),  # Provide the salt
-            util.password_hash_rounds,  # It is recommended to use at least 100,000 iterations of SHA-256
+            # It is recommended to use at least 100,000 iterations of SHA-256
+            util.password_hash_rounds,
             dklen=128  # Get a 128 byte key
         )
         if salt is None:
