@@ -448,7 +448,7 @@ class Queries:
             member: Member = session.query(
                 Member).filter_by(name=name.lower()).first()
 
-            return member.id if member is not None else None
+            return member.to_dict() if member is not None else None
 
     def get_most_bought_drink_name(self, member_id: int, timestamp: datetime):
         with self.get_session() as session:
