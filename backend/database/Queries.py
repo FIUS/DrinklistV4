@@ -290,15 +290,18 @@ class Queries:
             member: Member = session.query(
                 Member).filter_by(id=member_id).first()
             member.balance += amount
-            deposit_transaction = Transaction(description=f"Deposit",
-                                              member_id=member_id, amount=amount)
-            session.add(deposit_transaction)
+            connected_checkout = None
+
             checkouts = self.get_checkouts()
             if len(checkouts) > 0:
                 most_recent_checkout = session.query(
                     Checkout).filter_by(id=checkouts[-1]["id"]).first()
                 most_recent_checkout.current_cash += amount
-                deposit_transaction.checkout_id = most_recent_checkout.id
+                connected_checkout = most_recent_checkout.id
+
+            deposit_transaction = Transaction(description=f"Deposit",
+                                              member_id=member_id, amount=amount, checkout_id=connected_checkout)
+            session.add(deposit_transaction)
 
             session.commit()
 
