@@ -856,31 +856,31 @@ class Queries:
             return member.is_admin
 
     def add_token(self, token, member_id, time):
-        with self.get_session() as session:
-            session: Session = session.query(
+        with self.get_session() as db_session:
+            session: Session = db_session.query(
                 Session).filter_by(member_id=member_id).first()
             if session is None:
-                session.add(
+                db_session.add(
                     Session(token=token, member_id=member_id, time=time))
             else:
                 session.token = token
                 session.time = time
 
-            session.commit()
+            db_session.commit()
 
     def delete_token(self, token):
-        with self.get_session() as session:
-            session: Session = session.query(
+        with self.get_session() as db_session:
+            session: Session = db_session.query(
                 Session).filter_by(token=token).first()
 
             if session is not None:
-                session.delete(session)
-                session.commit()
+                db_session.delete(session)
+                db_session.commit()
 
     def load_tokens(self):
-        with self.get_session() as session:
+        with self.get_session() as db_session:
 
-            sessions = session.query(Session).all()
+            sessions = db_session.query(Session).all()
             return [s.to_dict() for s in sessions]
 
     def get_config_state(self):
