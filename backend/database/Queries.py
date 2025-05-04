@@ -20,6 +20,7 @@ from sqlalchemy import inspect, text
 import database.Migrations
 import math
 from contextlib import contextmanager
+import threading
 
 
 class Queries:
@@ -27,6 +28,7 @@ class Queries:
 
         self.db: SQLAlchemy = db
         self.db.create_all()
+        self.write_lock = threading.Lock()
 
         with self.get_session() as session:
             if not database.Migrations.migrate(session):
@@ -200,22 +202,23 @@ class Queries:
             session.commit()
 
     def buy_drink(self, member_id, drink_id):
-        with self.get_session() as session:
-            drink: Drink = session.query(
-                Drink).filter_by(id=drink_id).first()
-            if drink is None:
-                return {}
-            member: Member = session.query(
-                Member).filter_by(id=member_id).first()
+        with self.write_lock:
+            with self.get_session() as session:
+                drink: Drink = session.query(
+                    Drink).filter_by(id=drink_id).first()
+                if drink is None:
+                    return {}
+                member: Member = session.query(
+                    Member).filter_by(id=member_id).first()
 
-            member.balance -= drink.price
-            drink.stock -= 1
-            session.add(Transaction(
-                description=f"{drink.name}", member_id=member.id, amount=(-drink.price)))
+                member.balance -= drink.price
+                drink.stock -= 1
+                session.add(Transaction(
+                    description=f"{drink.name}", member_id=member.id, amount=(-drink.price)))
 
-            session.commit()
+                session.commit()
 
-            return drink.to_dict()
+                return drink.to_dict()
 
     def get_drink_categories(self):
         with self.get_session() as session:
@@ -250,30 +253,31 @@ class Queries:
             return session.query(Transaction).filter_by(id=transaction_id).first().to_dict()
 
     def delete_transaction(self, transaction_id):
-        with self.get_session() as session:
-            transaction: Transaction = session.query(
-                Transaction).filter_by(id=transaction_id).first()
-            if transaction.checkout_id is not None:
-                # Cannot delete a transaction that is part of a checkout
-                return False
+        with self.write_lock:
+            with self.get_session() as session:
+                transaction: Transaction = session.query(
+                    Transaction).filter_by(id=transaction_id).first()
+                if transaction.checkout_id is not None:
+                    # Cannot delete a transaction that is part of a checkout
+                    return False
 
-            member: Member = session.query(Member).filter_by(
-                id=transaction.member_id).first()
-            member.balance -= transaction.amount
+                member: Member = session.query(Member).filter_by(
+                    id=transaction.member_id).first()
+                member.balance -= transaction.amount
 
-            if transaction.connected_transaction_id is not None:
-                transaction_connected: Transaction = session.query(
-                    Transaction).filter_by(id=transaction.connected_transaction_id).first()
+                if transaction.connected_transaction_id is not None:
+                    transaction_connected: Transaction = session.query(
+                        Transaction).filter_by(id=transaction.connected_transaction_id).first()
 
-                member_connected: Member = session.query(Member).filter_by(
-                    id=transaction_connected.member_id).first()
-                member_connected.balance -= transaction_connected.amount
-                session.delete(transaction_connected)
+                    member_connected: Member = session.query(Member).filter_by(
+                        id=transaction_connected.member_id).first()
+                    member_connected.balance -= transaction_connected.amount
+                    session.delete(transaction_connected)
 
-            session.delete(transaction)
+                session.delete(transaction)
 
-            session.commit()
-            return True
+                session.commit()
+                return True
 
     def delete_user(self, member_id):
         with self.get_session() as session:
