@@ -113,7 +113,7 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * The id of the checkin list in pretix
   * Defaults to: `None`
 * `PRETIX_ORGANIZER`
-  * The organizer shot name of the event in pretix
+  * The organizer short name of the event in pretix
   * Defaults to: `None`
 * `PRETIX_EVENT`
   * The event slug of the event in pretix
