@@ -6,10 +6,10 @@ import util
 
 class Drink(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
-    name = sql.Column(sql.String(100), nullable=False, unique=True)
-    stock = sql.Column(sql.Integer, default=0, nullable=True)
-    price = sql.Column(sql.Float, default=0, nullable=True)
-    category = sql.Column(sql.String(100), nullable=False,
+    name = sql.Column(sql.String(100), unique=True)
+    stock = sql.Column(sql.Integer, default=0)
+    price = sql.Column(sql.Float, default=0)
+    category = sql.Column(sql.String(100),
                           default=util.default_drink_category)
 
     def to_dict(self):
