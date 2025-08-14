@@ -43,7 +43,7 @@ with app.app_context():
     if util.pretix_url is not None:
         db.enable_disable_pretix_user()
         taskScheduler.add_5min_Task(db.enable_disable_pretix_user)
-    #if util.ai_enabled:
+    # if util.ai_enabled:
     #    taskScheduler.add_Weekly_Task(ai.learn_and_set)
     taskScheduler.start()
 
@@ -571,6 +571,9 @@ class set_drink_price(Resource):
         """
         Set the price of a drink
         """
+        if request.json["amount"] is None:
+            return util.build_response("Price cannot be empty", code=406)
+
         db.change_drink_price(drink_id, request.json["amount"])
         return util.build_response("Price changed")
 
