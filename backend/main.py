@@ -464,6 +464,10 @@ class set_drink_price(Resource):
         """
         Set the price of a drink
         """
+
+        if request.json["amount"] is None:
+            return util.build_response("Price cannot be empty", code=406)
+
         db.change_drink_price(drink_id, request.json["amount"])
         return util.build_response("Price changed")
 
