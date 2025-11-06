@@ -32,9 +32,6 @@ class Transaction(db.Model):
             "partOfCheckout": self.checkout_id is not None
         }
 
-        if self.member_id == 61:
-            print(output["partOfCheckout"], self.checkout_id)
-
         if self.member is not None:
             output["memberName"] = self.member.name
 
