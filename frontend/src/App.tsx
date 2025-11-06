@@ -5,7 +5,7 @@ import { themes } from './Components/Common/Theme';
 
 import allReducer from './Reducer/reducerCombiner';
 import { createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
+//import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import { Box, CssBaseline, ScopedCssBaseline, Toolbar } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -41,7 +41,7 @@ declare global {
 
 function App() {
   const [themeCookie, setthemeCookie] = useState(0)
-  const store = createStore(allReducer, composeWithDevTools())
+  const store = createStore(allReducer)
 
   useEffect(() => {
     // Get current theme from cookie
