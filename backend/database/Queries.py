@@ -397,23 +397,26 @@ class Queries:
     def get_checkout_mail(self, memberIDs):
         with self.get_session() as session:
             members: list[Member] = session.query(Member).all()
+            members= [m.to_dict() for m in members]
             checkouts = self.get_checkouts()
+            
             if len(checkouts) > 2:
                 last_checkout = self.get_checkouts()[-2]
                 last_date = datetime.strptime(
                     last_checkout["date"], '%Y-%m-%dT%H:%M:%SZ')
                 "{price,income,paid,name}"
                 member_dict = {}
+                
                 for m in members:
-                    if m.id not in memberIDs:
+                    if m["id"] not in memberIDs:
                         continue
 
                     transactions: list[Transaction] = session.query(Transaction).filter(
-                        Transaction.date > last_date, Transaction.member_id == m.id).all()
+                        Transaction.date > last_date, Transaction.member_id == m["id"]).all()
                     temp_dict = {}
-                    temp_dict["balance"] = m.balance
-                    temp_dict["name"] = m.alias if m.alias != "" else m.name
-                    temp_dict["id"] = m.id
+                    temp_dict["balance"] = m["balance"]
+                    temp_dict["name"] = m["alias"] if m["alias"] != "" else m["name"]
+                    temp_dict["id"] = m["id"]
                     income_transactions = []
                     paid_transactions = []
 
@@ -430,7 +433,7 @@ class Queries:
                     temp_dict["income"] = income_transactions
                     temp_dict["paid"] = paid_transactions
 
-                    member_dict[m.name] = temp_dict
+                    member_dict[m["name"]] = temp_dict
 
                 return member_dict
             else:
