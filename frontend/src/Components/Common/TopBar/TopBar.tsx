@@ -190,7 +190,7 @@ const TopBar = (props: Props) => {
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                    <ListItemButton onClick={() => navigate("/admin/federation")}>
+                    <ListItemButton onClick={() => navigate("/admin/federations")}>
                         <ListItemIcon>
                             <Diversity2Icon />
                         </ListItemIcon>

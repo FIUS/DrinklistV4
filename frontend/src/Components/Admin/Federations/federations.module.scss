@@ -1,0 +1,40 @@
+@use "../../Common/variables.module.scss";
+
+.container {
+    padding: variables.$padding;
+}
+
+.federationListItem{
+    padding: variables.$padding;
+    width: fit-content;
+}
+
+.pendingChipLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pendingDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgb(255, 152, 0);
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.55);
+    animation: pendingPulse 1.6s infinite;
+}
+
+@keyframes pendingPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.55);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px transparent;
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 transparent;
+    }
+}

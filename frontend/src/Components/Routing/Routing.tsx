@@ -13,6 +13,7 @@ import Message from '../Common/Message/Message';
 import MainConfigurator from '../Admin/Configurator/MainConfigurator';
 import MainConfiguratorInit from '../Admin/Configurator/MainConfiguratorInit';
 import Statistics from '../Admin/Statistics/Statistics';
+import Federations from '../Admin/Federations/Federations';
 
 type Props = {}
 
@@ -33,6 +34,7 @@ const Routing = (props: Props) => {
                 <Route path="/admin/checkout" element={<Checkout />} />
                 <Route path="/admin/statistics" element={<Statistics />} />
                 <Route path="/admin/settings" element={<Settings />} />
+                <Route path="/admin/federations" element={<Federations />} />
             </Routes>
         </>
     )
