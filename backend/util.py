@@ -11,6 +11,8 @@ domain = os.environ.get("DOMAIN") if os.environ.get(
     "DOMAIN") else "127.0.0.1:3000"
 logging_enabled = os.environ.get(
     "DEBUG") == "true" if os.environ.get("DEBUG") else False
+federation_enabled = os.environ.get(
+    "FEDERATION") == "true" if os.environ.get("FEDERATION") else False
 
 token = os.environ.get("X_AUTH_TOKEN")
 old_domain = os.environ.get("OLD_DOMAIN")
