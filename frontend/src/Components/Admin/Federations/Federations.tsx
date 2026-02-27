@@ -21,7 +21,7 @@ const Federations = (props: Props) => {
 
     useEffect(() => {
         //TODO fetch federations from backend and set state
-        doGetRequest("/federations").then((resp) => {
+        doGetRequest("federations").then((resp) => {
             if (resp.code === 200) {
                 setfederations(resp.content as Federation[])
             }
@@ -61,12 +61,12 @@ const Federations = (props: Props) => {
                     <Button variant='outlined' onClick={() => {
                         if (name !== "" && domain !== "") {
                             //TODO send request to backend to create pending federation
-                            doPostRequest("/federation/local", {
+                            doPostRequest("federation/local", {
                                 name: name,
                                 domain: domain
                             }).then((resp) => {
                                 if (resp.code === 200) {
-                                    doGetRequest("/federations").then((resp) => {
+                                    doGetRequest("federations").then((resp) => {
                                         if (resp.code === 200) {
                                             setfederations(resp.content as Federation[])
                                         }
