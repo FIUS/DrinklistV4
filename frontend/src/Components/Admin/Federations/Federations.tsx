@@ -87,13 +87,11 @@ const Federations = (props: Props) => {
                 {federations && federations.map((federation) => (
                     <FederationsDetail key={federation.id} 
                     name={federation.name} 
-                    pending={federation.pending} 
+                    accepted={federation.accepted} 
                     balance={federation.balance} 
-                    extern={federation.extern} />
+                    initiator={federation.initiator} />
                 ))}
-                <FederationsDetail name='stuvus' pending={true} />
-                <FederationsDetail name='stuvus' pending={true} extern={true} />
-                <FederationsDetail name='stuvus' balance={-12.50} />
+                
             </Stack>
         </div>
     )

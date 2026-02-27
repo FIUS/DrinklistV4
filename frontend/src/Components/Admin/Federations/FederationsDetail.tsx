@@ -8,9 +8,9 @@ import { doPostRequest } from '../../Common/StaticFunctions';
 
 type Props = {
     name: string,
-    pending?: boolean,
+    accepted?: boolean,
     balance?: number,
-    extern?: boolean
+    initiator?: boolean
 }
 
 const FederationsDetail = (props: Props) => {
@@ -27,7 +27,7 @@ const FederationsDetail = (props: Props) => {
                     <Typography variant="h5">
                         {props.name}
                     </Typography>
-                    {props.pending ?
+                    {!props.accepted ?
                         <Chip
                             label={
                                 <span className={style.pendingChipLabel}>
@@ -42,7 +42,7 @@ const FederationsDetail = (props: Props) => {
                         {props.balance.toFixed(2)}€
                     </Typography> : <></>}
 
-                {props.extern ?
+                {!props.initiator ?
                     <Button variant="contained"
                         color="primary"
                         onClick={() => {
@@ -50,7 +50,7 @@ const FederationsDetail = (props: Props) => {
                         }}>
                         Akzeptieren
                     </Button> : <></>}
-                {props.pending ?
+                {!props.accepted ?
                     <Button variant="outlined"
                         color="primary"
                         onClick={() => {
@@ -58,7 +58,7 @@ const FederationsDetail = (props: Props) => {
                         }}>
                         Abbrechen
                     </Button> : <></>}
-                {!props.pending ?
+                {props.accepted ?
                     <>
                         <Grow in={isOpen} unmountOnExit>
                             <Stack direction="column" spacing={2}>

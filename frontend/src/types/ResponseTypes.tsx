@@ -47,8 +47,8 @@ export type Message = {
 export type Federation = {
     id: number,
     name: string,
-    url: string,
+    domain: string,
     balance?: number,
-    pending?: boolean,
-    extern?: boolean
+    accepted?: boolean,
+    initiator?: boolean
 }
