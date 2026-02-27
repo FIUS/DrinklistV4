@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import style from './Federations.module.scss';
+import style from './federations.module.scss';
 import { Accordion, AccordionDetails, AccordionSummary, Button, Chip, Paper, Stack, TextField, Typography } from '@mui/material';
 import Spacer from '../../Common/Spacer';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

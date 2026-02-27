@@ -43,3 +43,11 @@ export type Message = {
         amount: number
     }
 }
+
+export type Federation = {
+    id: number,
+    name: string,
+    url: string,
+    balance: number,
+    pending: boolean
+}
