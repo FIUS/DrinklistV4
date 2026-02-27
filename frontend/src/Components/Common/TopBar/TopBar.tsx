@@ -33,6 +33,7 @@ import { themes } from '../Theme';
 import KeyIcon from '@mui/icons-material/Key';
 import PasswordDialog from '../../Admin/Members/PasswordDialog';
 import { Member } from '../../../types/ResponseTypes';
+import Diversity2Icon from '@mui/icons-material/Diversity2';
 
 type Props = {}
 
@@ -186,6 +187,14 @@ const TopBar = (props: Props) => {
                             < InsertChartIcon />
                         </ListItemIcon>
                         <ListItemText primary={STATISTIKEN} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/admin/federation")}>
+                        <ListItemIcon>
+                            <Diversity2Icon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Federations"} />
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
