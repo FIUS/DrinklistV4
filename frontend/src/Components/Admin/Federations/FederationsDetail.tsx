@@ -7,10 +7,12 @@ import { HINZUFUEGEN } from '../../Common/Internationalization/i18n';
 import { doPostRequest } from '../../Common/StaticFunctions';
 
 type Props = {
+    id: number,
     name: string,
     accepted?: boolean,
     balance?: number,
-    initiator?: boolean
+    initiator?: boolean,
+    reload: () => void
 }
 
 const FederationsDetail = (props: Props) => {
@@ -46,7 +48,13 @@ const FederationsDetail = (props: Props) => {
                     <Button variant="contained"
                         color="primary"
                         onClick={() => {
-                            //TODO abort pending federation
+                            doPostRequest("federation/local/accept", {
+                                federationID: props.id
+                            }).then((resp) => {
+                                if (resp.code !== 200) {
+                                    props.reload()
+                                }
+                            })
                         }}>
                         Akzeptieren
                     </Button> : <></>}
@@ -54,7 +62,14 @@ const FederationsDetail = (props: Props) => {
                     <Button variant="outlined"
                         color="primary"
                         onClick={() => {
-                            //TODO abort pending federation
+                            doPostRequest("federation/local/deny", {
+                                federationID: props.id
+                            }).then((resp) => {
+                                if (resp.code !== 200) {
+                                    //TODO handle error
+                                    props.reload()
+                                }
+                            })
                         }}>
                         Abbrechen
                     </Button> : <></>}

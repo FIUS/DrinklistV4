@@ -17,6 +17,7 @@ const Federations = (props: Props) => {
     const [name, setname] = useState("")
     const [domain, setdomain] = useState("")
     const [federations, setfederations] = useState<Federation[] | null>(null)
+    const [reload, setreload] = useState(false)
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -26,7 +27,7 @@ const Federations = (props: Props) => {
                 setfederations(resp.content as Federation[])
             }
         })
-    }, [])
+    }, [reload])
 
 
     return (
@@ -85,11 +86,13 @@ const Federations = (props: Props) => {
 
             <Stack direction="row" flexWrap={"wrap"} gap={2} alignItems={"center"}>
                 {federations && federations.map((federation) => (
-                    <FederationsDetail key={federation.id} 
+                    <FederationsDetail key={federation.id}
+                    id={federation.id}
                     name={federation.name} 
                     accepted={federation.accepted} 
                     balance={federation.balance} 
-                    initiator={federation.initiator} />
+                    initiator={federation.initiator}
+                    reload={() => setreload(!reload)} />
                 ))}
                 
             </Stack>
