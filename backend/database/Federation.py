@@ -8,6 +8,7 @@ class Federation(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     name = sql.Column(sql.String(100), nullable=False)
     url = sql.Column(sql.String(200), nullable=False)
+    remote_password = sql.Column(sql.String(100), nullable=False)
     federation_user_id = sql.Column(sql.Integer, sql.ForeignKey(
         'member.id', ondelete='CASCADE'), nullable=False)
     federation_user = relationship(
