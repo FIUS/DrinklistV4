@@ -85,16 +85,38 @@ function devServerPlugin(): Plugin {
 	return {
 		name: "dev-server-plugin",
 		config(_, { mode }) {
-			const { HOST, PORT, HTTPS, SSL_CRT_FILE, SSL_KEY_FILE } = loadEnv(
+			const {
+				HOST,
+				PORT,
+				HTTPS,
+				SSL_CRT_FILE,
+				SSL_KEY_FILE,
+				CHOKIDAR_USEPOLLING,
+				CHOKIDAR_INTERVAL,
+			} = loadEnv(
 				mode,
 				".",
-				["HOST", "PORT", "HTTPS", "SSL_CRT_FILE", "SSL_KEY_FILE"],
+				[
+					"HOST",
+					"PORT",
+					"HTTPS",
+					"SSL_CRT_FILE",
+					"SSL_KEY_FILE",
+					"CHOKIDAR_USEPOLLING",
+					"CHOKIDAR_INTERVAL",
+				],
 			);
 			const https = HTTPS === "true";
+			const usePolling = CHOKIDAR_USEPOLLING !== "false";
+			const pollingInterval = parseInt(CHOKIDAR_INTERVAL || "100", 10);
 			return {
 				server: {
 					host: HOST || "0.0.0.0",
 					port: parseInt(PORT || "3000", 10),
+					watch: {
+						usePolling,
+						interval: pollingInterval,
+					},
 					open: true,
 					...(https &&
 						SSL_CRT_FILE &&
