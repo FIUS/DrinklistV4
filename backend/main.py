@@ -971,7 +971,16 @@ model_federation_remote = api.model('Federation-Extern', {
     'name': fields.String(required=True),
     'domain': fields.String(required=True),
     'password': fields.String(required=True),
-    'user_id': fields.Integer(required=True),
+    'userID': fields.Integer(required=True),
+})
+
+model_federation_local_accept = api.model('Federation-Local-Accept', {
+    "federationID": fields.String(required=True)
+})
+
+model_federation_remote_accept = api.model('Federation-Local-Accept', {
+    "userID": fields.Integer(required=True),
+    "password": fields.String(required=True)
 })
 
 @api.route('/federations')
@@ -995,12 +1004,9 @@ class add_federation_local(Resource):
         db.add_federation(request.json["name"], request.json["domain"], member["id"])
 
         url = f"http://{request.json['domain']}/api/federation/remote"
-
         payload = json.dumps({
-            "name": util.federation_name,
-            "domain": util.domain,
             "password": password,
-            "user_id": member["id"]
+            "userID": member["id"]
         })
         headers = {
           'Content-Type': 'application/json'
@@ -1014,7 +1020,55 @@ class add_federation_local(Resource):
         if not ("status" in responseJson and responseJson["status"] == "ok"):
             return util.build_response("Federation request failed")
 
-        return util.build_response("Federation request sent")
+        return util.build_response("Federation request accepted")
+
+@api.route('/federation/local/accept')
+class accept_federation_local(Resource):
+    @api.doc(body=model_federation_local_accept)
+    def post(self):
+        """
+        Accept a federation request
+        """
+        remote = db.get_federation(request.json["federationID"])
+
+        password = secrets.token_urlsafe(64)
+
+        url = f"http://{remote['domain']}/api/federation/remote"
+        payload = json.dumps({
+            "name": util.federation_name,
+            "domain": util.domain,
+            "password": password,
+            "userID": member["id"]
+        })
+        headers = {
+          'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload, timeout=5)
+        if (response.status_code != 200):
+            return util.build_response("Federation request failed")
+
+        responseJson = response.json()
+        if not ("status" in responseJson and responseJson["status"] == "ok"):
+            return util.build_response("Federation request failed")
+
+        member = db.add_user(remote["name"], 0, password, alias=remote["name"] hidden=True)
+        db.accept_federation(federation_id=remote["id"], user_id=member["id"])
+
+@api.route('/federation/remote/accept')
+class accept_federation_remote(Resource):
+    @api.doc(body=model_federation_remote_accept)
+    def post(self):
+        """
+        Receive accept federation request
+        """
+        local_user_id = 1
+        remote_user_id = requests.json["userID"]
+        remote_password = requests.json["password"]
+
+        db.accept_federation(user_id=local_user_id, remote_user_id=remote_user_id, remote_password=remote_password)
+
+        return util.build_response({"status": "ok"})
 
 @api.route('/federation/remote')
 class add_federation_remote(Resource):
@@ -1023,7 +1077,7 @@ class add_federation_remote(Resource):
         """
         Create a federation request
         """
-        db.add_federation(name=request.json["name"], domain=request.json["domain"], remote_password=request.json["password"], remote_user_id=request.json["user_id"])
+        db.add_federation(name=request.json["name"], domain=request.json["domain"], remote_password=request.json["password"], remote_user_id=request.json["userID"])
 
         return util.build_response({"status": "ok"})
 

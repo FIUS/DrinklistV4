@@ -279,6 +279,29 @@ class Queries:
                 session.commit()
                 return True
 
+    def get_federation(self, federation_id):
+        with self.get_session() as session:
+            federation: Federation = session.query(
+                Federation).filter_by(id=federation_id).first()
+            return federation.to_dict()
+
+    def accept_federation(self, federation_id=None, user_id, remote_user_id=None, remote_password=None):
+        with self.get_session() as session:
+
+            if federation_id is not None:
+                federation: Federation = session.query(Federation).filter_by(id=federation_id).first()
+                federation.accepted = True
+                federation.federation_user_id = user_id
+                session.commit()
+                return federation.to_dict()
+            else if remote_user_id is not None and remote_password is not None:
+                federation: Federation = session.query(Federation).filter_by(federation_user_id=user_id).first()
+                federation.accept_federation = True
+                federation.remote_user_id = remote_user_id
+                federation.remote_password = remote_password
+                session.commit()
+                return federation.to_dict()
+
     def get_federations(self):
         with self.get_session() as session:
             federations = session.query(
@@ -303,7 +326,7 @@ class Queries:
                 new_federation = Federation(name=name, domain=domain, remote_password=remote_password, remote_user_id=remote_user_id, initiator=False)
                 session.add(new_federation)
                 session.commit()
-                return new_federation
+                return new_federation.to_dict()
 
     def delete_user(self, member_id):
         with self.get_session() as session:
