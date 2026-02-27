@@ -4,8 +4,11 @@ import { Accordion, AccordionDetails, AccordionSummary, Button, Chip, Paper, Sta
 import Spacer from '../../Common/Spacer';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { HINZUFUEGEN } from '../../Common/Internationalization/i18n';
-import { doPostRequest } from '../../Common/StaticFunctions';
+import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
 import FederationsDetail from './FederationsDetail';
+import { useDispatch } from 'react-redux';
+import { openErrorToast } from '../../../Actions/CommonAction';
+import { Federation } from '../../../types/ResponseTypes';
 
 type Props = {}
 
@@ -13,9 +16,16 @@ const Federations = (props: Props) => {
 
     const [name, setname] = useState("")
     const [domain, setdomain] = useState("")
+    const [federations, setfederations] = useState<Federation[] | null>(null)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         //TODO fetch federations from backend and set state
+        doGetRequest("/federations").then((resp) => {
+            if (resp.code === 200) {
+                setfederations(resp.content as Federation[])
+            }
+        })
     }, [])
 
 
@@ -51,6 +61,20 @@ const Federations = (props: Props) => {
                     <Button variant='outlined' onClick={() => {
                         if (name !== "" && domain !== "") {
                             //TODO send request to backend to create pending federation
+                            doPostRequest("/federation/local", {
+                                name: name,
+                                domain: domain
+                            }).then((resp) => {
+                                if (resp.code === 200) {
+                                    doGetRequest("/federations").then((resp) => {
+                                        if (resp.code === 200) {
+                                            setfederations(resp.content as Federation[])
+                                        }
+                                    })
+                                } else {
+                                    dispatch(openErrorToast())
+                                }
+                            })
                         }
                     }}>
                         {HINZUFUEGEN}
@@ -59,9 +83,16 @@ const Federations = (props: Props) => {
             </Accordion>
             <Spacer vertical={20} />
 
-            <Stack direction="row" gap={2} alignItems={"center"}>
-
+            <Stack direction="row" flexWrap={"wrap"} gap={2} alignItems={"center"}>
+                {federations && federations.map((federation) => (
+                    <FederationsDetail key={federation.id} 
+                    name={federation.name} 
+                    pending={federation.pending} 
+                    balance={federation.balance} 
+                    extern={federation.extern} />
+                ))}
                 <FederationsDetail name='stuvus' pending={true} />
+                <FederationsDetail name='stuvus' pending={true} extern={true} />
                 <FederationsDetail name='stuvus' balance={-12.50} />
             </Stack>
         </div>

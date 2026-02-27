@@ -48,6 +48,7 @@ export type Federation = {
     id: number,
     name: string,
     url: string,
-    balance: number,
-    pending: boolean
+    balance?: number,
+    pending?: boolean,
+    extern?: boolean
 }

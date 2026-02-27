@@ -10,7 +10,7 @@ type Props = {
     name: string,
     pending?: boolean,
     balance?: number,
-
+    extern?: boolean
 }
 
 const FederationsDetail = (props: Props) => {
@@ -42,8 +42,16 @@ const FederationsDetail = (props: Props) => {
                         {props.balance.toFixed(2)}€
                     </Typography> : <></>}
 
-                {props.pending ?
+                {props.extern ?
                     <Button variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            //TODO abort pending federation
+                        }}>
+                        Akzeptieren
+                    </Button> : <></>}
+                {props.pending ?
+                    <Button variant="outlined"
                         color="primary"
                         onClick={() => {
                             //TODO abort pending federation
