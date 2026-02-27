@@ -279,6 +279,32 @@ class Queries:
                 session.commit()
                 return True
 
+    def get_federations(self):
+        with self.get_session() as session:
+            federations = session.query(
+                Federation).order_by(desc(Federation.id)).all()
+            output = []
+            for f in federations:
+                federation: Federation = f
+                output.append(federation.to_dict())
+
+            return output
+
+    def add_federation(self, name, domain, user_id=None, remote_password=None, remote_user_id=None):
+        with self.get_session() as session:
+            if user_id is not None:
+                # local initiator
+                new_federation = Federation(name=name, domain=domain, federation_user_id=user_id, initiator=True)
+                session.add(new_federation)
+                session.commit()
+                return new_federation.to_dict()
+            elif remote_password is not None and remote_user_id is not None:
+                # remote initiator
+                new_federation = Federation(name=name, domain=domain, remote_password=remote_password, remote_user_id=remote_user_id, initiator=False)
+                session.add(new_federation)
+                session.commit()
+                return new_federation
+
     def delete_user(self, member_id):
         with self.get_session() as session:
             session.delete(session.query(
