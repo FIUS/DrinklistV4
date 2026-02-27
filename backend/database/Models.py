@@ -6,3 +6,4 @@ from database.Checkout import Checkout
 from database.KeyValue import KeyValue
 from database.Reminder import Reminder
 from database.Session import Session
+from database.Federation import Federation
