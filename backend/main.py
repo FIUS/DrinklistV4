@@ -85,7 +85,8 @@ def admin(fn):
 def is_self_or_admin(request, member_id):
     is_self = str(member_id) == str(request.cookies.get(
         f"{util.auth_cookie_memberID}memberID"))
-    is_admin = db.is_admin(member_id)
+    is_admin = db.is_admin(request.cookies.get(
+        f"{util.auth_cookie_memberID}memberID"))
 
     return is_self or is_admin
 
@@ -230,8 +231,8 @@ class transfer_money(Resource):
                                      from_alias,
                                      to_name,
                                      to_alias,
-                                     f"Du hast {'{:.2f}'.format(amount)}€ an {to_alias if to_alias !='' else to_name}{to_message}gesendet",
-                                     f"Du hast {'{:.2f}'.format(amount)}€ von {from_alias if from_alias !='' else from_name}{from_message}erhalten")
+                                     f"Du hast {'{:.2f}'.format(amount)}€ an {to_alias if to_alias != '' else to_name}{to_message}gesendet",
+                                     f"Du hast {'{:.2f}'.format(amount)}€ von {from_alias if from_alias != '' else from_name}{from_message}erhalten")
 
         else:
             return util.build_response("Your are not allowed to transfer money from this account", code=403)
