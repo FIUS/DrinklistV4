@@ -77,6 +77,6 @@
     "typescript-plugin-css-modules": "^5.0.2",
     "vite": "^7.1.12",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }
