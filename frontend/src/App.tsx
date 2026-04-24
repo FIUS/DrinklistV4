@@ -45,15 +45,20 @@ function App() {
 
   useEffect(() => {
     // Get current theme from cookie
+    const getValidTheme = (value: number) => (value >= 0 && value < themes.length ? value : 0);
+
     const theme = Cookies.get("theme");
     if (theme) {
-      setthemeCookie(Number(theme))
+      const parsedTheme = Number(theme);
+      const themeToSet = getValidTheme(parsedTheme);
+      setthemeCookie(themeToSet)
+      Cookies.set("theme", themeToSet.toString());
     } else {
       let themeToSet = 0;
       if (window.globalTS.DEFAULT_THEME) {
-        themeToSet = window.globalTS.DEFAULT_THEME;
+        themeToSet = getValidTheme(window.globalTS.DEFAULT_THEME);
       } else {
-        themeToSet = 3;
+        themeToSet = 0;
       }
       setthemeCookie(themeToSet)
       Cookies.set("theme", themeToSet.toString());

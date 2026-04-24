@@ -1958,4 +1958,4 @@ export const theme04 = createTheme({
     }
 });
 
-export const themes = [normalTheme, darkTheme1, darkTheme2, theme02, darkTheme3, darkTheme4, theme03, theme04]
+export const themes = [theme02, theme03, theme04]
