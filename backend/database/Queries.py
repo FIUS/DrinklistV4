@@ -143,6 +143,12 @@ class Queries:
             session.commit()
             return new_member.to_dict()
 
+    def _get_category_sorting_index(self, session: session.Session, category: str) -> int:
+        existing_drink: Drink = session.query(Drink).filter_by(category=category).order_by(asc(Drink.id)).first()
+        if existing_drink is None or existing_drink.sorting_index is None:
+            return 0
+        return int(existing_drink.sorting_index)
+
     def get_drinks(self):
         with self.get_session() as session:
             drinks = session.query(Drink).all()
@@ -182,7 +188,16 @@ class Queries:
             drink: Drink = session.query(
                 Drink).filter_by(id=drink_id).first()
             drink.category = category
+            drink.sorting_index = self._get_category_sorting_index(
+                session, category)
             session.commit()
+
+    def change_category_sorting_index(self, category: str, sorting_index: int):
+        with self.get_session() as session:
+            affected_rows = session.query(Drink).filter_by(
+                category=category).update({Drink.sorting_index: sorting_index}, synchronize_session=False)
+            session.commit()
+            return affected_rows > 0
 
     def delete_drink(self, drink_id):
         with self.get_session() as session:
@@ -193,11 +208,12 @@ class Queries:
 
     def add_drink(self, name, price, stock, category=None):
         with self.get_session() as session:
-            if category is None:
-                session.add(Drink(name=name, stock=stock, price=price))
-            else:
-                session.add(Drink(name=name, stock=stock,
-                                  price=price, category=category))
+            effective_category = category if category is not None else util.default_drink_category
+            sorting_index = self._get_category_sorting_index(
+                session, effective_category)
+
+            session.add(Drink(name=name, stock=stock,
+                        price=price, category=effective_category, sorting_index=sorting_index))
 
             session.commit()
 

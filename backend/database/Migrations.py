@@ -17,7 +17,9 @@ def migrate(db: session):
         # Add lists for migrations
         # E.g ALTER TABLE drink ADD column price6 float DEFAULT 50
         ["ALTER TABLE member ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;",
-            "UPDATE member SET is_admin = FALSE;"]
+            "UPDATE member SET is_admin = FALSE;"],
+        ["ALTER TABLE drink ADD COLUMN sorting_index INTEGER DEFAULT 0;",
+            "UPDATE drink SET sorting_index = 0;"]
     ]
 
     if util.CURRENT_VERSION != len(migrations):

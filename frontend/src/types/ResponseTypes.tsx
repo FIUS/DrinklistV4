@@ -12,7 +12,8 @@ export type Drink = {
     name: string,
     stock: number,
     price: number,
-    category: string
+    category: string,
+    sortingIndex?: number
 }
 
 export type Transaction = {

@@ -522,6 +522,38 @@ class set_drink_category(Resource):
         return util.build_response("Category changed")
 
 
+model_sorting_index = api.model('Drink-Category-Sorting-Index', {
+    'category': fields.String(description='Category to update', required=True),
+    'sortingIndex': fields.Integer(description='Sorting index of the category', required=True),
+})
+
+
+@api.route('/drinks/categories/sorting-index')
+class set_category_sorting_index(Resource):
+    @admin
+    @api.doc(body=model_sorting_index)
+    def post(self):
+        """
+        Set the sorting index of a category
+        """
+        if request.json is None or "sortingIndex" not in request.json or "category" not in request.json:
+            return util.build_response("Category and sorting index cannot be empty", code=406)
+
+        category = request.json["category"]
+        if category == "":
+            return util.build_response("Category cannot be empty", code=406)
+
+        try:
+            sorting_index = int(request.json["sortingIndex"])
+        except (TypeError, ValueError):
+            return util.build_response("Sorting index has to be an integer", code=406)
+
+        if not db.change_category_sorting_index(category, sorting_index):
+            return util.build_response("Category does not exist", code=404)
+
+        return util.build_response("Category sorting index changed")
+
+
 @api.route('/drinks/<int:drink_id>/stock/increase')
 class set_drink_stock_increase(Resource):
     @admin

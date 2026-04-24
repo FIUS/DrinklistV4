@@ -1,4 +1,4 @@
-import { Member } from "../../types/ResponseTypes"
+import { Drink, Member } from "../../types/ResponseTypes"
 
 export const safeMemberName = (member: Member) => {
     return member.alias === "" ? member.name : member.alias
@@ -36,4 +36,24 @@ export const convertToLocalDate = (date: string) => {
         return new Date(date)
     }
     return new Date(date.replace("Z", ""))
+}
+
+export const getCategorySortingIndex = (category: string, drinks: Array<Drink> | null | undefined) => {
+    const categoryDrink = drinks?.find((drink) => drink.category === category)
+    return categoryDrink?.sortingIndex ?? 0
+}
+
+export const compareCategoriesBySortingIndex = (
+    category1: string,
+    category2: string,
+    drinks: Array<Drink> | null | undefined
+) => {
+    const sortingIndexCategory1 = getCategorySortingIndex(category1, drinks)
+    const sortingIndexCategory2 = getCategorySortingIndex(category2, drinks)
+
+    if (sortingIndexCategory1 !== sortingIndexCategory2) {
+        return sortingIndexCategory1 - sortingIndexCategory2
+    }
+
+    return category1.localeCompare(category2)
 }

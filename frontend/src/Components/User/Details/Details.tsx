@@ -20,7 +20,7 @@ import { Drink, Transaction } from '../../../types/ResponseTypes'
 import CountUp from 'react-countup';
 import RequestDialog from './RequestDialog'
 import RequestConfirmation from './RequestConfirmation'
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import { compareCategoriesBySortingIndex, convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 
 type Props = {}
 
@@ -292,16 +292,14 @@ const Details = (props: Props) => {
                     })}
                         memberID={params.userid ? params.userid : ""} />
                     <div className={style.buyDrinkContainerInner}>
-                        {common.drinkCategories?.sort((category1, category2) => category1.localeCompare(category2)).map(category => {
-                            const drinks = common.drinks?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).filter(value => {
+                        {[...(common.drinkCategories ?? [])].sort((category1, category2) => compareCategoriesBySortingIndex(category1, category2, common.drinks)).map(category => {
+                            const drinks = common.drinks?.filter(value => {
                                 return value.category === category
-                            })
+                            }).sort((drink1, drink2) => drink1.name.localeCompare(drink2.name))
                             if (drinks?.some((value) => filterSeachDrinks(value))) {
-                                return <>
-                                    <AvailableDrinkCard category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
-                                </>
+                                return <AvailableDrinkCard key={category} category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
                             } else {
-                                return <></>
+                                return null
                             }
                         })}
                     </div>

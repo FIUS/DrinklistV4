@@ -11,6 +11,7 @@ class Drink(db.Model):
     price = sql.Column(sql.Float, default=0)
     category = sql.Column(sql.String(100),
                           default=util.default_drink_category)
+    sorting_index = sql.Column(sql.Integer, default=0)
 
     def to_dict(self):
         return {
@@ -18,5 +19,6 @@ class Drink(db.Model):
             "name": self.name,
             "stock": self.stock,
             "price": self.price,
-            "category": self.category
+            "category": self.category,
+            "sortingIndex": self.sorting_index
         }
