@@ -1,0 +1,103 @@
+import React, { useEffect, useState } from 'react'
+import style from './federations.module.scss';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Chip, Paper, Stack, TextField, Typography } from '@mui/material';
+import Spacer from '../../Common/Spacer';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { HINZUFUEGEN } from '../../Common/Internationalization/i18n';
+import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions';
+import FederationsDetail from './FederationsDetail';
+import { useDispatch } from 'react-redux';
+import { openErrorToast } from '../../../Actions/CommonAction';
+import { Federation } from '../../../types/ResponseTypes';
+
+type Props = {}
+
+const Federations = (props: Props) => {
+
+    const [name, setname] = useState("")
+    const [domain, setdomain] = useState("")
+    const [federations, setfederations] = useState<Federation[] | null>(null)
+    const [reload, setreload] = useState(false)
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        //TODO fetch federations from backend and set state
+        doGetRequest("federations").then((resp) => {
+            if (resp.code === 200) {
+                setfederations(resp.content as Federation[])
+            }
+        })
+    }, [reload])
+
+
+    return (
+        <div className={style.container}>
+            <Accordion className={style.newMemberContainer} >
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                >
+                    <Typography variant='h5'>Neue Federation hinzufügen</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Stack direction={"row"} gap={2}>
+                        <TextField
+                            label='Drinklist Name'
+                            value={name}
+                            onChange={(value) => {
+                                setname(value.target.value)
+                            }}
+                            size="small"
+                        />
+                        <TextField
+                            label='Drinklist Domain'
+                            value={domain}
+                            onChange={(value) => {
+                                setdomain(value.target.value)
+                            }}
+                            size="small"
+                        />
+
+                    </Stack>
+                    <Spacer vertical={10} />
+                    <Button variant='outlined' onClick={() => {
+                        if (name !== "" && domain !== "") {
+                            //TODO send request to backend to create pending federation
+                            doPostRequest("federation/local", {
+                                name: name,
+                                domain: domain
+                            }).then((resp) => {
+                                if (resp.code === 200) {
+                                    doGetRequest("federations").then((resp) => {
+                                        if (resp.code === 200) {
+                                            setfederations(resp.content as Federation[])
+                                        }
+                                    })
+                                } else {
+                                    dispatch(openErrorToast())
+                                }
+                            })
+                        }
+                    }}>
+                        {HINZUFUEGEN}
+                    </Button>
+                </AccordionDetails>
+            </Accordion>
+            <Spacer vertical={20} />
+
+            <Stack direction="row" flexWrap={"wrap"} gap={2} alignItems={"center"}>
+                {federations && federations.map((federation) => (
+                    <FederationsDetail key={federation.id}
+                    id={federation.id}
+                    name={federation.name} 
+                    accepted={federation.accepted} 
+                    balance={federation.balance} 
+                    initiator={federation.initiator}
+                    reload={() => setreload(!reload)} />
+                ))}
+                
+            </Stack>
+        </div>
+    )
+}
+
+export default Federations

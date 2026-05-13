@@ -44,3 +44,12 @@ export type Message = {
         amount: number
     }
 }
+
+export type Federation = {
+    id: number,
+    name: string,
+    domain: string,
+    balance?: number,
+    accepted?: boolean,
+    initiator?: boolean
+}
