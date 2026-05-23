@@ -12,7 +12,8 @@ import { RootState } from '../../../Reducer/reducerCombiner'
 
 type Props = {
     favorites: Array<Drink> | undefined,
-    memberID: string
+    memberID: string,
+    onPurchased?: () => void
 }
 
 const BalanceBox = (props: Props) => {
@@ -45,12 +46,14 @@ const BalanceBox = (props: Props) => {
                         memberID={props.memberID}
                         key={props.memberID}
                         isGeneratedFavorite={true}
+                        onPurchased={props.onPurchased}
                     /> : <></>}
                     {props.favorites?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).map((value) => {
                         return <DrinkButton drink={value}
                             memberID={props.memberID}
                             key={props.memberID}
                             isGeneratedFavorite={favorite?.drinkID === value.id}
+                            onPurchased={props.onPurchased}
                         />
                     })}
                 </div></> : <></>}

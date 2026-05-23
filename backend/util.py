@@ -83,6 +83,17 @@ pretix_event = os.environ.get("PRETIX_EVENT") if os.environ.get(
 pretix_api_token = os.environ.get("PRETIX_API_TOKEN") if os.environ.get(
     "PRETIX_API_TOKEN") else None
 
+low_balance_threshold = float(os.environ.get(
+    "LOW_BALANCE_THRESHOLD")) if os.environ.get("LOW_BALANCE_THRESHOLD") else None
+low_balance_transfer_name = os.environ.get(
+    "LOW_BALANCE_TRANSFER_NAME") if os.environ.get("LOW_BALANCE_TRANSFER_NAME") else None
+low_balance_transfer_iban = os.environ.get(
+    "LOW_BALANCE_TRANSFER_IBAN") if os.environ.get("LOW_BALANCE_TRANSFER_IBAN") else None
+low_balance_transfer_bic = os.environ.get(
+    "LOW_BALANCE_TRANSFER_BIC") if os.environ.get("LOW_BALANCE_TRANSFER_BIC") else None
+low_balance_paypal_me = os.environ.get(
+    "LOW_BALANCE_PAYPAL_ME") if os.environ.get("LOW_BALANCE_PAYPAL_ME") else None
+
 
 tempfile_path = "tempfiles"
 backup_file_name = "backup.json"
@@ -136,6 +147,43 @@ def get_user_info(access_token, resource_url):
     headers = {'Authorization': 'Bearer ' + access_token}
     response = requests.get(resource_url, headers=headers)
     return response.json()
+
+
+def build_low_balance_epc_qr_text(amount_eur: float, member_name: str, member_id: int):
+    if low_balance_transfer_name is None or low_balance_transfer_iban is None or low_balance_transfer_bic is None:
+        return None
+
+    remittance = f"Drinklist {member_name} - {member_id}"
+    amount_str = f"{amount_eur:.2f}"
+    lines = [
+        "BCD",
+        "001",
+        "1",
+        "SCT",
+        low_balance_transfer_bic,
+        low_balance_transfer_name,
+        low_balance_transfer_iban,
+        f"EUR{amount_str}",
+        "",
+        remittance,
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def build_low_balance_paypal_qr_text(amount_eur: float):
+    if low_balance_paypal_me is None:
+        return None
+
+    username = low_balance_paypal_me.strip()
+    if username == "":
+        return None
+
+    if "paypal.me" in username:
+        username = username.rstrip("/").split("/")[-1]
+
+    amount_str = f"{amount_eur:.2f}".replace(".", ",")
+    return f"https://paypal.me/{username}/{amount_str}"
 
 
 checkout_mail_text = """Hallo {name},

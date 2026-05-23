@@ -14,7 +14,8 @@ import style from './availableDrinkBox.module.scss'
 type Props = {
     category: string,
     drinks: Drink[] | undefined,
-    memberID: string
+    memberID: string,
+    onPurchased?: () => void
 }
 
 const AvailableDrinkCard = (props: Props) => {
@@ -49,6 +50,9 @@ const AvailableDrinkCard = (props: Props) => {
                                             dispatch(setMembers(value.content))
                                         }
                                     })
+                                    if (props.onPurchased) {
+                                        props.onPurchased()
+                                    }
                                 } else {
                                     dispatch(openErrorToast())
                                 }

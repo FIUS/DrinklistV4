@@ -51,6 +51,20 @@ You need to mount the file   [`env.js`](frontend/public/environment/env.js) in t
   * Days after which a user is automatically hidden if he has not bought any drinks in this time
   * Feature is disabled if set to `None` (disabled per default)
   * Defaults to: `None`
+* `LOW_BALANCE_THRESHOLD`
+  * Balance threshold for low-balance warnings (inclusive)
+  * Feature is disabled if not set
+* `LOW_BALANCE_TRANSFER_NAME`
+  * Receiver name for EPC (SEPA) QR codes
+* `LOW_BALANCE_TRANSFER_IBAN`
+  * Receiver IBAN for EPC (SEPA) QR codes
+* `LOW_BALANCE_TRANSFER_BIC`
+  * Receiver BIC for EPC (SEPA) QR codes
+* `LOW_BALANCE_PAYPAL_ME`
+  * PayPal.Me username used to build PayPal QR codes
+  * Example: `yourname`
+  * If set, the QR code will include the deposit amount
+  * Bank transfer purpose is always: `Drinklist <username> - <userid>`
 * `PASSSWORD_HASH_ROUNDS`
   * Number of hash rounds for pbkdf2_hmac.
   * Minimum is 10 000. It is recommended to use at least 100 000

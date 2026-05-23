@@ -16,11 +16,12 @@ import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TR
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
-import { Drink, Transaction } from '../../../types/ResponseTypes'
+import { Drink, LowBalanceWarningResponse, Transaction } from '../../../types/ResponseTypes'
 import CountUp from 'react-countup';
 import RequestDialog from './RequestDialog'
 import RequestConfirmation from './RequestConfirmation'
 import { compareCategoriesBySortingIndex, convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import LowBalanceWarningDialog from './LowBalanceWarningDialog'
 
 type Props = {}
 
@@ -32,10 +33,13 @@ const Details = (props: Props) => {
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const [searchField, setsearchField] = useState("")
     const [confirmationDialogOpen, setconfirmationDialogOpen] = useState(false)
+    const [lowBalanceDialogOpen, setlowBalanceDialogOpen] = useState(false)
+    const [lowBalanceWarning, setlowBalanceWarning] = useState<LowBalanceWarningResponse | null>(null)
     const [isUser, setisUser] = useState(false)
     const [historyExpanded, sethistoryExpanded] = useState(false)
     const historyRef = useRef<HTMLDivElement>(null)
     const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
+    const memberId = params.userid ? params.userid : ""
 
     const mobileHistroyThreshold = 1270;
 
@@ -247,6 +251,22 @@ const Details = (props: Props) => {
         return parseInt(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID") as string)
     }
 
+    const checkLowBalanceWarning = (id: string) => {
+        if (id === "") {
+            return
+        }
+
+        doGetRequest("users/" + id + "/low-balance-warning").then((value) => {
+            if (value.code === 200) {
+                const warning: LowBalanceWarningResponse = value.content
+                if (warning.showWarning) {
+                    setlowBalanceWarning(warning)
+                    setlowBalanceDialogOpen(true)
+                }
+            }
+        })
+    }
+
     return (
         <>
             <TransferDialog
@@ -267,6 +287,11 @@ const Details = (props: Props) => {
                 isOpen={confirmationDialogOpen}
                 close={() => setconfirmationDialogOpen(false)}
 
+            />
+            <LowBalanceWarningDialog
+                isOpen={lowBalanceDialogOpen}
+                warning={lowBalanceWarning}
+                onClose={() => setlowBalanceDialogOpen(false)}
             />
             <div className={style.details} onKeyUp={(event) => {
                 if (event.key === "Escape") {
@@ -290,14 +315,15 @@ const Details = (props: Props) => {
                     <BalanceBox favorites={common.drinks?.filter((value) => {
                         return common.favorites?.includes(value.id)
                     })}
-                        memberID={params.userid ? params.userid : ""} />
+                        memberID={memberId}
+                        onPurchased={() => checkLowBalanceWarning(memberId)} />
                     <div className={style.buyDrinkContainerInner}>
                         {[...(common.drinkCategories ?? [])].sort((category1, category2) => compareCategoriesBySortingIndex(category1, category2, common.drinks)).map(category => {
                             const drinks = common.drinks?.filter(value => {
                                 return value.category === category
                             }).sort((drink1, drink2) => drink1.name.localeCompare(drink2.name))
                             if (drinks?.some((value) => filterSeachDrinks(value))) {
-                                return <AvailableDrinkCard key={category} category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={params.userid ? params.userid : ""} />
+                                return <AvailableDrinkCard key={category} category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={memberId} onPurchased={() => checkLowBalanceWarning(memberId)} />
                             } else {
                                 return null
                             }

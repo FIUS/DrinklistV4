@@ -1,0 +1,43 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qrGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.qrCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.qrLabel {
+    font-weight: 600;
+}
+
+.qrCode {
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.noQr {
+    margin-top: 8px;
+}

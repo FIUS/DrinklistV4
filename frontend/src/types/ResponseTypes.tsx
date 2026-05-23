@@ -44,3 +44,16 @@ export type Message = {
         amount: number
     }
 }
+
+export type LowBalanceQrCode = {
+    type: string,
+    payload: string
+}
+
+export type LowBalanceWarningResponse = {
+    showWarning: boolean,
+    balance: number,
+    threshold: number | null,
+    depositAmount: number,
+    qrCodes: Array<LowBalanceQrCode>
+}

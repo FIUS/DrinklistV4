@@ -139,6 +139,43 @@ class get_user_history(Resource):
         return util.build_response(db.get_user_history(member_id))
 
 
+@api.route('/users/<int:member_id>/low-balance-warning')
+class get_low_balance_warning(Resource):
+    @authenticated
+    def get(self, member_id):
+        """
+        Get low balance warning info for a user
+        """
+        member = db.get_user_by_id(member_id)
+        if member is None:
+            return util.build_response("User not found", code=404)
+
+        balance = float(member["balance"])
+        threshold = util.low_balance_threshold
+        show_warning = threshold is not None and balance <= threshold
+        deposit_amount = 0
+        qr_codes = []
+
+        if show_warning:
+            deposit_amount = abs(balance) + 20
+            epc_text = util.build_low_balance_epc_qr_text(
+                deposit_amount, member["name"], member["id"])
+            if epc_text is not None:
+                qr_codes.append({"type": "epc", "payload": epc_text})
+
+            paypal_text = util.build_low_balance_paypal_qr_text(deposit_amount)
+            if paypal_text is not None:
+                qr_codes.append({"type": "paypal", "payload": paypal_text})
+
+        return util.build_response({
+            "showWarning": show_warning,
+            "balance": balance,
+            "threshold": threshold,
+            "depositAmount": deposit_amount,
+            "qrCodes": qr_codes
+        })
+
+
 @api.route('/users/<int:member_id>/favorites/add/<int:drink_id>')
 class add_user_favorite(Resource):
     @authenticated

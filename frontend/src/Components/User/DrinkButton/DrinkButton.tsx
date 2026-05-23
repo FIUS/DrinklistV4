@@ -19,6 +19,7 @@ type Props = {
     drink: Drink,
     memberID: string,
     isGeneratedFavorite?: boolean,
+    onPurchased?: () => void,
 }
 
 const DrinkButton = (props: Props) => {
@@ -65,6 +66,9 @@ const DrinkButton = (props: Props) => {
                                             dispatch(setMembers(value.content))
                                         }
                                     })
+                                    if (props.onPurchased) {
+                                        props.onPurchased()
+                                    }
                                 } else {
                                     dispatch(openErrorToast())
                                 }

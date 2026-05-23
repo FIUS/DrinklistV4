@@ -70,6 +70,11 @@ class Queries:
 
             return output
 
+    def get_user_by_id(self, member_id):
+        with self.get_session() as session:
+            member: Member = session.query(Member).filter_by(id=member_id).first()
+            return member.to_dict() if member is not None else None
+
     def get_user_favorites(self, member_id):
         with self.get_session() as session:
             favorites = session.query(
