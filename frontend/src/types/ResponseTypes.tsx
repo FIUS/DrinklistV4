@@ -57,3 +57,28 @@ export type LowBalanceWarningResponse = {
     depositAmount: number,
     qrCodes: Array<LowBalanceQrCode>
 }
+
+export type EventModeStatus = {
+    enabled: boolean,
+    frontendDomain: string | null
+}
+
+export type EventDrinksResponse = {
+    drinks: Array<Drink>,
+    categories: Array<string>
+}
+
+export type EventGuestResponse = {
+    member: Member
+}
+
+export type EventGuestLoginResponse = {
+    memberID: number,
+    member: Member
+}
+
+export type EventPurchaseResponse = {
+    balance: number,
+    total: number,
+    cash: number
+}

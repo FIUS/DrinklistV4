@@ -1,0 +1,74 @@
+.container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.guestInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cartList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cartRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.cartActions {
+    display: flex;
+    gap: 6px;
+}
+
+.cartTotals {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.drinkGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.categoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.drinkCard {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
