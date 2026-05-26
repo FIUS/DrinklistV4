@@ -32,7 +32,7 @@ const Toast = (props: Props) => {
 
     useEffect(() => {
         setstartTime(Date.now())
-    }, [common.toast.open])
+    }, [common.toast.id])
 
     const progressValue = () => {
         const value = 1 - ((currentTime - startTime) / common.toast.duration)
@@ -47,9 +47,13 @@ const Toast = (props: Props) => {
     
     return (
         <Snackbar
+            key={common.toast.id}
             open={common.toast.open}
             autoHideDuration={common.toast.duration}
-            onClose={() => {
+            onClose={(_, reason) => {
+                if (reason === "clickaway") {
+                    return
+                }
                 dispatch(closeToast())
             }}
             className={style.snackbar}

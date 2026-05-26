@@ -1,0 +1,307 @@
+import React, { useEffect, useRef, useState } from 'react'
+import { Alert, Button, Paper, Stack, Typography } from '@mui/material'
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { openErrorToast, openToast } from '../../Actions/CommonAction'
+import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
+import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
+import { EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
+import EventScanDialog from './EventScanDialog'
+import style from './eventKasseCheckout.module.scss'
+import { format } from 'react-string-format'
+
+type CartItem = {
+    drink: Drink,
+    quantity: number
+}
+
+const EventKasseCheckout = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const [status, setStatus] = useState<EventModeStatus | null>(null)
+    const [drinks, setDrinks] = useState<Array<Drink>>([])
+    const [categories, setCategories] = useState<Array<string>>([])
+    const [activeGuest, setActiveGuest] = useState<Member | null>(null)
+    const [activeGuestCode, setActiveGuestCode] = useState<string | null>(null)
+    const [cart, setCart] = useState<Array<CartItem>>([])
+    const [scanOpen, setScanOpen] = useState(false)
+    const autoOpenedRef = useRef(false)
+
+    const eventEnabled = status?.enabled === true
+
+    useEffect(() => {
+        doGetRequest('event-mode').then((value) => {
+            if (value.code === 200) {
+                setStatus(value.content)
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        if (!eventEnabled) {
+            return
+        }
+        doGetRequest('event/drinks').then((value) => {
+            if (value.code === 200) {
+                const payload: EventDrinksResponse = value.content
+                setDrinks(payload.drinks)
+                setCategories(payload.categories)
+            }
+        })
+    }, [eventEnabled])
+
+    useEffect(() => {
+        if (!autoOpenedRef.current && eventEnabled && activeGuest === null) {
+            autoOpenedRef.current = true
+            setScanOpen(true)
+        }
+    }, [activeGuest, eventEnabled])
+
+    const addToCart = (drink: Drink) => {
+        setCart((prev) => {
+            const existing = prev.find((item) => item.drink.id === drink.id)
+            if (existing) {
+                return prev.map((item) => item.drink.id === drink.id
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+                )
+            }
+            return [...prev, { drink, quantity: 1 }]
+        })
+        dispatch(openToast({ message: format(EVENT_WARENKORB_HINZUGEFUEGT, drink.name) }))
+    }
+
+    const updateCartQuantity = (drinkId: number, delta: number) => {
+        setCart((prev) => {
+            return prev.flatMap((item) => {
+                if (item.drink.id !== drinkId) {
+                    return [item]
+                }
+                const nextQuantity = item.quantity + delta
+                if (nextQuantity <= 0) {
+                    if (delta < 0) {
+                        dispatch(openToast({ message: format(EVENT_WARENKORB_ENTFERNT, item.drink.name) }))
+                    }
+                    return []
+                }
+                if (delta < 0) {
+                    dispatch(openToast({ message: format(EVENT_WARENKORB_ENTFERNT, item.drink.name) }))
+                }
+                return [{ ...item, quantity: nextQuantity }]
+            })
+        })
+    }
+
+    const resetCart = () => {
+        setCart([])
+    }
+
+    const totalAmount = cart.reduce((sum, item) => sum + item.drink.price * item.quantity, 0)
+    const balance = activeGuest?.balance ?? 0
+    const shortage = Math.max(0, totalAmount - balance)
+    const showSplit = shortage > 0 && balance > 0
+    const showCashOnly = shortage > 0 && balance <= 0
+    const canCheckout = activeGuest !== null && cart.length > 0
+    const hasPositiveBalance = balance > 0
+    const canCover = balance >= totalAmount
+    const balanceColor = balance >= 0 ? 'limegreen' : 'darkred'
+
+    const handleLookup = (code: string) => {
+        doPostRequest('event/guest/lookup', { code }).then((value) => {
+            if (value.code === 200) {
+                const payload: EventGuestResponse = value.content
+                setActiveGuest(payload.member)
+                setActiveGuestCode(code)
+                dispatch(openToast({ message: EVENT_GAST_GELADEN }))
+                resetCart()
+            } else {
+                dispatch(openErrorToast())
+            }
+        })
+    }
+
+    const handleScan = (code: string) => {
+        setScanOpen(false)
+        handleLookup(code)
+    }
+
+    const doPurchase = (paymentMode: 'balance' | 'cash' | 'split') => {
+        if (!activeGuestCode || cart.length === 0) {
+            return
+        }
+        const items = cart.map((item) => ({ drinkID: item.drink.id, quantity: item.quantity }))
+        doPostRequest('event/guest/purchase', { code: activeGuestCode, items, paymentMode }).then((value) => {
+            if (value.code === 200) {
+                const response: EventPurchaseResponse = value.content
+                setActiveGuest((prev) => prev ? { ...prev, balance: response.balance } : prev)
+                dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
+                resetCart()
+                navigate('/event/kasse')
+            } else {
+                dispatch(openErrorToast())
+            }
+        })
+    }
+
+    if (status?.enabled === false) {
+        return (
+            <div className={style.container}>
+                <Typography variant="h4">{EVENT_KASSE}</Typography>
+                <Alert severity="warning">{EVENT_MODE_DISABLED}</Alert>
+            </div>
+        )
+    }
+
+    const guestName = activeGuest ? (activeGuest.alias !== '' ? activeGuest.alias : activeGuest.name) : ''
+
+    return (
+        <div className={style.container}>
+            <div className={style.headerRow}>
+                <Typography variant="h4">{EVENT_KASSE}</Typography>
+                <Stack direction="row" spacing={2} className={style.headerActions}>
+                    <Button variant="outlined" onClick={() => navigate('/event/kasse')}>{ZURUECK}</Button>
+                    {!activeGuest ? (
+                        <Button variant="contained" onClick={() => setScanOpen(true)} disabled={!eventEnabled}>{EVENT_SCANNEN}</Button>
+                    ) : null}
+                </Stack>
+            </div>
+
+            {activeGuest ? (
+                <Paper className={style.balanceCard} elevation={2}>
+                    <Typography variant="h6">{guestName}</Typography>
+                    <Typography variant="h2" sx={{ color: balanceColor }}>
+                        {balance.toFixed(2)} EUR
+                    </Typography>
+                </Paper>
+            ) : (
+                <Paper className={style.section} elevation={2}>
+                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={!eventEnabled}>
+                        {EVENT_SCANNEN}
+                    </Button>
+                </Paper>
+            )}
+
+            <Paper className={style.section} elevation={2}>
+                <Typography variant="h4">{EVENT_WARENKORB}</Typography>
+                {cart.length === 0 ? (
+                    <Typography variant="body2">
+                        {activeGuest ? EVENT_WARENKORB_LEER : EVENT_SCANNEN}
+                    </Typography>
+                ) : (
+                    <div className={style.cartList}>
+                        {cart.map((item) => (
+                            <div key={item.drink.id} className={style.cartRow}>
+                                <div>
+                                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                        {item.drink.name}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {item.drink.price.toFixed(2)} EUR x {item.quantity}
+                                    </Typography>
+                                </div>
+                                <div className={style.cartActions}>
+                                    <Button variant="outlined" size="small" onClick={() => updateCartQuantity(item.drink.id, -1)}>-</Button>
+                                    <Button variant="outlined" size="small" onClick={() => updateCartQuantity(item.drink.id, 1)}>+</Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                <div className={style.cartTotals}>
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        {EVENT_GESAMT}: {totalAmount.toFixed(2)} EUR
+                    </Typography>
+                    {activeGuest ? <Typography variant="body2">{GUTHABEN}: {balance.toFixed(2)} EUR</Typography> : <></>}
+                    {showSplit ? <Typography variant="body2">{EVENT_RESTBETRAG_BAR}: {shortage.toFixed(2)} EUR</Typography> : <></>}
+                    {showCashOnly ? <Typography variant="body2">{EVENT_BEZAHLEN_BAR}: {totalAmount.toFixed(2)} EUR</Typography> : <></>}
+                    {activeGuest && shortage > 0 ? (
+                        <Alert severity="warning">
+                            {format(EVENT_GUTHABEN_NICHT_AUSREICHEND, shortage.toFixed(2))}
+                        </Alert>
+                    ) : null}
+                </div>
+                <div className={style.actions}>
+                    {canCover ? (
+                        <Button
+                            variant="contained"
+                            disabled={!canCheckout}
+                            onClick={() => doPurchase('balance')}
+                        >
+                            {EVENT_BEZAHLEN_GUTHABEN}
+                        </Button>
+                    ) : hasPositiveBalance ? (
+                        <>
+                            <Button
+                                variant="contained"
+                                disabled={!canCheckout}
+                                onClick={() => doPurchase('split')}
+                            >
+                                {EVENT_BEZAHLEN_SPLIT}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                disabled={!canCheckout}
+                                onClick={() => doPurchase('cash')}
+                            >
+                                {EVENT_BEZAHLEN_BAR}
+                            </Button>
+                        </>
+                    ) : (
+                        <Button
+                            variant="contained"
+                            disabled={!canCheckout}
+                            onClick={() => doPurchase('cash')}
+                        >
+                            {EVENT_BEZAHLEN_BAR}
+                        </Button>
+                    )}
+                </div>
+            </Paper>
+
+            <div className={style.drinkGrid}>
+                {categories.map((category) => {
+                    const categoryDrinks = drinks.filter((drink) => drink.category === category)
+                    if (categoryDrinks.length === 0) {
+                        return null
+                    }
+                    return (
+                        <Paper key={category} className={style.section} elevation={2}>
+                            <Typography variant="h6">{category}</Typography>
+                            <div className={style.categoryGrid}>
+                                {categoryDrinks.map((drink) => (
+                                    <Paper key={drink.id} className={style.drinkCard} elevation={1}>
+                                        <Stack className={style.drinkStack} spacing={1} justifyContent="space-between">
+                                            <Stack>
+                                                <Typography variant="body1">{drink.name}</Typography>
+                                                <Typography variant="body2">{drink.price.toFixed(2)} EUR</Typography>
+                                            </Stack>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                className={style.addButton}
+                                                onClick={() => addToCart(drink)}
+                                                disabled={!activeGuest}
+                                            >
+                                                <AddBoxIcon />
+                                            </Button>
+                                        </Stack>
+                                    </Paper>
+                                ))}
+                            </div>
+                        </Paper>
+                    )
+                })}
+            </div>
+
+            <EventScanDialog
+                open={scanOpen}
+                title={EVENT_SCANNEN}
+                onClose={() => setScanOpen(false)}
+                onScanned={handleScan}
+            />
+        </div>
+    )
+}
+
+export default EventKasseCheckout

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { openErrorToast } from '../../Actions/CommonAction'
@@ -14,6 +14,7 @@ const EventGuest = () => {
     const [status, setStatus] = useState<EventModeStatus | null>(null)
     const [scanOpen, setScanOpen] = useState(false)
     const [memberId, setMemberId] = useState<number | null>(null)
+    const autoOpenedRef = useRef(false)
 
     useEffect(() => {
         doGetRequest('event-mode').then((value) => {
@@ -22,6 +23,13 @@ const EventGuest = () => {
             }
         })
     }, [])
+
+    useEffect(() => {
+        if (!autoOpenedRef.current && status?.enabled && memberId === null) {
+            autoOpenedRef.current = true
+            setScanOpen(true)
+        }
+    }, [memberId, status?.enabled])
 
     const handleScan = (code: string) => {
         setScanOpen(false)

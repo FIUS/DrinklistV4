@@ -17,6 +17,10 @@ import EventMode from '../Admin/EventMode/EventMode';
 import EventQrPage from '../Admin/EventMode/EventQrPage';
 import EventKasse from '../Event/EventKasse';
 import EventGuest from '../Event/EventGuest';
+import EventKasseCheckout from '../Event/EventKasseCheckout';
+import EventKasseRegister from '../Event/EventKasseRegister';
+import EventKasseDeposit from '../Event/EventKasseDeposit';
+import EventKassePayout from '../Event/EventKassePayout';
 
 type Props = {}
 
@@ -40,6 +44,10 @@ const Routing = (props: Props) => {
                 <Route path="/admin/event-mode" element={<EventMode />} />
                 <Route path="/admin/event-mode/qr/:target" element={<EventQrPage />} />
                 <Route path="/event/kasse" element={<EventKasse />} />
+                <Route path="/event/kasse/checkout" element={<EventKasseCheckout />} />
+                <Route path="/event/kasse/new-guest" element={<EventKasseRegister />} />
+                <Route path="/event/kasse/deposit" element={<EventKasseDeposit />} />
+                <Route path="/event/kasse/payout" element={<EventKassePayout />} />
                 <Route path="/event/guest" element={<EventGuest />} />
             </Routes>
         </>

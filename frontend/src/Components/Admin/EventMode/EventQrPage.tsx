@@ -54,7 +54,6 @@ const EventQrPage = () => {
             <Paper className={style.qrBox} elevation={2}>
                 <QRCode value={fullUrl} size={320} />
             </Paper>
-            <Typography variant="body2" className={style.url}>{fullUrl}</Typography>
             <div className={style.actions}>
                 <Button variant="outlined" onClick={() => navigate('/admin/event-mode')}>{ZURUECK}</Button>
                 <Button variant="contained" onClick={() => window.print()}>{EVENT_DRUCKEN}</Button>

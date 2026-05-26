@@ -18,6 +18,11 @@ const EventScanDialog = (props: Props) => {
     const scanningRef = useRef(true)
     const scannerRef = useRef<Html5Qrcode | null>(null)
     const isRunningRef = useRef(false)
+    const onScannedRef = useRef(onScanned)
+
+    useEffect(() => {
+        onScannedRef.current = onScanned
+    }, [onScanned])
 
     useEffect(() => {
         if (!open) {
@@ -30,6 +35,13 @@ const EventScanDialog = (props: Props) => {
         let cancelled = false
         let retryTimeout: number | null = null
 
+        const clearTarget = () => {
+            const node = document.getElementById(regionId)
+            if (node) {
+                node.innerHTML = ""
+            }
+        }
+
         const startScanner = () => {
             if (cancelled) {
                 return
@@ -40,6 +52,24 @@ const EventScanDialog = (props: Props) => {
                 retryTimeout = window.setTimeout(startScanner, 50)
                 return
             }
+
+            if (scannerRef.current) {
+                if (isRunningRef.current) {
+                    isRunningRef.current = false
+                    try {
+                        scannerRef.current.stop().catch(() => { })
+                    } catch {
+                        // Ignore stop errors when scanner is not running.
+                    }
+                }
+                if (typeof (scannerRef.current as any).clear === 'function') {
+                    (scannerRef.current as any).clear()
+                }
+                scannerRef.current = null
+            }
+
+            clearTarget()
+            isRunningRef.current = false
 
             const scanner = new Html5Qrcode(regionId)
             scannerRef.current = scanner
@@ -59,7 +89,7 @@ const EventScanDialog = (props: Props) => {
                             // Ignore stop errors when scanner is not running.
                         }
                     }
-                    onScanned(decodedText)
+                    onScannedRef.current(decodedText)
                 },
                 () => { }
             )
@@ -93,15 +123,16 @@ const EventScanDialog = (props: Props) => {
                 }
                 scannerRef.current = null
             }
+            clearTarget()
         }
-    }, [open, onScanned, regionId])
+    }, [open, regionId])
 
     const submitManual = () => {
         const trimmed = manualCode.trim()
         if (trimmed === '') {
             return
         }
-        onScanned(trimmed)
+        onScannedRef.current(trimmed)
     }
 
     return (
