@@ -53,23 +53,24 @@ const EventGuest = () => {
     }
 
     return (
-        <div className={style.container}>
-            <Typography variant="h4">{EVENT_GAST}</Typography>
+        <>
+
             {memberId === null ? (
                 <Button variant="contained" onClick={() => setScanOpen(true)}>{EVENT_SCANNEN}</Button>
             ) : (
                 <>
-                    <Button variant="outlined" onClick={() => setScanOpen(true)}>{EVENT_SCANNEN}</Button>
                     <Details readOnly memberIdOverride={memberId.toString()} />
                 </>
             )}
+
             <EventScanDialog
                 open={scanOpen}
                 title={EVENT_SCANNEN}
                 onClose={() => setScanOpen(false)}
                 onScanned={handleScan}
             />
-        </div>
+
+        </>
     )
 }
 

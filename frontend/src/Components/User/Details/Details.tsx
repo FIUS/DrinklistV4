@@ -12,7 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, GUTHABEN, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -141,7 +141,7 @@ const Details = (props: Props) => {
 
         return <>
             <Paper className={style.balanceTop}>
-                <Typography variant='h3'>{KONTOSTAND}:</Typography>
+                <Typography variant='h3'>{isReadOnly ? GUTHABEN : KONTOSTAND}:</Typography>
                 <Typography variant='h2' color={textColor}>
                     <CountUp start={saveValue - saveLastValue}
                         end={saveValue}
@@ -322,8 +322,8 @@ const Details = (props: Props) => {
                 </div>
 
                 <div className={style.buyDrinkContainer}>
-                    <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
                     {!isReadOnly ? <>
+                        <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
                         <TextField
                             placeholder={SUCHE_DOT_DOT_DOT}
                             value={searchField}

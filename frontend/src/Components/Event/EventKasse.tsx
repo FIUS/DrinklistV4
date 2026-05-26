@@ -26,16 +26,7 @@ const EventKasse = () => {
             {status?.enabled === false ? (
                 <Alert severity="warning">{EVENT_MODE_DISABLED}</Alert>
             ) : null}
-            <Stack spacing={2} className={style.buttonStack}>
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={() => navigate('/event/kasse/new-guest')}
-                    disabled={!eventEnabled}
-                >
-                    {EVENT_NEUER_GAST}
-                </Button>
+            <Stack spacing={2} className={style.buttonStack}>     
                 <Button
                     variant="contained"
                     size="large"
@@ -44,6 +35,15 @@ const EventKasse = () => {
                     disabled={!eventEnabled}
                 >
                     {EVENT_KASSE}
+                </Button>
+                <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    onClick={() => navigate('/event/kasse/new-guest')}
+                    disabled={!eventEnabled}
+                >
+                    {EVENT_NEUER_GAST}
                 </Button>
                 <Button
                     variant="contained"
