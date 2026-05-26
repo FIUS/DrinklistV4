@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Button, Paper, Stack, Typography } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography } from '@mui/material'
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
 import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
-import { EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
+import { ABBRECHEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseCheckout.module.scss'
 import { format } from 'react-string-format'
@@ -26,6 +26,9 @@ const EventKasseCheckout = () => {
     const [activeGuestCode, setActiveGuestCode] = useState<string | null>(null)
     const [cart, setCart] = useState<Array<CartItem>>([])
     const [scanOpen, setScanOpen] = useState(false)
+    const [confirmOpen, setConfirmOpen] = useState(false)
+    const [pendingMode, setPendingMode] = useState<'balance' | 'cash' | 'split' | null>(null)
+    const [confirming, setConfirming] = useState(false)
     const autoOpenedRef = useRef(false)
 
     const eventEnabled = status?.enabled === true
@@ -141,8 +144,41 @@ const EventKasseCheckout = () => {
             } else {
                 dispatch(openErrorToast())
             }
+            setConfirming(false)
         })
     }
+
+    const openConfirm = (mode: 'balance' | 'cash' | 'split') => {
+        setPendingMode(mode)
+        setConfirmOpen(true)
+    }
+
+    const confirmPurchase = () => {
+        if (!pendingMode) {
+            return
+        }
+        if (confirming) {
+            return
+        }
+        setConfirming(true)
+        setConfirmOpen(false)
+        doPurchase(pendingMode)
+        setPendingMode(null)
+    }
+
+    const getBreakdown = (mode: 'balance' | 'cash' | 'split') => {
+        if (mode === 'balance') {
+            return { balanceUsed: totalAmount, cashUsed: 0 }
+        }
+        if (mode === 'cash') {
+            return { balanceUsed: 0, cashUsed: totalAmount }
+        }
+
+        const balanceUsed = Math.min(balance, totalAmount)
+        return { balanceUsed, cashUsed: Math.max(0, totalAmount - balanceUsed) }
+    }
+
+    const breakdown = pendingMode ? getBreakdown(pendingMode) : { balanceUsed: 0, cashUsed: 0 }
 
     if (status?.enabled === false) {
         return (
@@ -161,9 +197,7 @@ const EventKasseCheckout = () => {
                 <Typography variant="h4">{EVENT_KASSE}</Typography>
                 <Stack direction="row" spacing={2} className={style.headerActions}>
                     <Button variant="outlined" onClick={() => navigate('/event/kasse')}>{ZURUECK}</Button>
-                    {!activeGuest ? (
-                        <Button variant="contained" onClick={() => setScanOpen(true)} disabled={!eventEnabled}>{EVENT_SCANNEN}</Button>
-                    ) : null}
+                    
                 </Stack>
             </div>
 
@@ -226,7 +260,7 @@ const EventKasseCheckout = () => {
                         <Button
                             variant="contained"
                             disabled={!canCheckout}
-                            onClick={() => doPurchase('balance')}
+                            onClick={() => openConfirm('balance')}
                         >
                             {EVENT_BEZAHLEN_GUTHABEN}
                         </Button>
@@ -235,14 +269,14 @@ const EventKasseCheckout = () => {
                             <Button
                                 variant="contained"
                                 disabled={!canCheckout}
-                                onClick={() => doPurchase('split')}
+                                onClick={() => openConfirm('split')}
                             >
                                 {EVENT_BEZAHLEN_SPLIT}
                             </Button>
                             <Button
                                 variant="outlined"
                                 disabled={!canCheckout}
-                                onClick={() => doPurchase('cash')}
+                                onClick={() => openConfirm('cash')}
                             >
                                 {EVENT_BEZAHLEN_BAR}
                             </Button>
@@ -251,7 +285,7 @@ const EventKasseCheckout = () => {
                         <Button
                             variant="contained"
                             disabled={!canCheckout}
-                            onClick={() => doPurchase('cash')}
+                            onClick={() => openConfirm('cash')}
                         >
                             {EVENT_BEZAHLEN_BAR}
                         </Button>
@@ -300,6 +334,21 @@ const EventKasseCheckout = () => {
                 onClose={() => setScanOpen(false)}
                 onScanned={handleScan}
             />
+
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+                <DialogTitle>{EVENT_ZAHLUNG_BESTAETIGEN}</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={1}>
+                        <Typography variant="body1">{EVENT_GESAMT}: {totalAmount.toFixed(2)} EUR</Typography>
+                        <Typography variant="body2">{EVENT_ZAHLUNG_GUTHABEN}: {breakdown.balanceUsed.toFixed(2)} EUR</Typography>
+                        <Typography variant="body2">{EVENT_ZAHLUNG_BAR}: {breakdown.cashUsed.toFixed(2)} EUR</Typography>
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmOpen(false)}>{ABBRECHEN}</Button>
+                    <Button variant="contained" onClick={confirmPurchase} disabled={confirming}>{EVENT_BESTAETIGEN}</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }

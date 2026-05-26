@@ -56,6 +56,7 @@ const EventKasseRegister = () => {
                 }
             } else if (value.code === 409) {
                 dispatch(openToast({ message: EVENT_GAST_EXISTIERT, type: "error" }))
+                navigate('/event/kasse')
             } else {
                 dispatch(openErrorToast())
             }

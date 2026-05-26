@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
 import { Html5Qrcode } from 'html5-qrcode'
-import { ABBRECHEN, ERROR_MESSAGE, EVENT_MANUELL, OK } from '../Common/Internationalization/i18n'
+import { ABBRECHEN, ERROR_MESSAGE, EVENT_MANUELL, EVENT_QR_CODE_UNGUELTIG, EVENT_QR_VERSION_FALSCH, OK } from '../Common/Internationalization/i18n'
 
 type Props = {
     open: boolean,
@@ -24,6 +24,33 @@ const EventScanDialog = (props: Props) => {
         onScannedRef.current = onScanned
     }, [onScanned])
 
+    const normalizeCode = (rawCode: string) => {
+        const trimmed = rawCode.trim()
+        if (trimmed === "") {
+            return { error: EVENT_QR_CODE_UNGUELTIG, value: null }
+        }
+
+        const lowered = trimmed.toLowerCase()
+
+        if (lowered.startsWith("v1.1,")) {
+            const parts = trimmed.split(",")
+            if (parts.length < 3) {
+                return { error: EVENT_QR_CODE_UNGUELTIG, value: null }
+            }
+            const extracted = parts[2].trim()
+            if (extracted === "") {
+                return { error: EVENT_QR_CODE_UNGUELTIG, value: null }
+            }
+            return { error: null, value: extracted }
+        }
+
+        if (lowered.startsWith("v")) {
+            return { error: EVENT_QR_VERSION_FALSCH, value: null }
+        }
+
+        return { error: null, value: trimmed }
+    }
+
     useEffect(() => {
         if (!open) {
             return
@@ -42,6 +69,35 @@ const EventScanDialog = (props: Props) => {
             }
         }
 
+        const stopScanner = () => {
+            const scanner = scannerRef.current
+            if (!scanner) {
+                return Promise.resolve()
+            }
+
+            const doClear = () => {
+                try {
+                    if (typeof (scanner as any).clear === 'function') {
+                        (scanner as any).clear()
+                    }
+                } catch {
+                    // Ignore clear errors after stop.
+                }
+                scannerRef.current = null
+                clearTarget()
+            }
+
+            if (isRunningRef.current) {
+                isRunningRef.current = false
+                return scanner.stop().catch(() => {
+                    // Ignore stop errors when scanner is not running.
+                }).finally(doClear)
+            }
+
+            doClear()
+            return Promise.resolve()
+        }
+
         const startScanner = () => {
             if (cancelled) {
                 return
@@ -52,52 +108,46 @@ const EventScanDialog = (props: Props) => {
                 retryTimeout = window.setTimeout(startScanner, 50)
                 return
             }
-
-            if (scannerRef.current) {
-                if (isRunningRef.current) {
-                    isRunningRef.current = false
-                    try {
-                        scannerRef.current.stop().catch(() => { })
-                    } catch {
-                        // Ignore stop errors when scanner is not running.
-                    }
+            stopScanner().finally(() => {
+                if (cancelled) {
+                    return
                 }
-                if (typeof (scannerRef.current as any).clear === 'function') {
-                    (scannerRef.current as any).clear()
-                }
-                scannerRef.current = null
-            }
-
-            clearTarget()
-            isRunningRef.current = false
-
-            const scanner = new Html5Qrcode(regionId)
-            scannerRef.current = scanner
-            const startPromise = scanner.start(
-                { facingMode: 'environment' },
-                { fps: 10, qrbox: 240 },
-                (decodedText) => {
-                    if (!scanningRef.current) {
-                        return
-                    }
-                    scanningRef.current = false
-                    if (isRunningRef.current) {
-                        isRunningRef.current = false
-                        try {
-                            scanner.stop().catch(() => { })
-                        } catch {
-                            // Ignore stop errors when scanner is not running.
+                const scanner = new Html5Qrcode(regionId)
+                scannerRef.current = scanner
+                const startPromise = scanner.start(
+                    { facingMode: 'environment' },
+                    { fps: 10, qrbox: 240 },
+                    (decodedText) => {
+                        if (!scanningRef.current) {
+                            return
                         }
-                    }
-                    onScannedRef.current(decodedText)
-                },
-                () => { }
-            )
+                        const parsed = normalizeCode(decodedText)
+                        if (parsed.error) {
+                            setError(parsed.error)
+                            return
+                        }
+                        scanningRef.current = false
+                        if (isRunningRef.current) {
+                            isRunningRef.current = false
+                            try {
+                                scanner.stop().catch(() => { })
+                            } catch {
+                                // Ignore stop errors when scanner is not running.
+                            }
+                        }
+                        setError(null)
+                        if (parsed.value !== null) {
+                            onScannedRef.current(parsed.value)
+                        }
+                    },
+                    () => { }
+                )
 
-            startPromise.then(() => {
-                isRunningRef.current = true
-            }).catch(() => {
-                setError(ERROR_MESSAGE)
+                startPromise.then(() => {
+                    isRunningRef.current = true
+                }).catch(() => {
+                    setError(ERROR_MESSAGE)
+                })
             })
         }
 
@@ -109,30 +159,20 @@ const EventScanDialog = (props: Props) => {
                 window.clearTimeout(retryTimeout)
             }
             scanningRef.current = false
-            if (scannerRef.current) {
-                if (isRunningRef.current) {
-                    isRunningRef.current = false
-                    try {
-                        scannerRef.current.stop().catch(() => { })
-                    } catch {
-                        // Ignore stop errors when scanner is not running.
-                    }
-                }
-                if (typeof (scannerRef.current as any).clear === 'function') {
-                    (scannerRef.current as any).clear()
-                }
-                scannerRef.current = null
-            }
-            clearTarget()
+            stopScanner()
         }
     }, [open, regionId])
 
     const submitManual = () => {
-        const trimmed = manualCode.trim()
-        if (trimmed === '') {
+        const parsed = normalizeCode(manualCode)
+        if (parsed.error) {
+            setError(parsed.error)
             return
         }
-        onScannedRef.current(trimmed)
+        setError(null)
+        if (parsed.value !== null) {
+            onScannedRef.current(parsed.value)
+        }
     }
 
     return (

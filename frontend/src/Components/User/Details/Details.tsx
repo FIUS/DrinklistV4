@@ -160,6 +160,9 @@ const Details = (props: Props) => {
     }
 
     const shouldAddUndoColumn = () => {
+        if (isReadOnly) {
+            return false
+        }
         return common.history?.find(value => {
             return value.revertable
         }) !== undefined
@@ -176,6 +179,9 @@ const Details = (props: Props) => {
     </TableRow>
 
     const dateOrRevert = (transaction: Transaction) => {
+        if (isReadOnly) {
+            return format("{0} - {1}", dateToString(convertToLocalDate(transaction.date)), timeToString(convertToLocalDate(transaction.date)))
+        }
         if (transaction.revertable) {
             return <Button fullWidth onClick={() => {
                 doPostRequest("transactions/" + transaction.id + "/undo", null).then((innerValue) => {
