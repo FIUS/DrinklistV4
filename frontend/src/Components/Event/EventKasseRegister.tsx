@@ -35,7 +35,19 @@ const EventKasseRegister = () => {
 
     const handleScan = (code: string) => {
         setScanOpen(false)
-        setGuestCode(code)
+        // Check if guest already exists; if so, notify and return to kasse
+        doPostRequest('event/guest/lookup', { code }).then((value) => {
+            if (value.code === 200) {
+                // guest exists
+                dispatch(openToast({ message: EVENT_GAST_EXISTIERT, type: "error" }))
+                navigate('/event/kasse')
+            } else if (value.code === 404) {
+                // guest not found — proceed with registration flow (allow initial balance input)
+                setGuestCode(code)
+            } else {
+                dispatch(openErrorToast())
+            }
+        })
     }
 
     const confirmRegister = () => {
