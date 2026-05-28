@@ -29,7 +29,6 @@ const EventKasseCheckout = () => {
     const [confirmOpen, setConfirmOpen] = useState(false)
     const [pendingMode, setPendingMode] = useState<'balance' | 'cash' | 'split' | null>(null)
     const [confirming, setConfirming] = useState(false)
-    const autoOpenedRef = useRef(false)
 
     const eventEnabled = status?.enabled === true
 
@@ -54,12 +53,7 @@ const EventKasseCheckout = () => {
         })
     }, [eventEnabled])
 
-    useEffect(() => {
-        if (!autoOpenedRef.current && eventEnabled && activeGuest === null) {
-            autoOpenedRef.current = true
-            setScanOpen(true)
-        }
-    }, [activeGuest, eventEnabled])
+    // Scanner will open only when the user presses the scan button.
 
     const addToCart = (drink: Drink) => {
         setCart((prev) => {
@@ -102,12 +96,15 @@ const EventKasseCheckout = () => {
 
     const totalAmount = cart.reduce((sum, item) => sum + item.drink.price * item.quantity, 0)
     const balance = activeGuest?.balance ?? 0
+    const balanceInCents = Math.round(balance * 100)
     const shortage = Math.max(0, totalAmount - balance)
-    const showSplit = shortage > 0 && balance > 0
-    const showCashOnly = shortage > 0 && balance <= 0
+    const showSplit = shortage > 0 && balanceInCents > 0
+    const showCashOnly = shortage > 0 && balanceInCents <= 0
     const canCheckout = activeGuest !== null && cart.length > 0
-    const hasPositiveBalance = balance > 0
-    const canCover = balance >= totalAmount
+    const canCashCheckout = cart.length > 0
+    const hasPositiveBalance = balanceInCents > 0
+    // require positive balance to be considered able to cover via balance
+    const canCover = balanceInCents > 0 && balance >= totalAmount
     const balanceColor = balance >= 0 ? 'limegreen' : 'darkred'
 
     const handleLookup = (code: string) => {
@@ -148,6 +145,23 @@ const EventKasseCheckout = () => {
         })
     }
 
+    const doCashPurchase = () => {
+        if (cart.length === 0) {
+            return
+        }
+        const items = cart.map((item) => ({ drinkID: item.drink.id, quantity: item.quantity }))
+        doPostRequest('event/purchase', { items, paymentMode: 'cash' }).then((value) => {
+            if (value.code === 200) {
+                dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
+                resetCart()
+                navigate('/event/kasse')
+            } else {
+                dispatch(openErrorToast())
+            }
+            setConfirming(false)
+        })
+    }
+
     const openConfirm = (mode: 'balance' | 'cash' | 'split') => {
         setPendingMode(mode)
         setConfirmOpen(true)
@@ -162,7 +176,11 @@ const EventKasseCheckout = () => {
         }
         setConfirming(true)
         setConfirmOpen(false)
-        doPurchase(pendingMode)
+        if (pendingMode === 'cash' && !activeGuest) {
+            doCashPurchase()
+        } else {
+            doPurchase(pendingMode)
+        }
         setPendingMode(null)
     }
 
@@ -275,7 +293,7 @@ const EventKasseCheckout = () => {
                             </Button>
                             <Button
                                 variant="outlined"
-                                disabled={!canCheckout}
+                                disabled={!canCashCheckout}
                                 onClick={() => openConfirm('cash')}
                             >
                                 {EVENT_BEZAHLEN_BAR}
@@ -284,7 +302,7 @@ const EventKasseCheckout = () => {
                     ) : (
                         <Button
                             variant="contained"
-                            disabled={!canCheckout}
+                            disabled={!canCashCheckout}
                             onClick={() => openConfirm('cash')}
                         >
                             {EVENT_BEZAHLEN_BAR}
@@ -315,7 +333,7 @@ const EventKasseCheckout = () => {
                                                 size="small"
                                                 className={style.addButton}
                                                 onClick={() => addToCart(drink)}
-                                                disabled={!activeGuest}
+                                                disabled={!eventEnabled}
                                             >
                                                 <AddBoxIcon />
                                             </Button>

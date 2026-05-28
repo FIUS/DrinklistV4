@@ -608,7 +608,7 @@ class event_guest_deposit(Resource):
         if member_id is None:
             return util.build_response("User not found", code=404)
 
-        member = db.event_deposit_user(member_id, amount, description="Event cash")
+        member = db.event_deposit_user(member_id, amount, description="Barzahlung")
         if member is None:
             return util.build_response("User not found", code=404)
 
@@ -658,6 +658,57 @@ class event_guest_purchase(Resource):
             return util.build_response(result, code=400)
 
         return util.build_response(result)
+
+
+@api.route('/event/purchase')
+class event_purchase_anonymous(Resource):
+    @event_mode_only
+    @api.doc(body=event_purchase_model)
+    def post(self):
+        """
+        Purchase drinks as anonymous cash-only purchase
+        """
+        items = request.json.get("items") if request.json is not None else []
+
+        result = db.event_purchase_cash(items)
+        if isinstance(result, dict) and "error" in result:
+            return util.build_response(result, code=400)
+
+        return util.build_response(result)
+
+
+@api.route('/event/transactions/limit/<int:limit>')
+class get_event_transactions_limited(Resource):
+    @event_mode_only
+    def get(self, limit):
+        """
+        Get the lastest x transactions (event view)
+        """
+        return util.build_response(db.get_transactions(limit))
+
+
+@api.route('/event/transactions/<int:transaction_id>/undo')
+class event_undo_transaction(Resource):
+    @event_mode_only
+    def post(self, transaction_id):
+        """
+        Undo the given transaction (event mode).
+        """
+        try:
+            transaction = db.get_transaction(transaction_id)
+        except Exception:
+            return util.build_response("NotFound", code=404)
+
+        if transaction is None:
+            return util.build_response("NotFound", code=404)
+
+        transaction_date = datetime.strptime(
+            transaction['date'], "%Y-%m-%dT%H:%M:%SZ")
+
+        if db.delete_transaction(transaction_id):
+            return util.build_response("Transaction undone")
+        else:
+            return util.build_response("Transaction cannot be deleted", code=403)
 
 
 @api.route('/drinks')

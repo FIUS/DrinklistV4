@@ -14,6 +14,7 @@ const EventScanDialog = (props: Props) => {
     const { open, onScanned, onClose, title } = props
     const regionId = useMemo(() => `qr-reader-${Math.random().toString(36).slice(2, 10)}`, [])
     const [manualCode, setManualCode] = useState('')
+    const manualRef = useRef<HTMLInputElement | null>(null)
     const [error, setError] = useState<string | null>(null)
     const scanningRef = useRef(true)
     const scannerRef = useRef<Html5Qrcode | null>(null)
@@ -58,6 +59,14 @@ const EventScanDialog = (props: Props) => {
 
         setManualCode('')
         setError(null)
+        // focus the manual input shortly after opening
+        setTimeout(() => {
+            try {
+                manualRef.current?.focus()
+            } catch {
+                // ignore
+            }
+        }, 50)
         scanningRef.current = true
         let cancelled = false
         let retryTimeout: number | null = null
@@ -185,8 +194,11 @@ const EventScanDialog = (props: Props) => {
                     label={EVENT_MANUELL}
                     value={manualCode}
                     onChange={(event) => setManualCode(event.target.value)}
+                    inputRef={(el: HTMLInputElement) => { manualRef.current = el }}
                     fullWidth
                     margin="dense"
+                    autoComplete="off"
+                    autoFocus={false}
                 />
             </DialogContent>
             <DialogActions>

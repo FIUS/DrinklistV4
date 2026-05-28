@@ -282,17 +282,22 @@ class Queries:
                     # Cannot delete a transaction that is part of a checkout
                     return False
 
-                member: Member = session.query(Member).filter_by(
-                    id=transaction.member_id).first()
-                member.balance -= transaction.amount
+                member: Member = None
+                if transaction.member_id is not None:
+                    member = session.query(Member).filter_by(
+                        id=transaction.member_id).first()
+                    if member is not None:
+                        member.balance -= transaction.amount
 
                 if transaction.connected_transaction_id is not None:
                     transaction_connected: Transaction = session.query(
                         Transaction).filter_by(id=transaction.connected_transaction_id).first()
 
-                    member_connected: Member = session.query(Member).filter_by(
-                        id=transaction_connected.member_id).first()
-                    member_connected.balance -= transaction_connected.amount
+                    if transaction_connected.member_id is not None:
+                        member_connected: Member = session.query(Member).filter_by(
+                            id=transaction_connected.member_id).first()
+                        if member_connected is not None:
+                            member_connected.balance -= transaction_connected.amount
                     session.delete(transaction_connected)
 
                 session.delete(transaction)
@@ -329,7 +334,7 @@ class Queries:
     def _get_latest_checkout(self, session: session.Session):
         return session.query(Checkout).order_by(desc(Checkout.id)).first()
 
-    def event_deposit_user(self, member_id, amount, description="Event cash"):
+    def event_deposit_user(self, member_id, amount, description="Barzahlung"):
         with self.write_lock:
             with self.get_session() as session:
                 member: Member = session.query(
@@ -437,7 +442,7 @@ class Queries:
 
                     member.balance += cash_amount
                     session.add(Transaction(
-                        description="Event cash",
+                        description="Barzahlung",
                         member_id=member_id,
                         amount=cash_amount,
                         checkout_id=checkout_id
@@ -456,6 +461,61 @@ class Queries:
                 session.commit()
                 return {
                     "balance": float(member.balance),
+                    "total": total_amount,
+                    "cash": cash_amount
+                }
+
+    def event_purchase_cash(self, items):
+        with self.write_lock:
+            with self.get_session() as session:
+                prepared_items = []
+                total_amount = 0
+                for item in items:
+                    drink_id = item.get("drinkID")
+                    quantity = int(item.get("quantity", 1))
+                    if quantity < 1:
+                        continue
+
+                    drink: Drink = session.query(
+                        Drink).filter_by(id=drink_id).first()
+                    if drink is None:
+                        return {"error": "DrinkNotFound"}
+
+                    prepared_items.append((drink, quantity))
+                    total_amount += drink.price * quantity
+
+                if len(prepared_items) == 0:
+                    return {"error": "EmptyCart"}
+
+                cash_amount = total_amount
+
+                connected_checkout = self._get_latest_checkout(session)
+                checkout_id = None
+                if connected_checkout is not None:
+                    connected_checkout.current_cash += cash_amount
+                    checkout_id = connected_checkout.id
+
+                if cash_amount > 0:
+                    session.add(Transaction(
+                        description="Barzahlung",
+                        member_id=None,
+                        amount=cash_amount,
+                        checkout_id=checkout_id
+                    ))
+
+                for drink, quantity in prepared_items:
+                    for _ in range(quantity):
+                        drink.stock -= 1
+                        session.add(Transaction(
+                            description=f"{drink.name}",
+                            member_id=None,
+                            amount=-drink.price,
+                            checkout_id=checkout_id
+                        ))
+
+                session.commit()
+                return {
+                    "balance": None,
                     "total": total_amount,
                     "cash": cash_amount
                 }
