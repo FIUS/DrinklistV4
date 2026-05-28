@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
 import { EventGuestResponse, EventModeStatus, Member } from '../../types/ResponseTypes'
-import { EVENT_AUSZAHLEN, EVENT_AUSZAHLUNG_ERFOLG, EVENT_GAST_GELADEN, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_RESTGELD_AUSZAHLEN, EVENT_SCANNEN, ZURUECK } from '../Common/Internationalization/i18n'
+import { EVENT_AUSZAHLEN, EVENT_AUSZAHLUNG_ERFOLG, EVENT_GAST_GELADEN, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTGELD_AUSZAHLEN, EVENT_SCANNEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseAction.module.scss'
 
@@ -40,6 +40,8 @@ const EventKassePayout = () => {
                 setActiveGuest(payload.member)
                 setActiveGuestCode(code)
                 dispatch(openToast({ message: EVENT_GAST_GELADEN }))
+            } else if (value.code === 404) {
+                dispatch(openToast({ message: EVENT_NO_GUTHABENKARTE, type: 'error' }))
             } else {
                 dispatch(openErrorToast())
             }

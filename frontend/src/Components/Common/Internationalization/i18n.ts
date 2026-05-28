@@ -219,3 +219,4 @@ export const EVENT_WARENKORB_ENTFERNT = "{0} entfernt";
 export const EVENT_AUSZAHLEN = "Auszahlen";
 export const EVENT_EINZAHLEN = "Einzahlen";
 export const EVENT_GAST_EXISTIERT = "Gast existiert bereits";
+export const EVENT_NO_GUTHABENKARTE = "Noch keine Guthabenkarte";
