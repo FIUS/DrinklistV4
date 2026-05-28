@@ -79,9 +79,9 @@ function App() {
               <LoginChecker />
               <Toast />
               <NewMessagesPopup />
-              <Box sx={{ display: 'flex' }}>
+              <Box sx={{ display: 'flex', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
                 <TopBar />
-                <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0 }}>
+                <Box component="main" sx={{ flexGrow: 1, p: 3, padding: 0, minWidth: 0 }}>
                   <Toolbar />
                   <Routing />
                 </Box>

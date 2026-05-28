@@ -1,0 +1,30 @@
+.container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cardRow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cardActions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.url {
+    word-break: break-all;
+    color: #555;
+}

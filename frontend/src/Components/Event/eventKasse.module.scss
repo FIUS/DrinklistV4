@@ -1,0 +1,27 @@
+.container {
+    --kasse-section-padding: 16px;
+
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 520px;
+}
+
+.buttonStack {
+    width: 100%;
+}
+
+.section {
+    padding: var(--kasse-section-padding);
+}
+
+.transactionGroup {
+    padding: calc(var(--kasse-section-padding) * 0.6);
+}
+
+.groupTimestamp {
+    display: block;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}

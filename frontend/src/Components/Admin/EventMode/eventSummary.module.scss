@@ -1,0 +1,72 @@
+.container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: white;
+    color: black;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.actions {
+    flex-wrap: wrap;
+}
+
+.statBox {
+    padding: 16px;
+    min-width: 180px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
+}
+
+.hourGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    break-inside: avoid;
+}
+
+.chartCard {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 380px;
+    break-inside: avoid;
+}
+
+@media print {
+    .container {
+        padding: 0;
+    }
+
+    .actions {
+        display: none;
+    }
+
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .hourGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

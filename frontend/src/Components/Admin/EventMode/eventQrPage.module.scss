@@ -1,0 +1,25 @@
+.container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.qrBox {
+    padding: 16px;
+    background: #fff;
+}
+
+.url {
+    word-break: break-all;
+    text-align: center;
+    color: #555;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}

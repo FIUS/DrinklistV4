@@ -12,7 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Delete } from '@mui/icons-material'
-import { BESCHREIBUNG, BETRAG, DATUM, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
+import { BESCHREIBUNG, BETRAG, DATUM, GUTHABEN, HALLO, HISTORY, KONTOSTAND, NICHT_DEINE_TRANSAKTION, NICHT_MEHR_ABGESTRICHEN, RUECKGAENGIG, SUCHE_DOT_DOT_DOT, WENDE_DICH_AN_ADMIN_RUECKGAENGIG, ZEIGE_ALLE, ZEIGE_WENIGER, ZEITLIMIT_ABGELAUFEN } from '../../Common/Internationalization/i18n'
 import { format } from 'react-string-format';
 import TransferDialog from './TransferDialog'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -23,7 +23,10 @@ import RequestConfirmation from './RequestConfirmation'
 import { compareCategoriesBySortingIndex, convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 import LowBalanceWarningDialog from './LowBalanceWarningDialog'
 
-type Props = {}
+type Props = {
+    readOnly?: boolean,
+    memberIdOverride?: string
+}
 
 const Details = (props: Props) => {
 
@@ -38,8 +41,9 @@ const Details = (props: Props) => {
     const [isUser, setisUser] = useState(false)
     const [historyExpanded, sethistoryExpanded] = useState(false)
     const historyRef = useRef<HTMLDivElement>(null)
-    const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(params.userid ? params.userid : "0"))
-    const memberId = params.userid ? params.userid : ""
+    const isReadOnly = props.readOnly === true
+    const memberId = props.memberIdOverride ?? (params.userid ? params.userid : "")
+    const unsafeCurrentMember = common.members?.find((value) => value.id === parseInt(memberId ? memberId : "0"))
 
     const mobileHistroyThreshold = 1270;
 
@@ -52,6 +56,10 @@ const Details = (props: Props) => {
     };
 
     useEffect(() => {
+        if (isReadOnly) {
+            return
+        }
+
         if (common.drinks === null || common.members === null || common.drinkCategories === null || common.history === null) {
             doGetRequest("drinks").then((value) => {
                 if (value.code === 200) {
@@ -66,9 +74,13 @@ const Details = (props: Props) => {
 
 
         }
-    }, [common.drinks, common.members, common.drinkCategories, common.history, dispatch])
+    }, [common.drinks, common.members, common.drinkCategories, common.history, dispatch, isReadOnly])
 
     useEffect(() => {
+        if (memberId === "") {
+            return
+        }
+
         dispatch(setHistory([]))
         dispatch(setFavorites([]))
         doGetRequest("users").then((value) => {
@@ -76,17 +88,19 @@ const Details = (props: Props) => {
                 dispatch(setMembers(value.content))
             }
         })
-        doGetRequest("users/" + params.userid + "/favorites").then((value) => {
-            if (value.code === 200) {
-                dispatch(setFavorites(value.content))
-            }
-        })
-        doGetRequest("users/" + params.userid + "/history").then((value) => {
+        if (!isReadOnly) {
+            doGetRequest("users/" + memberId + "/favorites").then((value) => {
+                if (value.code === 200) {
+                    dispatch(setFavorites(value.content))
+                }
+            })
+        }
+        doGetRequest("users/" + memberId + "/history").then((value) => {
             if (value.code === 200) {
                 dispatch(setHistory(value.content))
             }
         })
-    }, [dispatch, params.userid])
+    }, [dispatch, memberId, isReadOnly])
 
     useEffect(() => {
         const memberID = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID");
@@ -98,11 +112,11 @@ const Details = (props: Props) => {
     }, [])
 
     const getUsername = () => {
-        return common.members?.find(value => value.id === parseInt(params.userid ? params.userid : "-1"))?.name
+        return common.members?.find(value => value.id === parseInt(memberId ? memberId : "-1"))?.name
     }
 
     const getAlias = () => {
-        let alias = common.members?.find(value => value.id === parseInt(params.userid ? params.userid : "-1"))?.alias
+        let alias = common.members?.find(value => value.id === parseInt(memberId ? memberId : "-1"))?.alias
         if (alias === "") {
             alias = getUsername()
         }
@@ -111,23 +125,23 @@ const Details = (props: Props) => {
 
     const balancePaper = () => {
         const balance = common.members?.find((value) => {
-            return value.id === parseInt(params.userid ? params.userid : "")
+            return value.id === parseInt(memberId ? memberId : "")
         })?.balance
         const balanceNotNull = balance !== undefined ? balance : 0
         const textColor = balanceNotNull > 0 ? "limegreen" : "darkred"
 
         const value = common.members?.find((value) => {
-            return value.id === parseInt(params.userid ? params.userid : "")
+            return value.id === parseInt(memberId ? memberId : "")
         })?.balance;
 
-        const lastValue = common.history?.find(value => value.memberID === parseInt(params.userid ? params.userid : ""))?.amount
+        const lastValue = common.history?.find(value => value.memberID === parseInt(memberId ? memberId : ""))?.amount
 
         const saveValue = value ? value : 0;
         const saveLastValue = lastValue ? lastValue : 0;
 
         return <>
             <Paper className={style.balanceTop}>
-                <Typography variant='h3'>{KONTOSTAND}:</Typography>
+                <Typography variant='h3'>{isReadOnly ? GUTHABEN : KONTOSTAND}:</Typography>
                 <Typography variant='h2' color={textColor}>
                     <CountUp start={saveValue - saveLastValue}
                         end={saveValue}
@@ -146,6 +160,9 @@ const Details = (props: Props) => {
     }
 
     const shouldAddUndoColumn = () => {
+        if (isReadOnly) {
+            return false
+        }
         return common.history?.find(value => {
             return value.revertable
         }) !== undefined
@@ -162,6 +179,9 @@ const Details = (props: Props) => {
     </TableRow>
 
     const dateOrRevert = (transaction: Transaction) => {
+        if (isReadOnly) {
+            return format("{0} - {1}", dateToString(convertToLocalDate(transaction.date)), timeToString(convertToLocalDate(transaction.date)))
+        }
         if (transaction.revertable) {
             return <Button fullWidth onClick={() => {
                 doPostRequest("transactions/" + transaction.id + "/undo", null).then((innerValue) => {
@@ -172,7 +192,7 @@ const Details = (props: Props) => {
                                 dispatch(setMembers(t_value.content))
                             }
                         })
-                        doGetRequest("users/" + params.userid + "/history").then((value) => {
+                        doGetRequest("users/" + memberId + "/history").then((value) => {
                             if (value.code === 200) {
                                 dispatch(setHistory(value.content))
                             }
@@ -256,6 +276,10 @@ const Details = (props: Props) => {
             return
         }
 
+        if (isReadOnly) {
+            return
+        }
+
         doGetRequest("users/" + id + "/low-balance-warning").then((value) => {
             if (value.code === 200) {
                 const warning: LowBalanceWarningResponse = value.content
@@ -269,12 +293,12 @@ const Details = (props: Props) => {
 
     return (
         <>
-            <TransferDialog
+            {!isReadOnly ? <TransferDialog
                 isOpen={common.transferDialogOpen}
                 close={() => dispatch(setTransferDialogOpen(false))}
                 member={currentMember}
-            />
-            <RequestDialog
+            /> : <></>}
+            {!isReadOnly ? <RequestDialog
                 isOpen={common.requestDialogOpen}
                 close={() => dispatch(setRequestDialogOpen(false))}
                 showConfirmation={() => {
@@ -282,17 +306,17 @@ const Details = (props: Props) => {
                 }}
                 member={currentMember}
                 isGroup={true}
-            />
-            <RequestConfirmation
+            /> : <></>}
+            {!isReadOnly ? <RequestConfirmation
                 isOpen={confirmationDialogOpen}
                 close={() => setconfirmationDialogOpen(false)}
 
-            />
-            <LowBalanceWarningDialog
+            /> : <></>}
+            {!isReadOnly ? <LowBalanceWarningDialog
                 isOpen={lowBalanceDialogOpen}
                 warning={lowBalanceWarning}
                 onClose={() => setlowBalanceDialogOpen(false)}
-            />
+            /> : <></>}
             <div className={style.details} onKeyUp={(event) => {
                 if (event.key === "Escape") {
                     navigate(checkUser() !== 1 && checkUser() !== 2 ? "/user/" + checkUser() : "/")
@@ -304,31 +328,33 @@ const Details = (props: Props) => {
                 </div>
 
                 <div className={style.buyDrinkContainer}>
-                    <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
-                    <TextField
-                        placeholder={SUCHE_DOT_DOT_DOT}
-                        value={searchField}
-                        onChange={(value) => setsearchField(value.target.value)}
-                        type="search"
-                        autoFocus
-                    />
-                    <BalanceBox favorites={common.drinks?.filter((value) => {
-                        return common.favorites?.includes(value.id)
-                    })}
-                        memberID={memberId}
-                        onPurchased={() => checkLowBalanceWarning(memberId)} />
-                    <div className={style.buyDrinkContainerInner}>
-                        {[...(common.drinkCategories ?? [])].sort((category1, category2) => compareCategoriesBySortingIndex(category1, category2, common.drinks)).map(category => {
-                            const drinks = common.drinks?.filter(value => {
-                                return value.category === category
-                            }).sort((drink1, drink2) => drink1.name.localeCompare(drink2.name))
-                            if (drinks?.some((value) => filterSeachDrinks(value))) {
-                                return <AvailableDrinkCard key={category} category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={memberId} onPurchased={() => checkLowBalanceWarning(memberId)} />
-                            } else {
-                                return null
-                            }
+                    {!isReadOnly ? <>
+                        <Typography variant='h4'><>{HALLO} <b>{getAlias()}</b>!</></Typography>
+                        <TextField
+                            placeholder={SUCHE_DOT_DOT_DOT}
+                            value={searchField}
+                            onChange={(value) => setsearchField(value.target.value)}
+                            type="search"
+                            autoFocus
+                        />
+                        <BalanceBox favorites={common.drinks?.filter((value) => {
+                            return common.favorites?.includes(value.id)
                         })}
-                    </div>
+                            memberID={memberId}
+                            onPurchased={() => checkLowBalanceWarning(memberId)} />
+                        <div className={style.buyDrinkContainerInner}>
+                            {[...(common.drinkCategories ?? [])].sort((category1, category2) => compareCategoriesBySortingIndex(category1, category2, common.drinks)).map(category => {
+                                const drinks = common.drinks?.filter(value => {
+                                    return value.category === category
+                                }).sort((drink1, drink2) => drink1.name.localeCompare(drink2.name))
+                                if (drinks?.some((value) => filterSeachDrinks(value))) {
+                                    return <AvailableDrinkCard key={category} category={category} drinks={drinks.filter((value) => filterSeachDrinks(value))} memberID={memberId} onPurchased={() => checkLowBalanceWarning(memberId)} />
+                                } else {
+                                    return null
+                                }
+                            })}
+                        </div>
+                    </> : <></>}
                 </div>
                 {window.innerWidth <= mobileHistroyThreshold ? extraFunctions() : <></>}
             </div>

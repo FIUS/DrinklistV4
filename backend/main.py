@@ -82,6 +82,16 @@ def admin(fn):
     return wrapper
 
 
+def event_mode_only(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not util.event_mode_enabled:
+            return util.build_response("Event mode disabled", 403)
+        return fn(*args, **kwargs)
+    wrapper.__name__ = fn.__name__
+    return wrapper
+
+
 def is_self_or_admin(request, member_id):
     is_self = str(member_id) == str(request.cookies.get(
         f"{util.auth_cookie_memberID}memberID"))
@@ -89,6 +99,15 @@ def is_self_or_admin(request, member_id):
         f"{util.auth_cookie_memberID}memberID"))
 
     return is_self or is_admin
+
+
+def get_member_id_from_code(code):
+    if code is None:
+        return None
+    trimmed = str(code).strip()
+    if trimmed == "":
+        return None
+    return db.checkPassword(trimmed, trimmed)
 
 
 model_amount = api.model('Amount', {
@@ -448,6 +467,248 @@ class add_user(Resource):
         mail.send_welcome_mail(request.json["name"])
 
         return util.build_response("User added")
+
+
+@api.route('/event-mode')
+class event_mode_status(Resource):
+    def get(self):
+        """
+        Get current event mode status
+        """
+        return util.build_response({
+            "enabled": util.event_mode_enabled,
+            "frontendDomain": util.domain
+        })
+
+
+event_code_model = api.model('Event-Code', {
+    'code': fields.String(description='QR code content', required=True)
+})
+
+event_register_model = api.model('Event-Register', {
+    'code': fields.String(description='QR code content', required=True),
+    'initialBalance': fields.Float(description='Initial balance', required=False)
+})
+
+event_deposit_model = api.model('Event-Deposit', {
+    'code': fields.String(description='QR code content', required=True),
+    'amount': fields.Float(description='Cash amount', required=True)
+})
+
+event_purchase_item_model = api.model('Event-Purchase-Item', {
+    'drinkID': fields.Integer(description='Drink ID', required=True),
+    'quantity': fields.Integer(description='Quantity', required=True)
+})
+
+event_purchase_model = api.model('Event-Purchase', {
+    'code': fields.String(description='QR code content', required=True),
+    'items': fields.List(fields.Nested(event_purchase_item_model)),
+    'paymentMode': fields.String(description='balance | cash | split', required=True)
+})
+
+
+@api.route('/event/drinks')
+class event_drinks(Resource):
+    @event_mode_only
+    def get(self):
+        """
+        Get drinks and categories for event mode
+        """
+        return util.build_response({
+            "drinks": db.get_drinks(),
+            "categories": db.get_drink_categories()
+        })
+
+
+@api.route('/event/guest/register')
+class event_guest_register(Resource):
+    @event_mode_only
+    @api.doc(body=event_register_model)
+    def post(self):
+        """
+        Register a new guest by QR code
+        """
+        code = request.json.get("code") if request.json is not None else None
+        code = str(code).strip() if code is not None else None
+        if code is None or code == "":
+            return util.build_response("Missing code", code=406)
+
+        if db.check_user(code) is not None:
+            return util.build_response("User already exists", code=409)
+
+        initial_balance = 0
+        if request.json is not None and "initialBalance" in request.json and request.json["initialBalance"] is not None:
+            initial_balance = float(request.json["initialBalance"])
+
+        new_member = db.add_user(code, initial_balance, code)
+        return util.build_response({"member": new_member})
+
+
+@api.route('/event/guest/lookup')
+class event_guest_lookup(Resource):
+    @event_mode_only
+    @api.doc(body=event_code_model)
+    def post(self):
+        """
+        Lookup guest by QR code
+        """
+        code = request.json.get("code") if request.json is not None else None
+        member_id = get_member_id_from_code(code)
+        if member_id is None:
+            return util.build_response("User not found", code=404)
+
+        member = db.get_user_by_id(member_id)
+        return util.build_response({"member": member})
+
+
+@api.route('/event/guest/login')
+class event_guest_login(Resource):
+    @event_mode_only
+    @api.doc(body=event_code_model)
+    def post(self):
+        """
+        Login guest by QR code
+        """
+        code = request.json.get("code") if request.json is not None else None
+        member_id = get_member_id_from_code(code)
+        if member_id is None:
+            return util.build_response("Unauthorized", code=403)
+
+        token = token_manager.create_token(member_id)
+        member = db.get_user_by_id(member_id)
+        return util.build_response({
+            "memberID": member_id,
+            "member": member
+        }, cookieToken=token, cookieMemberID=member_id, is_Admin=False)
+
+
+@api.route('/event/guest/deposit')
+class event_guest_deposit(Resource):
+    @event_mode_only
+    @api.doc(body=event_deposit_model)
+    def post(self):
+        """
+        Deposit cash for a guest (Marke kaufen)
+        """
+        code = request.json.get("code") if request.json is not None else None
+        amount = request.json.get("amount") if request.json is not None else None
+
+        if amount is None:
+            return util.build_response("Missing amount", code=406)
+
+        try:
+            amount = float(amount)
+        except (TypeError, ValueError):
+            return util.build_response("Invalid amount", code=406)
+
+        if amount <= 0:
+            return util.build_response("Amount must be positive", code=406)
+
+        member_id = get_member_id_from_code(code)
+        if member_id is None:
+            return util.build_response("User not found", code=404)
+
+        member = db.event_deposit_user(member_id, amount, description="Barzahlung")
+        if member is None:
+            return util.build_response("User not found", code=404)
+
+        return util.build_response({"member": member, "amount": amount})
+
+
+@api.route('/event/guest/payout')
+class event_guest_payout(Resource):
+    @event_mode_only
+    @api.doc(body=event_code_model)
+    def post(self):
+        """
+        Payout remaining balance to guest (Restgeld auszahlen)
+        """
+        code = request.json.get("code") if request.json is not None else None
+        member_id = get_member_id_from_code(code)
+        if member_id is None:
+            return util.build_response("User not found", code=404)
+
+        result = db.event_payout_user(member_id, description="Event payout")
+        if result is None:
+            return util.build_response("User not found", code=404)
+
+        return util.build_response(result)
+
+
+@api.route('/event/guest/purchase')
+class event_guest_purchase(Resource):
+    @event_mode_only
+    @api.doc(body=event_purchase_model)
+    def post(self):
+        """
+        Purchase drinks for a guest with balance/cash/split
+        """
+        code = request.json.get("code") if request.json is not None else None
+        member_id = get_member_id_from_code(code)
+        if member_id is None:
+            return util.build_response("User not found", code=404)
+
+        items = request.json.get("items") if request.json is not None else []
+        payment_mode = request.json.get("paymentMode") if request.json is not None else "balance"
+
+        result = db.event_purchase(member_id, items, payment_mode)
+        if "error" in result:
+            if result["error"] == "InsufficientBalance":
+                return util.build_response(result, code=409)
+            return util.build_response(result, code=400)
+
+        return util.build_response(result)
+
+
+@api.route('/event/purchase')
+class event_purchase_anonymous(Resource):
+    @event_mode_only
+    @api.doc(body=event_purchase_model)
+    def post(self):
+        """
+        Purchase drinks as anonymous cash-only purchase
+        """
+        items = request.json.get("items") if request.json is not None else []
+
+        result = db.event_purchase_cash(items)
+        if isinstance(result, dict) and "error" in result:
+            return util.build_response(result, code=400)
+
+        return util.build_response(result)
+
+
+@api.route('/event/transactions/limit/<int:limit>')
+class get_event_transactions_limited(Resource):
+    @event_mode_only
+    def get(self, limit):
+        """
+        Get the lastest x transactions (event view)
+        """
+        return util.build_response(db.get_transactions(limit))
+
+
+@api.route('/event/transactions/<int:transaction_id>/undo')
+class event_undo_transaction(Resource):
+    @event_mode_only
+    def post(self, transaction_id):
+        """
+        Undo the given transaction (event mode).
+        """
+        try:
+            transaction = db.get_transaction(transaction_id)
+        except Exception:
+            return util.build_response("NotFound", code=404)
+
+        if transaction is None:
+            return util.build_response("NotFound", code=404)
+
+        transaction_date = datetime.strptime(
+            transaction['date'], "%Y-%m-%dT%H:%M:%SZ")
+
+        if db.delete_transaction(transaction_id):
+            return util.build_response("Transaction undone")
+        else:
+            return util.build_response("Transaction cannot be deleted", code=403)
 
 
 @api.route('/drinks')

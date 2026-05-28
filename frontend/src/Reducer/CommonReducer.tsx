@@ -11,6 +11,7 @@ const initialState: CommonReducerType = {
     history: null,
     isLoggedIn: false,
     toast: {
+        id: 0,
         open: false,
         duration: 4000,
         headline: undefined,
@@ -29,6 +30,7 @@ export type CommonReducerType = {
     history: Array<Transaction> | null,
     isLoggedIn: boolean,
     toast: {
+        id: number,
         open: boolean,
         duration: number,
         headline: string | undefined,
@@ -69,6 +71,7 @@ const reducer = (state = initialState, { type, payload }: any) => {
 
         case "OPEN_TOAST":
             newState.toast.open = true;
+            newState.toast.id = (newState.toast.id ?? 0) + 1
             newState.toast.message = payload.message;
             newState.toast.headline = payload.headline
             newState.toast.duration = payload.duration ? payload.duration : initialState.toast.duration

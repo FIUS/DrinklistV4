@@ -5,7 +5,7 @@ import Spacer from '../Spacer'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { doPostRequest } from '../StaticFunctions';
+import { doGetRequest, doPostRequest } from '../StaticFunctions';
 import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -24,7 +24,7 @@ import { RootState } from '../../../Reducer/reducerCombiner';
 import InfoIcon from '@mui/icons-material/Info';
 import About from './About';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
-import { ABRECHNUNGEN, EINSTELLUNGEN, GELD_ANFORDERN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, PASSWORT_AENDERN, STATISTIKEN, TRANSAKTIONEN, UEBERWEISEN } from '../Internationalization/i18n';
+import { ABRECHNUNGEN, EINSTELLUNGEN, EVENT_MODE, EVENT_MODE_DEAKTIVIERT, GELD_ANFORDERN, GETRAENKE, MITGLIEDER, NUTZER_DASHBOARD, PASSWORT_AENDERN, STATISTIKEN, TRANSAKTIONEN, UEBERWEISEN } from '../Internationalization/i18n';
 import Cookies from 'js-cookie';
 import { setRequestDialogOpen, setTransferDialogOpen } from '../../../Actions/CommonAction';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
@@ -33,6 +33,7 @@ import { themes } from '../Theme';
 import KeyIcon from '@mui/icons-material/Key';
 import PasswordDialog from '../../Admin/Members/PasswordDialog';
 import { Member } from '../../../types/ResponseTypes';
+import QrCode2Icon from '@mui/icons-material/QrCode2';
 
 type Props = {}
 
@@ -47,12 +48,14 @@ const TopBar = (props: Props) => {
     const [drawerVisible, setdrawerVisible] = useState(true)
     const [aboutDialogOpen, setaboutDialogOpen] = useState(false)
     const [passwordDialogOpen, setpasswordDialogOpen] = useState(false)
+    const [eventModeEnabled, seteventModeEnabled] = useState<boolean | null>(null)
 
     const memberIDCookie = Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID")
     const memberIDCookieSafe = memberIDCookie ? parseInt(memberIDCookie) : -1
 
     const currentMember = common.members?.find(member => member.id === memberIDCookieSafe)
     const currentMemberSafe: Member = currentMember ? currentMember : { name: "", id: -1, balance: 0, hidden: false, alias: "" }
+    const isEventRoute = location.pathname.startsWith("/event")
 
     const showDrawerButton = () => {
         if (location.pathname.startsWith("/admin")) {
@@ -76,6 +79,14 @@ const TopBar = (props: Props) => {
             setdrawerVisible(false)
         }
     }, [location.pathname])
+
+    useEffect(() => {
+        doGetRequest("event-mode").then((value) => {
+            if (value.code === 200) {
+                seteventModeEnabled(value.content.enabled)
+            }
+        })
+    }, [])
 
 
     const navigationButton = () => {
@@ -196,6 +207,20 @@ const TopBar = (props: Props) => {
                         <ListItemText primary={EINSTELLUNGEN} />
                     </ListItemButton>
                 </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => navigate("/admin/event-mode")}
+                        disabled={eventModeEnabled === false}
+                    >
+                        <ListItemIcon>
+                            <QrCode2Icon />
+                        </ListItemIcon>
+                        <ListItemText
+                            primary={EVENT_MODE}
+                            secondary={eventModeEnabled === false ? EVENT_MODE_DEAKTIVIERT : undefined}
+                        />
+                    </ListItemButton>
+                </ListItem>
 
             </List>
         </Box>
@@ -280,9 +305,12 @@ const TopBar = (props: Props) => {
                         <Button
                             size="large"
                             color="inherit"
-                            onClick={() =>
+                            onClick={() => {
+                                if (isEventRoute) {
+                                    return
+                                }
                                 navigate(isUser() !== 1 && isUser() !== 2 ? "/user/" + isUser() : "/")
-                            }
+                            }}
                             sx={{ display: "inline-flex" }}
                             variant="text">
                             {window.globalTS.HOME_BUTTON}
