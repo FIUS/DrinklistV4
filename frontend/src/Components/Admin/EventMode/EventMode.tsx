@@ -3,13 +3,13 @@ import { Alert, Button, Paper, Stack, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { doGetRequest } from '../../Common/StaticFunctions'
 import { EventModeStatus } from '../../../types/ResponseTypes'
-import { EVENT_GAST, EVENT_KASSE, EVENT_MODE, EVENT_MODE_DISABLED, EVENT_QR_ANZEIGEN, OEFFNEN } from '../../Common/Internationalization/i18n'
+import { EVENT_GAST, EVENT_KASSE, EVENT_MODE, EVENT_MODE_DISABLED, EVENT_QR_ANZEIGEN, EVENT_ZUSAMMENFASSUNG, OEFFNEN } from '../../Common/Internationalization/i18n'
 import style from './eventMode.module.scss'
 
 type EventCardProps = {
     title: string,
     onOpen: () => void,
-    onShowQr: () => void,
+    onShowQr?: () => void,
     enabled: boolean
 }
 
@@ -19,7 +19,9 @@ const EventCard = (props: EventCardProps) => {
             <Typography variant="h5">{props.title}</Typography>
             <Stack spacing={1} className={style.cardActions}>
                 <Button variant="contained" onClick={props.onOpen} disabled={!props.enabled}>{OEFFNEN}</Button>
-                <Button variant="outlined" onClick={props.onShowQr} disabled={!props.enabled}>{EVENT_QR_ANZEIGEN}</Button>
+                {props.onShowQr ? (
+                    <Button variant="outlined" onClick={props.onShowQr} disabled={!props.enabled}>{EVENT_QR_ANZEIGEN}</Button>
+                ) : null}
             </Stack>
         </Paper>
     )
@@ -60,6 +62,11 @@ const EventMode = () => {
                     onOpen={() => navigate('/event/guest')}
                     onShowQr={() => navigate('/admin/event-mode/qr/guest')}
                     enabled={enabled}
+                />
+                <EventCard
+                    title={EVENT_ZUSAMMENFASSUNG}
+                    onOpen={() => navigate('/admin/event-mode/summary')}
+                    enabled={true}
                 />
             </div>
         </div>
