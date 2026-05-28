@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
+import { compareCategoriesBySortingIndex } from '../Common/StaticFunctionsTyped'
 import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
 import { ABBRECHEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
@@ -312,8 +313,8 @@ const EventKasseCheckout = () => {
             </Paper>
 
             <div className={style.drinkGrid}>
-                {categories.map((category) => {
-                    const categoryDrinks = drinks.filter((drink) => drink.category === category)
+                    {([...categories]).sort((c1, c2) => compareCategoriesBySortingIndex(c1, c2, drinks)).map((category) => {
+                        const categoryDrinks = drinks.filter((drink) => drink.category === category)
                     if (categoryDrinks.length === 0) {
                         return null
                     }
