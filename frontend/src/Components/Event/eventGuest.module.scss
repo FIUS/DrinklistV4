@@ -4,3 +4,12 @@
     flex-direction: column;
     gap: 16px;
 }
+
+.scanCenter {
+    min-height: calc(100vh - 88px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+}

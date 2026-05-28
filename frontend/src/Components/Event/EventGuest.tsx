@@ -56,7 +56,9 @@ const EventGuest = () => {
         <>
 
             {memberId === null ? (
-                <Button variant="contained" onClick={() => setScanOpen(true)}>{EVENT_SCANNEN}</Button>
+                <div className={style.scanCenter}>
+                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)}>{EVENT_SCANNEN}</Button>
+                </div>
             ) : (
                 <>
                     <Details readOnly memberIdOverride={memberId.toString()} />
