@@ -55,6 +55,7 @@ const TopBar = (props: Props) => {
 
     const currentMember = common.members?.find(member => member.id === memberIDCookieSafe)
     const currentMemberSafe: Member = currentMember ? currentMember : { name: "", id: -1, balance: 0, hidden: false, alias: "" }
+    const isEventRoute = location.pathname.startsWith("/event")
 
     const showDrawerButton = () => {
         if (location.pathname.startsWith("/admin")) {
@@ -304,9 +305,12 @@ const TopBar = (props: Props) => {
                         <Button
                             size="large"
                             color="inherit"
-                            onClick={() =>
+                            onClick={() => {
+                                if (isEventRoute) {
+                                    return
+                                }
                                 navigate(isUser() !== 1 && isUser() !== 2 ? "/user/" + isUser() : "/")
-                            }
+                            }}
                             sx={{ display: "inline-flex" }}
                             variant="text">
                             {window.globalTS.HOME_BUTTON}
