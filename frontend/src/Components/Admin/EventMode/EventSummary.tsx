@@ -15,7 +15,7 @@ type SummaryRow = {
     revenue: number
 }
 
-const ignoredDescriptions = ['Checkout', 'Deposit', 'Transfer', 'Barzahlung']
+const ignoredDescriptions = ['Checkout', 'Deposit', 'Transfer', 'Barzahlung', 'Auszahlung', 'Event payout', 'Payout']
 
 const EventSummary = () => {
     const navigate = useNavigate()
@@ -28,11 +28,11 @@ const EventSummary = () => {
 
         const load = async () => {
             const [transactionsValue, drinksValue] = await Promise.all([
-                doGetRequest('event/transactions/limit/10000').then((value) => {
+                doGetRequest('transactions').then((value) => {
                     if (value.code === 200) {
                         return value
                     }
-                    return doGetRequest('transactions/limit/10000')
+                    return doGetRequest('event/transactions/limit/10000')
                 }),
                 doGetRequest('drinks')
             ])
@@ -67,10 +67,12 @@ const EventSummary = () => {
 
     const transactionSales = useMemo(() => {
         return transactions.filter((transaction) => {
+            const desc = (transaction.description ?? '').toString().toLowerCase()
+            // exclude any explicit cash payments regardless of sign
             if (transaction.amount >= 0) {
                 return false
             }
-            return !ignoredDescriptions.some((ignored) => transaction.description.includes(ignored))
+            return !ignoredDescriptions.some((ignored) => desc.includes(ignored.toLowerCase()))
         })
     }, [transactions])
 
