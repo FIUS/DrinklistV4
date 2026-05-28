@@ -733,11 +733,21 @@ export const theme03 = createTheme({
                     textTransform: 'none',
                     borderRadius: 12,
                     fontWeight: 600,
-                    letterSpacing: '0.01em'
+                    letterSpacing: '0.01em',
+                    '&.Mui-disabled': {
+                        color: '#7e8ea4',
+                        opacity: 0.62
+                    }
                 },
                 contained: {
                     background: 'linear-gradient(140deg, #4772b2 0%, #5f89c4 100%)',
                     boxShadow: '0px 6px 16px rgba(63, 99, 154, 0.16)',
+                    '&.Mui-disabled': {
+                        color: '#6b7687',
+                        background: '#d8e1ee',
+                        backgroundImage: 'none',
+                        boxShadow: 'none'
+                    },
                     '&:hover': {
                         background: 'linear-gradient(140deg, #3e66a3 0%, #527eb7 100%)',
                         boxShadow: '0px 8px 20px rgba(63, 99, 154, 0.2)'
@@ -745,12 +755,19 @@ export const theme03 = createTheme({
                 },
                 outlined: {
                     borderColor: '#c7d6ec',
+                    '&.Mui-disabled': {
+                        color: '#8a98ad',
+                        borderColor: '#c7d0de'
+                    },
                     '&:hover': {
                         borderColor: '#afc4e4',
                         backgroundColor: 'rgba(59, 111, 178, 0.04)'
                     }
                 },
                 text: {
+                    '&.Mui-disabled': {
+                        color: '#8a98ad'
+                    },
                     '&:hover': {
                         backgroundColor: 'rgba(59, 111, 178, 0.06)'
                     }
