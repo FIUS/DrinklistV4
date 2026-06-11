@@ -13,7 +13,8 @@ import DialogManager from './DialogManager';
 import StatisticBox from '../../Common/InfoBox/StatisticBox';
 import TopDepter from '../Common/TopDepter/TopDepter';
 import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, HINZUFUEGEN, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, NUTZER_LEOSCHEN, SICHER_X_LOESCHEN, SICHTBARKEIT_AENDERN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
+import { BENUTZER_ZAHL, BUDGET, HINZUFUEGEN, KONTO, MEMBER_LOESCHEN, MODIFIZIEREN, NAME, NUTZER_LEOSCHEN, SICHER_X_LOESCHEN, SICHTBARKEIT_AENDERN, SUCHE_DOT_DOT_DOT, VERSTECKTE_NUTZER, EVENT_SCANNEN } from '../../Common/Internationalization/i18n';
+import EventScanDialog from '../../Event/EventScanDialog';
 import WarningPopup from '../../Common/WarningPopup/WarningPopup';
 import { format } from 'react-string-format';
 import MemberNameEditDialog from './MemberNameEditDialog';
@@ -30,6 +31,10 @@ const Members = (props: Props) => {
     const [balance, setbalance] = useState(0.0)
     const [password, setpassword] = useState("")
     const [alias, setalias] = useState("")
+    const [qrScanOpen, setQrScanOpen] = useState(false)
+    const [qrScannedCode, setQrScannedCode] = useState<string | null>(null)
+    const [qrAlias, setQrAlias] = useState("")
+    const [qrBalance, setQrBalance] = useState(0.0)
     const [searchName, setsearchName] = useState("")
     const [searchID, setsearchID] = useState("")
     const [deleteDialogOpen, setdeleteDialogOpen] = useState(false)
@@ -133,7 +138,8 @@ const Members = (props: Props) => {
                     colorCode={window.globalTS.ICON_COLOR} />
                 <TopDepter members={common.members} />
             </div>
-            <Accordion className={style.newMemberContainer} >
+            <div className={style.table}>
+            <Accordion  >
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                 >
@@ -207,6 +213,83 @@ const Members = (props: Props) => {
                     </Button>
                 </AccordionDetails>
             </Accordion>
+            <Accordion  >
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                >
+                    <Typography variant='h5'>Neuen Benutzer per QR-Code anlegen</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {!qrScannedCode ? (
+                        <div>
+                            <Button variant='contained' onClick={() => setQrScanOpen(true)}>{EVENT_SCANNEN}</Button>
+                        </div>
+                    ) : (
+                        <div className={style.newUserBoxInputs}>
+                            <TextField
+                                label='Code'
+                                value={qrScannedCode}
+                                size="small"
+                                disabled
+                            />
+                            <TextField
+                                label='Alias (optional)'
+                                value={qrAlias}
+                                onChange={(value) => { setQrAlias(value.target.value) }}
+                                size="small"
+                            />
+                            <TextField
+                                label='Guthaben'
+                                type="number"
+                                value={qrBalance}
+                                onChange={(value) => {
+                                    if (parseFloat(value.target.value)) {
+                                        setQrBalance(parseFloat(value.target.value))
+                                    } else {
+                                        setQrBalance(0.0)
+                                    }
+                                }}
+                                size="small"
+                            />
+                            <Spacer vertical={10} />
+                            <Button variant='outlined' onClick={() => {
+                                if (qrScannedCode !== null && qrScannedCode !== "") {
+                                    doPostRequest("users/add",
+                                        {
+                                            name: qrScannedCode,
+                                            money: qrBalance,
+                                            password: qrScannedCode,
+                                            alias: qrAlias
+                                        }
+                                    ).then((s_value) => {
+                                        if (s_value.code === 200) {
+                                            setQrScannedCode(null)
+                                            setQrAlias("")
+                                            setQrBalance(0.0)
+                                            doGetRequest("users").then((t_value) => {
+                                                if (t_value.code === 200) {
+                                                    dispatch(setMembers(t_value.content))
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            }}>
+                                {HINZUFUEGEN}
+                            </Button>
+                        </div>
+                    )}
+
+                    <EventScanDialog
+                        open={qrScanOpen}
+                        title={EVENT_SCANNEN}
+                        onClose={() => setQrScanOpen(false)}
+                        onScanned={(code: string) => { setQrScanOpen(false); setQrScannedCode(code) }}
+                    />
+
+                </AccordionDetails>
+            </Accordion>
+            </div>
             <div className={style.table}>
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table" size='small'>

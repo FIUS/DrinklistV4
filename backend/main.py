@@ -1270,6 +1270,26 @@ class login(Resource):
         return util.build_response("Unauthorized", code=403)
 
 
+@api.route('/login/qr')
+class login_qr(Resource):
+    @api.doc(body=event_code_model)
+    def post(self):
+        """
+        Login by QR code (normal login)
+        """
+        code = request.json.get("code") if request.json is not None else None
+        member_id = get_member_id_from_code(code)
+        if member_id is None:
+            return util.build_response("Unauthorized", code=403)
+
+        token = token_manager.create_token(member_id)
+        member = db.get_user_by_id(member_id)
+        return util.build_response({
+            "memberID": member_id,
+            "member": member
+        }, cookieToken=token, cookieMemberID=member_id, is_Admin=db.is_admin(member_id))
+
+
 @api.route('/cookies')
 class cookie(Resource):
     def get(self):

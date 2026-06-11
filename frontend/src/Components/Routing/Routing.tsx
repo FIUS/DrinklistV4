@@ -7,6 +7,7 @@ import AdminOverview from '../Admin/Overview/Overview';
 import Settings from '../Admin/Settings/Settings';
 import Transactions from '../Admin/Transactions/Transactions';
 import Login from '../Common/Login/Login';
+import EventQrLogin from '../Common/Login/EventQrLogin';
 import Details from '../User/Details/Details';
 import UserOverview from '../User/Overview/Overview';
 import Message from '../Common/Message/Message';
@@ -31,6 +32,7 @@ const Routing = (props: Props) => {
             <Routes>
                 <Route path="/" element={<UserOverview />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/login/qr" element={<EventQrLogin />} />
                 <Route path="/user/:userid" element={<Details />} />
                 <Route path="/message/:message" element={<Message />} />
                 <Route path="/config/start" element={<MainConfigurator />} />
