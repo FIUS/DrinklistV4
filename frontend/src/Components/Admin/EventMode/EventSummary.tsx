@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { doGetRequest } from '../../Common/StaticFunctions'
+import { doGetRequest, downloadJSON } from '../../Common/StaticFunctions'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
 import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
@@ -22,6 +22,10 @@ const EventSummary = () => {
     const [transactions, setTransactions] = useState<Array<Transaction>>([])
     const [drinks, setDrinks] = useState<Array<Drink>>([])
     const [loading, setLoading] = useState(true)
+    const [closeDialogOpen, setCloseDialogOpen] = useState(false)
+    const [confirmationInput, setConfirmationInput] = useState("")
+    const [selectedAction, setSelectedAction] = useState<string | null>(null)
+    const confirmationPhrase = "ja-ich-bin-mir-sicher"
 
     useEffect(() => {
         let isActive = true
@@ -199,6 +203,14 @@ const EventSummary = () => {
                     <Typography variant="overline">{VERKAUFT}</Typography>
                     <Typography variant="h4">{totalSoldItems}</Typography>
                 </Paper>
+                <Paper className={style.closeBox} elevation={2}>
+                    <Typography variant="h6">Abschließen</Typography>
+                    <Typography variant="body2">Erstelle Endabrechnung und wähle Aktion</Typography>
+                    <Stack direction="column" spacing={1} sx={{ mt: 1 }}>
+                        <Button variant="contained" color="error" onClick={() => { setSelectedAction('users_and_transactions'); setConfirmationInput(''); setCloseDialogOpen(true) }}>Guthabenkarten Löschen</Button>
+                        <Button variant="outlined" onClick={() => { setSelectedAction('transactions_only_keep_balance'); setConfirmationInput(''); setCloseDialogOpen(true) }}>Guthabenkarten Beibehalten</Button>
+                    </Stack>
+                </Paper>
             </Stack>
 
             <div className={style.grid}>
@@ -293,6 +305,35 @@ const EventSummary = () => {
             </div>
 
             {loading ? <Typography variant="body2">Lade Daten...</Typography> : null}
+
+            <Dialog open={closeDialogOpen} onClose={() => setCloseDialogOpen(false)}>
+                <DialogTitle>Abschließen bestätigen</DialogTitle>
+                <DialogContent>
+                    <Typography>Geben Sie zur Bestätigung folgenden Text ein:</Typography>
+                    <Typography sx={{ fontWeight: 'bold', mt: 1 }}>ja-ich-bin-mir-sicher</Typography>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        fullWidth
+                        value={confirmationInput}
+                        onChange={(e) => setConfirmationInput(e.target.value)}
+                        placeholder="ja-ich-bin-mir-sicher"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setCloseDialogOpen(false)}>Abbrechen</Button>
+                    <Button disabled={confirmationInput !== confirmationPhrase} variant="contained" color="error" onClick={async () => {
+                        // Download backup then navigate to print view
+                        const now = new Date()
+                        const filename = "backup-drinklist-" + now.toLocaleDateString() + "-" + now.toTimeString() + ".json"
+                        await downloadJSON('settings/backup', filename)
+                        setCloseDialogOpen(false)
+                        if (selectedAction) {
+                            navigate('/admin/event-mode/summary/print?action=' + selectedAction)
+                        }
+                    }}>Bestätigen</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }

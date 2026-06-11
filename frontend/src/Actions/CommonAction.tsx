@@ -2,14 +2,14 @@ import { AlertColor } from "@mui/material"
 import { ERROR_MESSAGE } from "../Components/Common/Internationalization/i18n"
 import { Drink, Member } from "../types/ResponseTypes"
 
-export const setDrinks = (drinks: Array<Member>) => {
+export const setDrinks = (drinks: Array<Drink>) => {
     return {
         type: "SET_DRINKS",
         payload: drinks
     }
 }
 
-export const setMembers = (members: Array<Drink>) => {
+export const setMembers = (members: Array<Member>) => {
     return {
         type: "SET_MEMBERS",
         payload: members

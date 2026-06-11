@@ -24,6 +24,21 @@
     min-width: 180px;
 }
 
+.closeBox {
+    padding: 16px;
+    min-width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.printView {
+    font-family: 'Courier New', monospace;
+    padding: 24px;
+    color: black;
+    background: white;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -68,5 +83,9 @@
 
     .hourGrid {
         grid-template-columns: 1fr 1fr;
+    }
+    /* Hide interactive buttons in the print-only view */
+    .printView button {
+        display: none !important;
     }
 }

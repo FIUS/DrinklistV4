@@ -32,6 +32,7 @@ const Checkout = (props: Props) => {
     const [tempValue, settempValue] = useState(0)
     const [buttonDisabled, setbuttonDisabled] = useState(false)
     const [reloadCheckouts, setreloadCheckouts] = useState(false)
+    const [noMembersAvailable, setnoMembersAvailable] = useState(false)
     const common: CommonReducerType = useSelector((state: RootState) => state.common);
     const dispatch = useDispatch()
 
@@ -45,13 +46,17 @@ const Checkout = (props: Props) => {
             }
         })
 
-        if (!common.members || common.members?.length === 0)
+        if ((!common.members || common.members?.length === 0) && !noMembersAvailable) {
             doGetRequest("users").then((value) => {
                 if (value.code === 200) {
+                    if ((value.content as Array<Member>).length === 0) {
+                        setnoMembersAvailable(true)
+                    }
                     dispatch(setMembers(value.content))
                 }
             })
-    }, [dispatch, common.members, reloadCheckouts])
+        }
+    }, [dispatch, common.members, reloadCheckouts, noMembersAvailable])
 
     const resetAdd = () => {
         setselectedUser("")

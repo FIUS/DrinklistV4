@@ -56,6 +56,7 @@ const TopBar = (props: Props) => {
     const currentMember = common.members?.find(member => member.id === memberIDCookieSafe)
     const currentMemberSafe: Member = currentMember ? currentMember : { name: "", id: -1, balance: 0, hidden: false, alias: "" }
     const isEventRoute = location.pathname.startsWith("/event")
+    const isPrintRoute = location.pathname.startsWith("/admin/event-mode/summary/print")
 
     const showDrawerButton = () => {
         if (location.pathname.startsWith("/admin")) {
@@ -294,6 +295,10 @@ const TopBar = (props: Props) => {
         Cookies.set("theme", themeCookie.toString());
         // Reload page
         window.location.reload();
+    }
+
+    if (isPrintRoute) {
+        return <></>
     }
 
     return (

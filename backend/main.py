@@ -643,6 +643,14 @@ class event_guest_purchase(Resource):
         """
         Purchase drinks for a guest with balance/cash/split
         """
+        # Ensure at least one checkout exists for event purchases
+        try:
+            checkouts = db.get_checkouts()
+            if not checkouts or len(checkouts) == 0:
+                db.do_checkout({'newCash': None, 'members': [], 'invoices': []})
+        except Exception:
+            # If creating a checkout fails, continue and let purchase/reporting handle errors
+            pass
         code = request.json.get("code") if request.json is not None else None
         member_id = get_member_id_from_code(code)
         if member_id is None:
@@ -685,6 +693,42 @@ class get_event_transactions_limited(Resource):
         Get the lastest x transactions (event view)
         """
         return util.build_response(db.get_transactions(limit))
+
+
+@api.route('/event/checkout/finalize')
+class finalize_event_checkout(Resource):
+    @admin
+    def post(self):
+        """
+        Finalize event: either delete all transactions (keep balances) or delete all guests + transactions.
+        Request body: { "action": "transactions_only_keep_balance" | "users_and_transactions", "dryRun": bool }
+        """
+        if request.json is None:
+            return util.build_response("Missing body", code=400)
+
+        action = request.json.get("action")
+        dry_run = bool(request.json.get("dryRun", False))
+
+        if action not in ("transactions_only_keep_balance", "users_and_transactions"):
+            return util.build_response("Invalid action", code=400)
+
+        # Dry run: return counts only
+        if dry_run:
+            if action == "transactions_only_keep_balance":
+                tx_count = db.count_transactions()
+                return util.build_response({"deletedTransactions": tx_count, "deletedMembers": 0})
+            else:
+                tx_count = db.count_transactions()
+                mem_count = db.count_members_to_delete()
+                return util.build_response({"deletedTransactions": tx_count, "deletedMembers": mem_count})
+
+        # Execute action
+        if action == "transactions_only_keep_balance":
+            deleted = db.delete_all_event_transactions_keep_balance()
+            return util.build_response({"deletedTransactions": deleted})
+        else:
+            tx_deleted, mem_deleted = db.delete_all_event_transactions_and_guests()
+            return util.build_response({"deletedTransactions": tx_deleted, "deletedMembers": mem_deleted})
 
 
 @api.route('/event/transactions/<int:transaction_id>/undo')

@@ -17,6 +17,7 @@ import Statistics from '../Admin/Statistics/Statistics';
 import EventMode from '../Admin/EventMode/EventMode';
 import EventQrPage from '../Admin/EventMode/EventQrPage';
 import EventSummary from '../Admin/EventMode/EventSummary';
+import EventSummaryPrint from '../Admin/EventMode/EventSummaryPrint';
 import EventKasse from '../Event/EventKasse';
 import EventGuest from '../Event/EventGuest';
 import EventKasseCheckout from '../Event/EventKasseCheckout';
@@ -47,6 +48,7 @@ const Routing = (props: Props) => {
                 <Route path="/admin/event-mode" element={<EventMode />} />
                 <Route path="/admin/event-mode/qr/:target" element={<EventQrPage />} />
                 <Route path="/admin/event-mode/summary" element={<EventSummary />} />
+                <Route path="/admin/event-mode/summary/print" element={<EventSummaryPrint />} />
                 <Route path="/event/kasse" element={<EventKasse />} />
                 <Route path="/event/kasse/checkout" element={<EventKasseCheckout />} />
                 <Route path="/event/kasse/new-guest" element={<EventKasseRegister />} />

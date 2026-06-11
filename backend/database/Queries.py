@@ -823,6 +823,49 @@ class Queries:
 
             return success
 
+    def count_transactions(self):
+        with self.get_session() as session:
+            return session.query(Transaction).count()
+
+    def count_members_to_delete(self):
+        with self.get_session() as session:
+            return session.query(Member).filter(Member.id > 2).count()
+
+    def delete_all_event_transactions_keep_balance(self):
+        """
+        Delete all transactions without modifying member balances.
+        Returns the number of deleted transactions.
+        """
+        with self.write_lock:
+            with self.get_session() as session:
+                tx_count = session.query(Transaction).count()
+                # bulk delete all transactions
+                session.query(Transaction).delete(synchronize_session=False)
+                # also delete all checkouts
+                session.query(Checkout).delete(synchronize_session=False)
+
+                session.commit()
+                return tx_count
+
+    def delete_all_event_transactions_and_guests(self):
+        """
+        Delete all transactions and delete all members with id > 2.
+        Returns (deleted_transactions_count, deleted_members_count).
+        """
+        with self.write_lock:
+            with self.get_session() as session:
+                tx_count = session.query(Transaction).count()
+                session.query(Transaction).delete(synchronize_session=False)
+                # also delete all checkouts
+                session.query(Checkout).delete(synchronize_session=False)
+
+                members_q = session.query(Member).filter(Member.id > 2)
+                members_count = members_q.count()
+                members_q.delete(synchronize_session=False)
+
+                session.commit()
+                return tx_count, members_count
+
     def set_current_release(self, release_data):
         with self.get_session() as session:
             release_tag = session.query(
