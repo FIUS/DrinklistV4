@@ -8,6 +8,7 @@ import { ENTFERNEN, EVENT_KASSE, EVENT_MARKE_KAUFEN, EVENT_MODE_DISABLED, EVENT_
 import { useDispatch } from 'react-redux'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import style from './eventKasse.module.scss'
+import Spacer from '../Common/Spacer'
 
 const EventKasse = () => {
     const dispatch = useDispatch()
@@ -120,10 +121,11 @@ const EventKasse = () => {
 
             <Paper className={style.section} elevation={2}>
                 <Typography variant="h6">{LETZTE_KAEUFE}</Typography>
+                <Spacer vertical={5} />
                 {transactions.length === 0 ? (
                     <Typography variant="body2">-</Typography>
                 ) : (
-                    <Stack spacing={1.5}>
+                    <Stack gap={2}>
                         {groupedTransactions.map((group) => (
                             <Paper key={group.time} className={style.transactionGroup} elevation={1}>
                                 <Typography variant="caption" className={style.groupTimestamp}>{group.time}</Typography>
