@@ -649,8 +649,8 @@ class event_guest_purchase(Resource):
             if not checkouts or len(checkouts) == 0:
                 db.do_checkout({'newCash': None, 'members': [], 'invoices': []})
         except Exception:
-            # If creating a checkout fails, continue and let purchase/reporting handle errors
-            pass
+            return util.build_response(result, code=500)
+        
         code = request.json.get("code") if request.json is not None else None
         member_id = get_member_id_from_code(code)
         if member_id is None:
@@ -682,8 +682,8 @@ class event_purchase_anonymous(Resource):
             if not checkouts or len(checkouts) == 0:
                 db.do_checkout({'newCash': None, 'members': [], 'invoices': []})
         except Exception:
-            # If creating a checkout fails, continue and let purchase/reporting handle errors
-            pass
+            return util.build_response(result, code=500)
+        
         items = request.json.get("items") if request.json is not None else []
 
         result = db.event_purchase_cash(items)
