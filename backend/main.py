@@ -676,6 +676,14 @@ class event_purchase_anonymous(Resource):
         """
         Purchase drinks as anonymous cash-only purchase
         """
+        # Ensure at least one checkout exists for event purchases
+        try:
+            checkouts = db.get_checkouts()
+            if not checkouts or len(checkouts) == 0:
+                db.do_checkout({'newCash': None, 'members': [], 'invoices': []})
+        except Exception:
+            # If creating a checkout fails, continue and let purchase/reporting handle errors
+            pass
         items = request.json.get("items") if request.json is not None else []
 
         result = db.event_purchase_cash(items)
