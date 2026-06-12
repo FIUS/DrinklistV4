@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 import style from './eventSummary.module.scss'
 
 const ignoredDescriptions = ['Checkout', 'Deposit', 'Transfer', 'Barzahlung', 'Auszahlung', 'Event payout', 'Payout']
@@ -35,7 +34,7 @@ const EventSummaryPrint = () => {
 
             if (transactionsValue.code === 200) setTransactions((transactionsValue.content as Array<Transaction>).slice())
             if (drinksValue.code === 200) setDrinks(drinksValue.content as Array<Drink>)
-        } catch (e) {
+        } catch {
             // ignore
         } finally {
             setLoading(false)
@@ -134,7 +133,7 @@ const EventSummaryPrint = () => {
     useEffect(() => {
         if (!loading) {
             setTimeout(() => {
-                try { window.print() } catch (e) {
+                try { window.print() } catch {
                     // ignore
                 }
             }, 300)
@@ -162,25 +161,25 @@ const EventSummaryPrint = () => {
 
             <Typography variant="h6" sx={{ mt: 2 }}>Artikel</Typography>
             <pre>
-{(() => {
-    const lines = itemLinesWithTotals.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.unitPrice.toFixed(2).padStart(6)} = ${r.lineTotal.toFixed(2).padStart(8)} EUR`)
-    const sumLabel = 'Summe'
-    const nameAreaLength = 40 + 1 // name padded to 40 + one space in template
-    const partBeforeLineTotal = 1 + 4 + 3 + 6 + 3 // spaces+qty+' x '+unitPrice+' = '
-    const estimatedTotalLength = nameAreaLength + partBeforeLineTotal + 8 + 4 // 8 for amount field, 4 for ' EUR'
-    const totalLineLength = lines.length > 0 ? lines[0].length : estimatedTotalLength
-    const separator = ' '.repeat(nameAreaLength) + '-'.repeat(Math.max(0, totalLineLength - nameAreaLength))
-    const padForSumLabel = nameAreaLength + partBeforeLineTotal
-    const sumAmount = sumOfItems.toFixed(2).padStart(8)
-    lines.push(separator)
-    lines.push(sumLabel.padEnd(padForSumLabel) + sumAmount + ' EUR')
-    return lines.join('\n')
-})()}
+                {(() => {
+                    const lines = itemLinesWithTotals.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.unitPrice.toFixed(2).padStart(6)} = ${r.lineTotal.toFixed(2).padStart(8)} EUR`)
+                    const sumLabel = 'Summe'
+                    const nameAreaLength = 40 + 1 // name padded to 40 + one space in template
+                    const partBeforeLineTotal = 1 + 4 + 3 + 6 + 3 // spaces+qty+' x '+unitPrice+' = '
+                    const estimatedTotalLength = nameAreaLength + partBeforeLineTotal + 8 + 4 // 8 for amount field, 4 for ' EUR'
+                    const totalLineLength = lines.length > 0 ? lines[0].length : estimatedTotalLength
+                    const separator = ' '.repeat(nameAreaLength) + '-'.repeat(Math.max(0, totalLineLength - nameAreaLength))
+                    const padForSumLabel = nameAreaLength + partBeforeLineTotal
+                    const sumAmount = sumOfItems.toFixed(2).padStart(8)
+                    lines.push(separator)
+                    lines.push(sumLabel.padEnd(padForSumLabel) + sumAmount + ' EUR')
+                    return lines.join('\n')
+                })()}
             </pre>
 
             <Typography variant="h6" sx={{ mt: 2 }}>Pro Kategorie</Typography>
             <pre>
-{categoryRows.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.revenue.toFixed(2).padStart(8)} EUR`).join('\n')}
+                {categoryRows.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.revenue.toFixed(2).padStart(8)} EUR`).join('\n')}
             </pre>
 
             <div style={{ marginTop: 20 }}>
