@@ -799,7 +799,7 @@ export const theme03 = createTheme({
                     background: 'linear-gradient(140deg, #3f679e 0%, #3e7b9c 100%)',
                     borderRadius: 0,
                     backdropFilter: 'blur(8px)',
-                    borderBottom: '1px solid rgba(15, 23, 42, 0.14)',
+                    borderBottom: 'none',
                     boxShadow: '0px 6px 16px rgba(35, 58, 88, 0.22)',
                     '& .MuiButton-root, & .MuiIconButton-root, & .MuiSvgIcon-root': {
                         color: '#f8fbff'
@@ -929,7 +929,8 @@ export const theme03 = createTheme({
                     backdropFilter: 'blur(6px)',
                     border: '1px solid #e1e8f4',
                     '&.MuiAppBar-root': {
-                        borderRadius: 0
+                        borderRadius: 0,
+                        border: 'none'
                     }
                 }
             }
