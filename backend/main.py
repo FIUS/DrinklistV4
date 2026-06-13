@@ -600,7 +600,6 @@ class event_guest_lookup(Resource):
 
 @api.route('/event/guest/login')
 class event_guest_login(Resource):
-    @event_secret_only
     @api.doc(body=event_code_model)
     def post(self):
         """

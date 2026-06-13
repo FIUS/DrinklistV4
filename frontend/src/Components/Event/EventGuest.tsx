@@ -3,7 +3,7 @@ import { Alert, Button, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { openErrorToast } from '../../Actions/CommonAction'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
-import { EventModeStatus } from '../../types/ResponseTypes'
+import { EventGuestResponse, EventModeStatus } from '../../types/ResponseTypes'
 import { EVENT_GAST, EVENT_MODE_DISABLED, EVENT_SCANNEN } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import Details from '../User/Details/Details'
@@ -37,7 +37,7 @@ const EventGuest = () => {
         setScanOpen(false)
         setLookupLoading(true)
         // Use public lookup to display read-only guest details without requiring the event secret
-        return doPostRequest('event/guest/lookup', { code }).then((value) => {
+        return doPostRequest('event/guest/login', { code }).then((value) => {
             if (value.code === 200) {
                 const payload: EventGuestResponse = value.content
                 if (payload && payload.member && payload.member.id) {
