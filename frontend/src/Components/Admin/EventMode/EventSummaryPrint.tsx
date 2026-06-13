@@ -3,7 +3,7 @@ import { Button, Stack, Typography } from '@mui/material'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { doGetRequest, doGetRequestWithEventSecret, doPostRequest, downloadJSON } from '../../Common/StaticFunctions'
 import { useDispatch } from 'react-redux'
-import { openErrorToast } from '../../../Actions/CommonAction'
+import { openErrorToast, openToast } from '../../../Actions/CommonAction'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
 import style from './eventSummary.module.scss'
@@ -158,10 +158,10 @@ const EventSummaryPrint = () => {
     const finalize = async () => {
         const resp = await doPostRequest('event/checkout/finalize', { action: action, dryRun: false })
         if (resp.code === 200) {
-            alert('Finalisierung erfolgreich')
+            dispatch(openToast({ message: 'Event wurde finalisiert. Alle Guthaben wurden zurückgesetzt und die Endabrechnung wurde gespeichert.' }))
             navigate('/admin/event-mode')
         } else {
-            alert('Fehler bei Finalisierung')
+            dispatch(openErrorToast())
         }
     }
 
