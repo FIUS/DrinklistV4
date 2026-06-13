@@ -51,11 +51,10 @@ const EventSummaryPrint = () => {
         }
     }, [dispatch])
 
-    useCallback(() => {
-        let isActive = true
-        if (isActive) loadData()
-        return () => { isActive = false }
+    useEffect(() => {
+        loadData()
     }, [loadData])
+
 
     // Retry once if initial load produced no transactions (fixes SPA navigation race)
     useCallback(() => {
