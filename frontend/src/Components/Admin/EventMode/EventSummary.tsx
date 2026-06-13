@@ -207,8 +207,16 @@ const EventSummary = () => {
                     <Typography variant="h6">Abschließen</Typography>
                     <Typography variant="body2">Erstelle Endabrechnung und wähle Aktion</Typography>
                     <Stack direction="column" spacing={1} sx={{ mt: 1 }}>
-                        <Button variant="contained" color="error" onClick={() => { setSelectedAction('users_and_transactions'); setConfirmationInput(''); setCloseDialogOpen(true) }}>Guthabenkarten Löschen</Button>
-                        <Button variant="outlined" onClick={() => { setSelectedAction('transactions_only_keep_balance'); setConfirmationInput(''); setCloseDialogOpen(true) }}>Guthabenkarten Beibehalten</Button>
+                        <Button variant="contained" color="error" onClick={() => {
+                            setSelectedAction('users_and_transactions');
+                            setConfirmationInput('');
+                            setCloseDialogOpen(true)
+                        }}>Guthabenkarten Löschen</Button>
+                        <Button variant="outlined" onClick={() => {
+                            setSelectedAction('transactions_only_keep_balance');
+                            setConfirmationInput('');
+                            setCloseDialogOpen(true)
+                        }}>Guthabenkarten Beibehalten</Button>
                     </Stack>
                 </Paper>
             </Stack>
@@ -324,9 +332,6 @@ const EventSummary = () => {
                     <Button onClick={() => setCloseDialogOpen(false)}>Abbrechen</Button>
                     <Button disabled={confirmationInput !== confirmationPhrase} variant="contained" color="error" onClick={async () => {
                         // Download backup then navigate to print view
-                        const now = new Date()
-                        const filename = "backup-drinklist-" + now.toLocaleDateString() + "-" + now.toTimeString() + ".json"
-                        await downloadJSON('settings/backup', filename)
                         setCloseDialogOpen(false)
                         if (selectedAction) {
                             navigate('/admin/event-mode/summary/print?action=' + selectedAction)

@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Typography } from '@mui/material'
+import { Button, Stack, Typography } from '@mui/material'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { doGetRequest, doPostRequest } from '../../Common/StaticFunctions'
+import { doGetRequest, doPostRequest, downloadJSON } from '../../Common/StaticFunctions'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
 import style from './eventSummary.module.scss'
+import Spacer from '../../Common/Spacer'
 
 const ignoredDescriptions = ['Checkout', 'Deposit', 'Transfer', 'Barzahlung', 'Auszahlung', 'Event payout', 'Payout']
 
@@ -132,8 +133,14 @@ const EventSummaryPrint = () => {
 
     useEffect(() => {
         if (!loading) {
-            setTimeout(() => {
-                try { window.print() } catch {
+            setTimeout(async () => {
+                try {
+                    window.print();
+
+                    const now = new Date()
+                    const filename = "backup-drinklist-" + now.toLocaleDateString() + "-" + now.toTimeString() + ".json"
+                    await downloadJSON('settings/backup', filename)
+                } catch {
                     // ignore
                 }
             }, 300)
@@ -181,11 +188,12 @@ const EventSummaryPrint = () => {
             <pre>
                 {categoryRows.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.revenue.toFixed(2).padStart(8)} EUR`).join('\n')}
             </pre>
-
-            <div style={{ marginTop: 20 }}>
-                <Button variant="contained" color="error" onClick={finalize}>Finalisieren</Button>
+            <Spacer vertical={25} />
+            <Stack flexDirection="row" gap={2}>
                 <Button sx={{ ml: 2 }} onClick={() => navigate('/admin/event-mode')}>Abbrechen</Button>
-            </div>
+                <Button variant="contained" onClick={() => { window.print() }}>Drucken</Button>
+                <Button variant="contained" color="error" onClick={finalize}>Finalisieren</Button>
+            </Stack>
         </div>
     )
 }
