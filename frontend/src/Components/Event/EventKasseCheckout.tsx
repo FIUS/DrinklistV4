@@ -126,7 +126,7 @@ const EventKasseCheckout = () => {
                 setActiveGuest(payload.member)
                 setActiveGuestCode(code)
                 dispatch(openToast({ message: EVENT_GAST_GELADEN }))
-                resetCart()
+                //resetCart()
             } else if (value.code === 404) {
                 dispatch(openToast({ message: EVENT_NO_GUTHABENKARTE, type: 'error' }))
             } else {
