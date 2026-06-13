@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, Skeleton } from '@mui/material'
 import { Html5Qrcode } from 'html5-qrcode'
 import { ABBRECHEN, ERROR_MESSAGE, EVENT_MANUELL, EVENT_QR_CODE_UNGUELTIG, EVENT_QR_VERSION_FALSCH, OK } from '../Common/Internationalization/i18n'
 
@@ -7,7 +7,7 @@ type Props = {
     open: boolean,
     title: string,
     onClose: () => void,
-    onScanned: (code: string) => void
+    onScanned: (code: string) => void | Promise<void>
 }
 
 const EventScanDialog = (props: Props) => {
@@ -20,6 +20,8 @@ const EventScanDialog = (props: Props) => {
     const scannerRef = useRef<Html5Qrcode | null>(null)
     const isRunningRef = useRef(false)
     const onScannedRef = useRef(onScanned)
+    const [submitting, setSubmitting] = useState(false)
+    const [scannerReady, setScannerReady] = useState(false)
 
     useEffect(() => {
         onScannedRef.current = onScanned
@@ -94,6 +96,7 @@ const EventScanDialog = (props: Props) => {
                 }
                 scannerRef.current = null
                 clearTarget()
+                setScannerReady(false)
             }
 
             if (isRunningRef.current) {
@@ -146,7 +149,15 @@ const EventScanDialog = (props: Props) => {
                         }
                         setError(null)
                         if (parsed.value !== null) {
-                            onScannedRef.current(parsed.value)
+                            try {
+                                const maybe = onScannedRef.current(parsed.value)
+                                if (maybe && typeof (maybe as any).then === 'function') {
+                                    setSubmitting(true)
+                                        ; (maybe as Promise<any>).finally(() => setSubmitting(false))
+                                }
+                            } catch {
+                                // ignore
+                            }
                         }
                     },
                     () => { }
@@ -154,8 +165,10 @@ const EventScanDialog = (props: Props) => {
 
                 startPromise.then(() => {
                     isRunningRef.current = true
+                    setScannerReady(true)
                 }).catch(() => {
                     setError(ERROR_MESSAGE)
+                    setScannerReady(false)
                 })
             })
         }
@@ -180,7 +193,15 @@ const EventScanDialog = (props: Props) => {
         }
         setError(null)
         if (parsed.value !== null) {
-            onScannedRef.current(parsed.value)
+            try {
+                const maybe = onScannedRef.current(parsed.value)
+                if (maybe && typeof (maybe as any).then === 'function') {
+                    setSubmitting(true)
+                        ; (maybe as Promise<any>).finally(() => setSubmitting(false))
+                }
+            } catch {
+                // ignore
+            }
         }
     }
 
@@ -188,7 +209,7 @@ const EventScanDialog = (props: Props) => {
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth keepMounted>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
-                <div id={regionId} style={{ width: '100%' }} />
+                {!scannerReady && !error ? <Skeleton variant="rectangular" height={240} /> : <div id={regionId} style={{ width: '100%' }} />}
                 {error ? <Typography color="error" variant="body2">{error}</Typography> : <></>}
                 <TextField
                     label={EVENT_MANUELL}
@@ -202,8 +223,8 @@ const EventScanDialog = (props: Props) => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>{ABBRECHEN}</Button>
-                <Button variant="contained" onClick={submitManual}>{OK}</Button>
+                <Button onClick={onClose} disabled={submitting}>{ABBRECHEN}</Button>
+                <Button variant="contained" onClick={submitManual} disabled={submitting}>{OK}</Button>
             </DialogActions>
         </Dialog>
     )

@@ -66,7 +66,7 @@ const EventMode = () => {
                 <EventCard
                     title={EVENT_ZUSAMMENFASSUNG}
                     onOpen={() => navigate('/admin/event-mode/summary')}
-                    enabled={true}
+                    enabled={enabled}
                 />
             </div>
         </div>

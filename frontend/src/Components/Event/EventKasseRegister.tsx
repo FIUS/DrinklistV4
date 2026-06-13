@@ -28,19 +28,18 @@ const EventKasseRegister = () => {
     }, [])
 
     useEffect(() => {
-        if (guestCode === null) {
+        if (guestCode === null && status?.enabled && !loadingAvailability) {
             setScanOpen(true)
         } else {
             setScanOpen(false)
         }
-    }, [guestCode, status?.enabled])
+    }, [guestCode, status?.enabled, loadingAvailability])
 
     const handleScan = (code: string) => {
         setScanOpen(false)
         setloadingAvailability(true)
         // Check if guest already exists; if so, notify and return to kasse
-        doPostRequest('event/guest/lookup', { code }).then((value) => {
-            setloadingAvailability(false)
+        return doPostRequest('event/guest/lookup', { code }).then((value) => {
             if (value.code === 200) {
                 // guest exists
                 dispatch(openToast({ message: EVENT_GAST_EXISTIERT, type: "error" }))
@@ -51,12 +50,13 @@ const EventKasseRegister = () => {
             } else {
                 dispatch(openErrorToast())
             }
-        })
+        }).finally(() => setloadingAvailability(false))
     }
 
     const confirmRegister = () => {
         setokClicked(true)
         if (!guestCode) {
+            setokClicked(false)
             return
         }
         const amount = parseFloat(initialBalance)
@@ -77,8 +77,9 @@ const EventKasseRegister = () => {
             } else {
                 dispatch(openErrorToast())
             }
-            setokClicked(false)
-        })
+        }).catch(() => {
+            dispatch(openErrorToast())
+        }).finally(() => setokClicked(false))
     }
 
     if (status?.enabled === false) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography, Skeleton } from '@mui/material'
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -41,17 +41,19 @@ const EventKasseCheckout = () => {
         })
     }, [])
 
+    const [drinksLoading, setDrinksLoading] = useState(true)
     useEffect(() => {
         if (!eventEnabled) {
             return
         }
+        setDrinksLoading(true)
         doGetRequest('event/drinks').then((value) => {
             if (value.code === 200) {
                 const payload: EventDrinksResponse = value.content
                 setDrinks(payload.drinks)
                 setCategories(payload.categories)
             }
-        })
+        }).finally(() => setDrinksLoading(false))
     }, [eventEnabled])
 
     // Scanner will open only when the user presses the scan button.
@@ -109,7 +111,7 @@ const EventKasseCheckout = () => {
     const balanceColor = balance >= 0 ? 'limegreen' : 'darkred'
 
     const handleLookup = (code: string) => {
-        doPostRequest('event/guest/lookup', { code }).then((value) => {
+        return doPostRequest('event/guest/lookup', { code }).then((value) => {
             if (value.code === 200) {
                 const payload: EventGuestResponse = value.content
                 setActiveGuest(payload.member)
@@ -126,7 +128,7 @@ const EventKasseCheckout = () => {
 
     const handleScan = (code: string) => {
         setScanOpen(false)
-        handleLookup(code)
+        return handleLookup(code)
     }
 
     const doPurchase = (paymentMode: 'balance' | 'cash' | 'split') => {
@@ -134,7 +136,7 @@ const EventKasseCheckout = () => {
             return
         }
         const items = cart.map((item) => ({ drinkID: item.drink.id, quantity: item.quantity }))
-        doPostRequest('event/guest/purchase', { code: activeGuestCode, items, paymentMode }).then((value) => {
+        return doPostRequest('event/guest/purchase', { code: activeGuestCode, items, paymentMode }).then((value) => {
             if (value.code === 200) {
                 const response: EventPurchaseResponse = value.content
                 setActiveGuest((prev) => prev ? { ...prev, balance: response.balance } : prev)
@@ -144,7 +146,6 @@ const EventKasseCheckout = () => {
             } else {
                 dispatch(openErrorToast())
             }
-            setConfirming(false)
         })
     }
 
@@ -153,7 +154,7 @@ const EventKasseCheckout = () => {
             return
         }
         const items = cart.map((item) => ({ drinkID: item.drink.id, quantity: item.quantity }))
-        doPostRequest('event/purchase', { items, paymentMode: 'cash' }).then((value) => {
+        return doPostRequest('event/purchase', { items, paymentMode: 'cash' }).then((value) => {
             if (value.code === 200) {
                 dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
                 resetCart()
@@ -161,7 +162,6 @@ const EventKasseCheckout = () => {
             } else {
                 dispatch(openErrorToast())
             }
-            setConfirming(false)
         })
     }
 
@@ -180,9 +180,19 @@ const EventKasseCheckout = () => {
         setConfirming(true)
         setConfirmOpen(false)
         if (pendingMode === 'cash' && !activeGuest) {
-            doCashPurchase()
+            const p = doCashPurchase()
+            if (p && typeof (p as any).finally === 'function') {
+                ; (p as Promise<any>).finally(() => setConfirming(false))
+            } else {
+                setConfirming(false)
+            }
         } else {
-            doPurchase(pendingMode)
+            const p = doPurchase(pendingMode)
+            if (p && typeof (p as any).finally === 'function') {
+                ; (p as Promise<any>).finally(() => setConfirming(false))
+            } else {
+                setConfirming(false)
+            }
         }
         setPendingMode(null)
     }
@@ -218,7 +228,7 @@ const EventKasseCheckout = () => {
                 <Typography variant="h4">{EVENT_KASSE}</Typography>
                 <Stack direction="row" spacing={2} className={style.headerActions}>
                     <Button variant="outlined" onClick={() => navigate('/event/kasse')}>{ZURUECK}</Button>
-                    
+
                 </Stack>
             </div>
 
@@ -315,8 +325,13 @@ const EventKasseCheckout = () => {
             </Paper>
 
             <div className={style.drinkGrid}>
-                    {([...categories]).sort((c1, c2) => compareCategoriesBySortingIndex(c1, c2, drinks)).map((category) => {
-                        const categoryDrinks = drinks.filter((drink) => drink.category === category)
+                {drinksLoading ? (
+                    <Paper className={style.section} elevation={1}>
+                        <Skeleton variant="rectangular" height={200} />
+                    </Paper>
+                ) : null}
+                {!drinksLoading && ([...categories]).sort((c1, c2) => compareCategoriesBySortingIndex(c1, c2, drinks)).map((category) => {
+                    const categoryDrinks = drinks.filter((drink) => drink.category === category)
                     if (categoryDrinks.length === 0) {
                         return null
                     }

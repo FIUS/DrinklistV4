@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, IconButton, List, ListItem, ListItemText, Paper, Stack, Typography } from '@mui/material'
+import { Alert, Button, IconButton, List, ListItem, ListItemText, Paper, Stack, Typography, Skeleton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
@@ -14,6 +14,8 @@ const EventKasse = () => {
     const navigate = useNavigate()
     const [status, setStatus] = useState<EventModeStatus | null>(null)
     const [transactions, setTransactions] = useState<Array<Transaction>>([])
+    const [transactionsLoading, setTransactionsLoading] = useState(true)
+    const [undoingIds, setUndoingIds] = useState<number[]>([])
 
     useEffect(() => {
         doGetRequest('event-mode').then((value) => {
@@ -26,11 +28,12 @@ const EventKasse = () => {
     const eventEnabled = status?.enabled === true
 
     const fetchTransactions = () => {
+        setTransactionsLoading(true)
         doGetRequest('event/transactions/limit/20').then((value) => {
             if (value.code === 200) {
                 setTransactions(value.content)
             }
-        })
+        }).finally(() => setTransactionsLoading(false))
     }
 
     useEffect(() => {
@@ -41,6 +44,7 @@ const EventKasse = () => {
     }, [eventEnabled])
 
     const undoTransaction = (transactionId: number) => {
+        setUndoingIds((prev) => [...prev, transactionId])
         doPostRequest(`event/transactions/${transactionId}/undo`, null).then((value) => {
             if (value.code === 200) {
                 setTransactions((prev) => prev.filter((item) => item.id !== transactionId))
@@ -52,6 +56,8 @@ const EventKasse = () => {
             } else {
                 dispatch(openErrorToast())
             }
+        }).finally(() => {
+            setUndoingIds((prev) => prev.filter((id) => id !== transactionId))
         })
     }
 
@@ -121,7 +127,13 @@ const EventKasse = () => {
             <Paper className={style.section} elevation={2}>
                 <Stack gap={2}>
                     <Typography variant="h6">{LETZTE_KAEUFE}</Typography>
-                    {transactions.length === 0 ? (
+                    {transactionsLoading ? (
+                        <Stack gap={2}>
+                            <Skeleton variant="rectangular" height={40} />
+                            <Skeleton variant="rectangular" height={40} />
+                            <Skeleton variant="rectangular" height={40} />
+                        </Stack>
+                    ) : transactions.length === 0 ? (
                         <Typography variant="body2">-</Typography>
                     ) : (
                         <Stack gap={2}>
@@ -134,7 +146,7 @@ const EventKasse = () => {
                                                 key={transaction.id}
                                                 secondaryAction={isDeletableTransaction(transaction)
                                                     ? (
-                                                        <IconButton edge="end" onClick={() => undoTransaction(transaction.id)} aria-label={ENTFERNEN}>
+                                                        <IconButton edge="end" onClick={() => undoTransaction(transaction.id)} aria-label={ENTFERNEN} disabled={undoingIds.includes(transaction.id)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     )
@@ -152,7 +164,7 @@ const EventKasse = () => {
                     )}
                 </Stack>
             </Paper>
-        </div>
+        </div >
     )
 }
 

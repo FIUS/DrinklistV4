@@ -17,6 +17,8 @@ const EventKasseDeposit = () => {
     const [activeGuestCode, setActiveGuestCode] = useState<string | null>(null)
     const [depositAmount, setDepositAmount] = useState('0')
     const [scanOpen, setScanOpen] = useState(false)
+    const [depositLoading, setDepositLoading] = useState(false)
+    const [lookupLoading, setLookupLoading] = useState(false)
     const autoOpenedRef = useRef(false)
 
     useEffect(() => {
@@ -28,14 +30,15 @@ const EventKasseDeposit = () => {
     }, [])
 
     useEffect(() => {
-        if (!autoOpenedRef.current && status?.enabled && activeGuest === null) {
+        if (!autoOpenedRef.current && status?.enabled && activeGuest === null && !lookupLoading) {
             autoOpenedRef.current = true
             setScanOpen(true)
         }
-    }, [activeGuest, status?.enabled])
+    }, [activeGuest, status?.enabled, lookupLoading])
 
     const handleLookup = (code: string) => {
-        doPostRequest('event/guest/lookup', { code }).then((value) => {
+        setLookupLoading(true)
+        return doPostRequest('event/guest/lookup', { code }).then((value) => {
             if (value.code === 200) {
                 const payload: EventGuestResponse = value.content
                 setActiveGuest(payload.member)
@@ -44,12 +47,12 @@ const EventKasseDeposit = () => {
             } else {
                 dispatch(openErrorToast())
             }
-        })
+        }).finally(() => setLookupLoading(false))
     }
 
     const handleScan = (code: string) => {
         setScanOpen(false)
-        handleLookup(code)
+        return handleLookup(code)
     }
 
     const confirmDeposit = () => {
@@ -60,6 +63,7 @@ const EventKasseDeposit = () => {
         if (isNaN(amount) || amount <= 0) {
             return
         }
+        setDepositLoading(true)
         doPostRequest('event/guest/deposit', { code: activeGuestCode, amount }).then((value) => {
             if (value.code === 200) {
                 dispatch(openToast({ message: EVENT_EINZAHLUNG_ERFOLG }))
@@ -67,7 +71,7 @@ const EventKasseDeposit = () => {
             } else {
                 dispatch(openErrorToast())
             }
-        })
+        }).finally(() => setDepositLoading(false))
     }
 
     if (status?.enabled === false) {
@@ -92,7 +96,7 @@ const EventKasseDeposit = () => {
 
             {!activeGuest ? (
                 <Paper className={style.section} elevation={2}>
-                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)}>
+                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={lookupLoading}>
                         {EVENT_SCANNEN}
                     </Button>
                 </Paper>
@@ -114,7 +118,7 @@ const EventKasseDeposit = () => {
                             margin="dense"
                         />
                         <Stack direction="row" spacing={2} className={style.actions}>
-                            <Button variant="contained" onClick={confirmDeposit}>{EVENT_EINZAHLEN}</Button>
+                            <Button variant="contained" onClick={confirmDeposit} disabled={depositLoading}>{EVENT_EINZAHLEN}</Button>
                         </Stack>
                     </Paper>
                 </>

@@ -14,6 +14,7 @@ const EventGuest = () => {
     const [status, setStatus] = useState<EventModeStatus | null>(null)
     const [scanOpen, setScanOpen] = useState(false)
     const [memberId, setMemberId] = useState<number | null>(null)
+    const [lookupLoading, setLookupLoading] = useState(false)
     const autoOpenedRef = useRef(false)
 
     useEffect(() => {
@@ -25,22 +26,23 @@ const EventGuest = () => {
     }, [])
 
     useEffect(() => {
-        if (!autoOpenedRef.current && status?.enabled && memberId === null) {
+        if (!autoOpenedRef.current && status?.enabled && memberId === null && !lookupLoading) {
             autoOpenedRef.current = true
             setScanOpen(true)
         }
-    }, [memberId, status?.enabled])
+    }, [memberId, status?.enabled, lookupLoading])
 
     const handleScan = (code: string) => {
         setScanOpen(false)
-        doPostRequest('event/guest/login', { code }).then((value) => {
+        setLookupLoading(true)
+        return doPostRequest('event/guest/login', { code }).then((value) => {
             if (value.code === 200) {
                 const response: EventGuestLoginResponse = value.content
                 setMemberId(response.memberID)
             } else {
                 dispatch(openErrorToast())
             }
-        })
+        }).finally(() => setLookupLoading(false))
     }
 
     if (status?.enabled === false) {
@@ -57,7 +59,7 @@ const EventGuest = () => {
 
             {memberId === null ? (
                 <div className={style.scanCenter}>
-                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)}>{EVENT_SCANNEN}</Button>
+                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={lookupLoading}>{EVENT_SCANNEN}</Button>
                 </div>
             ) : (
                 <>

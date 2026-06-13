@@ -16,6 +16,8 @@ const EventKassePayout = () => {
     const [activeGuest, setActiveGuest] = useState<Member | null>(null)
     const [activeGuestCode, setActiveGuestCode] = useState<string | null>(null)
     const [scanOpen, setScanOpen] = useState(false)
+    const [payoutLoading, setPayoutLoading] = useState(false)
+    const [lookupLoading, setLookupLoading] = useState(false)
     const autoOpenedRef = useRef(false)
 
     useEffect(() => {
@@ -27,14 +29,15 @@ const EventKassePayout = () => {
     }, [])
 
     useEffect(() => {
-        if (!autoOpenedRef.current && status?.enabled && activeGuest === null) {
+        if (!autoOpenedRef.current && status?.enabled && activeGuest === null && !lookupLoading) {
             autoOpenedRef.current = true
             setScanOpen(true)
         }
-    }, [activeGuest, status?.enabled])
+    }, [activeGuest, status?.enabled, lookupLoading])
 
     const handleLookup = (code: string) => {
-        doPostRequest('event/guest/lookup', { code }).then((value) => {
+        setLookupLoading(true)
+        return doPostRequest('event/guest/lookup', { code }).then((value) => {
             if (value.code === 200) {
                 const payload: EventGuestResponse = value.content
                 setActiveGuest(payload.member)
@@ -45,18 +48,19 @@ const EventKassePayout = () => {
             } else {
                 dispatch(openErrorToast())
             }
-        })
+        }).finally(() => setLookupLoading(false))
     }
 
     const handleScan = (code: string) => {
         setScanOpen(false)
-        handleLookup(code)
+        return handleLookup(code)
     }
 
     const confirmPayout = () => {
         if (!activeGuestCode) {
             return
         }
+        setPayoutLoading(true)
         doPostRequest('event/guest/payout', { code: activeGuestCode }).then((value) => {
             if (value.code === 200) {
                 dispatch(openToast({ message: EVENT_AUSZAHLUNG_ERFOLG }))
@@ -64,7 +68,7 @@ const EventKassePayout = () => {
             } else {
                 dispatch(openErrorToast())
             }
-        })
+        }).finally(() => setPayoutLoading(false))
     }
 
     if (status?.enabled === false) {
@@ -89,7 +93,7 @@ const EventKassePayout = () => {
 
             {!activeGuest ? (
                 <Paper className={style.section} elevation={2}>
-                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)}>
+                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={lookupLoading}>
                         {EVENT_SCANNEN}
                     </Button>
                 </Paper>
@@ -100,7 +104,7 @@ const EventKassePayout = () => {
                         {balance.toFixed(2)} EUR
                     </Typography>
                     <Stack direction="row" spacing={2} className={style.actions}>
-                        <Button variant="contained" onClick={confirmPayout}>{EVENT_AUSZAHLEN}</Button>
+                        <Button variant="contained" onClick={confirmPayout} disabled={payoutLoading}>{EVENT_AUSZAHLEN}</Button>
                     </Stack>
                 </Paper>
             )}
