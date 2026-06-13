@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { doGetRequest } from '../../Common/StaticFunctions'
+import { doGetRequest, doGetRequestWithEventSecret } from '../../Common/StaticFunctions'
+import { useDispatch } from 'react-redux'
+import { openErrorToast } from '../../../Actions/CommonAction'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
 import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
@@ -27,16 +29,27 @@ const EventSummary = () => {
     const [selectedAction, setSelectedAction] = useState<string | null>(null)
     const confirmationPhrase = "ja-ich-bin-mir-sicher"
 
+    //const [secret, setSecret] = useState(null)
+
+    const dispatch = useDispatch()
+
     useEffect(() => {
         let isActive = true
 
         const load = async () => {
+            const secretResp = await doGetRequest('event/secret')
+            if (secretResp.code === 200 && secretResp.content && secretResp.content.secret) {
+                //setSecret(secretResp.content.secret)
+            } else if (secretResp.code === 403) {
+                dispatch(openErrorToast())
+            }
+
             const [transactionsValue, drinksValue] = await Promise.all([
                 doGetRequest('transactions').then((value) => {
                     if (value.code === 200) {
                         return value
                     }
-                    return doGetRequest('event/transactions/limit/10000')
+                    return doGetRequestWithEventSecret('event/transactions/limit/10000', secretResp.content ? secretResp.content.secret : null)
                 }),
                 doGetRequest('drinks')
             ])
@@ -59,7 +72,7 @@ const EventSummary = () => {
         return () => {
             isActive = false
         }
-    }, [])
+    }, [dispatch])
 
     const drinkCategoryByName = useMemo(() => {
         const map = new Map<string, string>()

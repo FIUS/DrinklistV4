@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography, Skeleton } from '@mui/material'
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
-import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
+import { doGetRequest, doGetRequestWithEventSecret } from '../Common/StaticFunctions'
 import { compareCategoriesBySortingIndex } from '../Common/StaticFunctionsTyped'
 import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
 import { ABBRECHEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
@@ -41,20 +41,25 @@ const EventKasseCheckout = () => {
         })
     }, [])
 
+    const params = useParams()
+    const secret = params.secret
+
     const [drinksLoading, setDrinksLoading] = useState(true)
     useEffect(() => {
         if (!eventEnabled) {
             return
         }
         setDrinksLoading(true)
-        doGetRequest('event/drinks').then((value) => {
+        doGetRequestWithEventSecret('event/drinks', secret).then((value) => {
             if (value.code === 200) {
                 const payload: EventDrinksResponse = value.content
                 setDrinks(payload.drinks)
                 setCategories(payload.categories)
+            } else if (value.code === 403) {
+                dispatch(openErrorToast())
             }
         }).finally(() => setDrinksLoading(false))
-    }, [eventEnabled])
+    }, [eventEnabled, dispatch, secret])
 
     // Scanner will open only when the user presses the scan button.
 
@@ -111,7 +116,11 @@ const EventKasseCheckout = () => {
     const balanceColor = balance >= 0 ? 'limegreen' : 'darkred'
 
     const handleLookup = (code: string) => {
-        return doPostRequest('event/guest/lookup', { code }).then((value) => {
+        return doPostRequestWithEventSecret('event/guest/lookup', { code }, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                return
+            }
             if (value.code === 200) {
                 const payload: EventGuestResponse = value.content
                 setActiveGuest(payload.member)
@@ -136,13 +145,17 @@ const EventKasseCheckout = () => {
             return
         }
         const items = cart.map((item) => ({ drinkID: item.drink.id, quantity: item.quantity }))
-        return doPostRequest('event/guest/purchase', { code: activeGuestCode, items, paymentMode }).then((value) => {
+        return doPostRequestWithEventSecret('event/guest/purchase', { code: activeGuestCode, items, paymentMode }, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                return
+            }
             if (value.code === 200) {
                 const response: EventPurchaseResponse = value.content
                 setActiveGuest((prev) => prev ? { ...prev, balance: response.balance } : prev)
                 dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
                 resetCart()
-                navigate('/event/kasse')
+                navigate(`/event/${secret}/kasse`)
             } else {
                 dispatch(openErrorToast())
             }
@@ -154,11 +167,15 @@ const EventKasseCheckout = () => {
             return
         }
         const items = cart.map((item) => ({ drinkID: item.drink.id, quantity: item.quantity }))
-        return doPostRequest('event/purchase', { items, paymentMode: 'cash' }).then((value) => {
+        return doPostRequestWithEventSecret('event/purchase', { items, paymentMode: 'cash' }, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                return
+            }
             if (value.code === 200) {
                 dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
                 resetCart()
-                navigate('/event/kasse')
+                navigate(`/event/${secret}/kasse`)
             } else {
                 dispatch(openErrorToast())
             }
@@ -227,7 +244,7 @@ const EventKasseCheckout = () => {
             <div className={style.headerRow}>
                 <Typography variant="h4">{EVENT_KASSE}</Typography>
                 <Stack direction="row" spacing={2} className={style.headerActions}>
-                    <Button variant="outlined" onClick={() => navigate('/event/kasse')}>{ZURUECK}</Button>
+                    <Button variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
 
                 </Stack>
             </div>

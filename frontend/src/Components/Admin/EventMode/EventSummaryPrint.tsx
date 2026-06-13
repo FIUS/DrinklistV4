@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Stack, Typography } from '@mui/material'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { doGetRequest, doPostRequest, downloadJSON } from '../../Common/StaticFunctions'
+import { doGetRequest, doGetRequestWithEventSecret, doPostRequest, downloadJSON } from '../../Common/StaticFunctions'
+import { useDispatch } from 'react-redux'
+import { openErrorToast } from '../../../Actions/CommonAction'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
 import style from './eventSummary.module.scss'
@@ -13,6 +15,7 @@ const EventSummaryPrint = () => {
     const [searchParams] = useSearchParams()
     const action = searchParams.get('action') ?? 'transactions_only_keep_balance'
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const [transactions, setTransactions] = useState<Array<Transaction>>([])
     const [drinks, setDrinks] = useState<Array<Drink>>([])
@@ -20,15 +23,21 @@ const EventSummaryPrint = () => {
 
     const [retryAttempted, setRetryAttempted] = useState(false)
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true)
         try {
+            const secretResp = await doGetRequest('event/secret')
+            const secret = (secretResp.code === 200 && secretResp.content && secretResp.content.secret) ? secretResp.content.secret : null
+            if (secretResp.code === 403) {
+                dispatch(openErrorToast())
+            }
+
             const [transactionsValue, drinksValue] = await Promise.all([
                 doGetRequest('transactions').then((value) => {
                     if (value.code === 200) {
                         return value
                     }
-                    return doGetRequest('event/transactions/limit/10000')
+                    return doGetRequestWithEventSecret('event/transactions/limit/10000', secret)
                 }),
                 doGetRequest('drinks')
             ])
@@ -40,16 +49,16 @@ const EventSummaryPrint = () => {
         } finally {
             setLoading(false)
         }
-    }
+    }, [dispatch])
 
-    useEffect(() => {
+    useCallback(() => {
         let isActive = true
         if (isActive) loadData()
         return () => { isActive = false }
-    }, [action])
+    }, [loadData])
 
     // Retry once if initial load produced no transactions (fixes SPA navigation race)
-    useEffect(() => {
+    useCallback(() => {
         if (!loading && transactions.length === 0 && !retryAttempted) {
             setRetryAttempted(true)
             const t = setTimeout(() => {
@@ -57,7 +66,7 @@ const EventSummaryPrint = () => {
             }, 400)
             return () => clearTimeout(t)
         }
-    }, [loading, transactions, retryAttempted])
+    }, [loading, transactions, retryAttempted, loadData])
 
     const drinkCategoryByName = useMemo(() => {
         const map = new Map<string, string>()

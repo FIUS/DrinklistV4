@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
-import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
+import { doGetRequest, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
 import { EventGuestResponse, EventModeStatus } from '../../types/ResponseTypes'
 import { EVENT_GAST_ANGELEGT, EVENT_GAST_EXISTIERT, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NEUER_GAST, EVENT_SCANNEN, EVENT_STARTGUTHABEN, ZURUECK, OK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
@@ -27,6 +27,9 @@ const EventKasseRegister = () => {
         })
     }, [])
 
+    const params = useParams()
+    const secret = params.secret
+
     useEffect(() => {
         if (guestCode === null && status?.enabled && !loadingAvailability) {
             setScanOpen(true)
@@ -39,11 +42,16 @@ const EventKasseRegister = () => {
         setScanOpen(false)
         setloadingAvailability(true)
         // Check if guest already exists; if so, notify and return to kasse
-        return doPostRequest('event/guest/lookup', { code }).then((value) => {
+        return doPostRequestWithEventSecret('event/guest/lookup', { code }, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                navigate(`/event/${secret}/kasse`)
+                return
+            }
             if (value.code === 200) {
                 // guest exists
                 dispatch(openToast({ message: EVENT_GAST_EXISTIERT, type: "error" }))
-                navigate('/event/kasse')
+                navigate(`/event/${secret}/kasse`)
             } else if (value.code === 404) {
                 // guest not found — proceed with registration flow (allow initial balance input)
                 setGuestCode(code)
@@ -64,16 +72,21 @@ const EventKasseRegister = () => {
             code: guestCode,
             initialBalance: isNaN(amount) ? 0 : amount
         }
-        doPostRequest('event/guest/register', payload).then((value) => {
+        doPostRequestWithEventSecret('event/guest/register', payload, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                navigate(`/event/${secret}/kasse`)
+                return
+            }
             if (value.code === 200) {
                 const response: EventGuestResponse = value.content
                 dispatch(openToast({ message: EVENT_GAST_ANGELEGT }))
                 if (response.member) {
-                    navigate('/event/kasse')
+                    navigate(`/event/${secret}/kasse`)
                 }
             } else if (value.code === 409) {
                 dispatch(openToast({ message: EVENT_GAST_EXISTIERT, type: "error" }))
-                navigate('/event/kasse')
+                navigate(`/event/${secret}/kasse`)
             } else {
                 dispatch(openErrorToast())
             }
@@ -95,7 +108,7 @@ const EventKasseRegister = () => {
         <div className={style.container}>
             <div className={style.headerRow}>
                 <Typography variant="h4">{EVENT_NEUER_GAST}</Typography>
-                <Button variant="outlined" onClick={() => navigate('/event/kasse')}>{ZURUECK}</Button>
+                <Button variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
             </div>
             {!guestCode ? (
                 <Paper className={style.section} elevation={2}>

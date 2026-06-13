@@ -3,7 +3,7 @@ import { Alert, Button, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { openErrorToast } from '../../Actions/CommonAction'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
-import { EventGuestLoginResponse, EventModeStatus } from '../../types/ResponseTypes'
+import { EventModeStatus } from '../../types/ResponseTypes'
 import { EVENT_GAST, EVENT_MODE_DISABLED, EVENT_SCANNEN } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import Details from '../User/Details/Details'
@@ -25,6 +25,7 @@ const EventGuest = () => {
         })
     }, [])
 
+
     useEffect(() => {
         if (!autoOpenedRef.current && status?.enabled && memberId === null && !lookupLoading) {
             autoOpenedRef.current = true
@@ -35,10 +36,17 @@ const EventGuest = () => {
     const handleScan = (code: string) => {
         setScanOpen(false)
         setLookupLoading(true)
-        return doPostRequest('event/guest/login', { code }).then((value) => {
+        // Use public lookup to display read-only guest details without requiring the event secret
+        return doPostRequest('event/guest/lookup', { code }).then((value) => {
             if (value.code === 200) {
-                const response: EventGuestLoginResponse = value.content
-                setMemberId(response.memberID)
+                const payload: EventGuestResponse = value.content
+                if (payload && payload.member && payload.member.id) {
+                    setMemberId(payload.member.id)
+                } else {
+                    dispatch(openErrorToast())
+                }
+            } else if (value.code === 404) {
+                dispatch(openErrorToast())
             } else {
                 dispatch(openErrorToast())
             }

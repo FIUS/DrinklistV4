@@ -82,6 +82,19 @@ def admin(fn):
     return wrapper
 
 
+def event_secret_only(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not util.event_mode_enabled:
+            return util.build_response("Event mode disabled", 403)
+        secret = request.args.get('eventSecret')
+        if not util.is_event_secret_valid(secret):
+            return util.build_response("Unauthorized", 403)
+        return fn(*args, **kwargs)
+    wrapper.__name__ = fn.__name__
+    return wrapper
+
+
 def event_mode_only(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -481,6 +494,31 @@ class event_mode_status(Resource):
         })
 
 
+@api.route('/event/secret')
+class event_secret(Resource):
+    @admin
+    def get(self):
+        """
+        Get today's event URL secret for admin use
+        """
+        return util.build_response({
+            "secret": util.get_event_secret_for_date()
+        })
+
+
+@api.route('/event/secret/validate/<string:secret>')
+class event_secret_validate(Resource):
+    def get(self, secret):
+        """
+        Validate a secret for event route access
+        """
+        if not util.event_mode_enabled:
+            return util.build_response("Event mode disabled", 403)
+        if util.is_event_secret_valid(secret):
+            return util.build_response({"valid": True})
+        return util.build_response("Unauthorized", 403)
+
+
 event_code_model = api.model('Event-Code', {
     'code': fields.String(description='QR code content', required=True)
 })
@@ -509,7 +547,7 @@ event_purchase_model = api.model('Event-Purchase', {
 
 @api.route('/event/drinks')
 class event_drinks(Resource):
-    @event_mode_only
+    @event_secret_only
     def get(self):
         """
         Get drinks and categories for event mode
@@ -522,7 +560,7 @@ class event_drinks(Resource):
 
 @api.route('/event/guest/register')
 class event_guest_register(Resource):
-    @event_mode_only
+    @event_secret_only
     @api.doc(body=event_register_model)
     def post(self):
         """
@@ -546,7 +584,6 @@ class event_guest_register(Resource):
 
 @api.route('/event/guest/lookup')
 class event_guest_lookup(Resource):
-    @event_mode_only
     @api.doc(body=event_code_model)
     def post(self):
         """
@@ -563,7 +600,7 @@ class event_guest_lookup(Resource):
 
 @api.route('/event/guest/login')
 class event_guest_login(Resource):
-    @event_mode_only
+    @event_secret_only
     @api.doc(body=event_code_model)
     def post(self):
         """
@@ -584,14 +621,15 @@ class event_guest_login(Resource):
 
 @api.route('/event/guest/deposit')
 class event_guest_deposit(Resource):
-    @event_mode_only
+    @event_secret_only
     @api.doc(body=event_deposit_model)
     def post(self):
         """
         Deposit cash for a guest (Marke kaufen)
         """
         code = request.json.get("code") if request.json is not None else None
-        amount = request.json.get("amount") if request.json is not None else None
+        amount = request.json.get(
+            "amount") if request.json is not None else None
 
         if amount is None:
             return util.build_response("Missing amount", code=406)
@@ -608,7 +646,8 @@ class event_guest_deposit(Resource):
         if member_id is None:
             return util.build_response("User not found", code=404)
 
-        member = db.event_deposit_user(member_id, amount, description="Barzahlung")
+        member = db.event_deposit_user(
+            member_id, amount, description="Barzahlung")
         if member is None:
             return util.build_response("User not found", code=404)
 
@@ -617,7 +656,7 @@ class event_guest_deposit(Resource):
 
 @api.route('/event/guest/payout')
 class event_guest_payout(Resource):
-    @event_mode_only
+    @event_secret_only
     @api.doc(body=event_code_model)
     def post(self):
         """
@@ -637,7 +676,7 @@ class event_guest_payout(Resource):
 
 @api.route('/event/guest/purchase')
 class event_guest_purchase(Resource):
-    @event_mode_only
+    @event_secret_only
     @api.doc(body=event_purchase_model)
     def post(self):
         """
@@ -647,17 +686,19 @@ class event_guest_purchase(Resource):
         try:
             checkouts = db.get_checkouts()
             if not checkouts or len(checkouts) == 0:
-                db.do_checkout({'newCash': None, 'members': [], 'invoices': []})
+                db.do_checkout(
+                    {'newCash': None, 'members': [], 'invoices': []})
         except Exception:
             return util.build_response(result, code=500)
-        
+
         code = request.json.get("code") if request.json is not None else None
         member_id = get_member_id_from_code(code)
         if member_id is None:
             return util.build_response("User not found", code=404)
 
         items = request.json.get("items") if request.json is not None else []
-        payment_mode = request.json.get("paymentMode") if request.json is not None else "balance"
+        payment_mode = request.json.get(
+            "paymentMode") if request.json is not None else "balance"
 
         result = db.event_purchase(member_id, items, payment_mode)
         if "error" in result:
@@ -670,7 +711,7 @@ class event_guest_purchase(Resource):
 
 @api.route('/event/purchase')
 class event_purchase_anonymous(Resource):
-    @event_mode_only
+    @event_secret_only
     @api.doc(body=event_purchase_model)
     def post(self):
         """
@@ -680,10 +721,11 @@ class event_purchase_anonymous(Resource):
         try:
             checkouts = db.get_checkouts()
             if not checkouts or len(checkouts) == 0:
-                db.do_checkout({'newCash': None, 'members': [], 'invoices': []})
+                db.do_checkout(
+                    {'newCash': None, 'members': [], 'invoices': []})
         except Exception:
             return util.build_response(result, code=500)
-        
+
         items = request.json.get("items") if request.json is not None else []
 
         result = db.event_purchase_cash(items)
@@ -695,7 +737,7 @@ class event_purchase_anonymous(Resource):
 
 @api.route('/event/transactions/limit/<int:limit>')
 class get_event_transactions_limited(Resource):
-    @event_mode_only
+    @event_secret_only
     def get(self, limit):
         """
         Get the lastest x transactions (event view)
@@ -741,7 +783,7 @@ class finalize_event_checkout(Resource):
 
 @api.route('/event/transactions/<int:transaction_id>/undo')
 class event_undo_transaction(Resource):
-    @event_mode_only
+    @event_secret_only
     def post(self, transaction_id):
         """
         Undo the given transaction (event mode).

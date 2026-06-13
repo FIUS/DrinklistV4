@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Alert, Button, IconButton, List, ListItem, ListItemText, Paper, Stack, Typography, Skeleton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useNavigate } from 'react-router-dom'
-import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
+import { useNavigate, useParams } from 'react-router-dom'
+import { doGetRequest, doGetRequestWithEventSecret, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
 import { EventModeStatus, Transaction } from '../../types/ResponseTypes'
 import { ENTFERNEN, EVENT_KASSE, EVENT_MARKE_KAUFEN, EVENT_MODE_DISABLED, EVENT_NEUER_GAST, EVENT_RESTGELD_AUSZAHLEN, LETZTE_KAEUFE, NICHT_DEINE_TRANSAKTION, TRANSAKTION_RUECKGAENIG, ZEITLIMIT_ABGELAUFEN } from '../Common/Internationalization/i18n'
 import { useDispatch } from 'react-redux'
@@ -26,26 +26,34 @@ const EventKasse = () => {
     }, [])
 
     const eventEnabled = status?.enabled === true
+    const params = useParams()
+    const secret = params.secret
 
-    const fetchTransactions = () => {
+    const fetchTransactions = useCallback(() => {
         setTransactionsLoading(true)
-        doGetRequest('event/transactions/limit/20').then((value) => {
+        doGetRequestWithEventSecret('event/transactions/limit/20', secret).then((value) => {
             if (value.code === 200) {
                 setTransactions(value.content)
+            } else if (value.code === 403) {
+                dispatch(openErrorToast())
             }
         }).finally(() => setTransactionsLoading(false))
-    }
+    }, [dispatch, secret])
 
     useEffect(() => {
         if (!eventEnabled) {
             return
         }
         fetchTransactions()
-    }, [eventEnabled])
+    }, [eventEnabled, fetchTransactions])
 
     const undoTransaction = (transactionId: number) => {
         setUndoingIds((prev) => [...prev, transactionId])
-        doPostRequest(`event/transactions/${transactionId}/undo`, null).then((value) => {
+        doPostRequestWithEventSecret(`event/transactions/${transactionId}/undo`, null, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                return
+            }
             if (value.code === 200) {
                 setTransactions((prev) => prev.filter((item) => item.id !== transactionId))
                 dispatch(openToast({ message: TRANSAKTION_RUECKGAENIG }))
@@ -90,7 +98,7 @@ const EventKasse = () => {
                     variant="contained"
                     size="large"
                     fullWidth
-                    onClick={() => navigate('/event/kasse/checkout')}
+                    onClick={() => navigate(`/event/${secret}/kasse/checkout`)}
                     disabled={!eventEnabled}
                 >
                     {EVENT_KASSE}
@@ -99,7 +107,7 @@ const EventKasse = () => {
                     variant="contained"
                     size="large"
                     fullWidth
-                    onClick={() => navigate('/event/kasse/new-guest')}
+                    onClick={() => navigate(`/event/${secret}/kasse/new-guest`)}
                     disabled={!eventEnabled}
                 >
                     {EVENT_NEUER_GAST}
@@ -108,7 +116,7 @@ const EventKasse = () => {
                     variant="contained"
                     size="large"
                     fullWidth
-                    onClick={() => navigate('/event/kasse/deposit')}
+                    onClick={() => navigate(`/event/${secret}/kasse/deposit`)}
                     disabled={!eventEnabled}
                 >
                     {EVENT_MARKE_KAUFEN}
@@ -117,7 +125,7 @@ const EventKasse = () => {
                     variant="contained"
                     size="large"
                     fullWidth
-                    onClick={() => navigate('/event/kasse/payout')}
+                    onClick={() => navigate(`/event/${secret}/kasse/payout`)}
                     disabled={!eventEnabled}
                 >
                     {EVENT_RESTGELD_AUSZAHLEN}

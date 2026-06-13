@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Paper, Typography } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { openErrorToast } from '../../../Actions/CommonAction'
 import QRCode from 'react-qr-code'
 import { doGetRequest } from '../../Common/StaticFunctions'
 import { EventModeStatus } from '../../../types/ResponseTypes'
@@ -24,6 +26,9 @@ const EventQrPage = () => {
     const navigate = useNavigate()
     const { target } = useParams()
     const [status, setStatus] = useState<EventModeStatus | null>(null)
+    const [secret, setSecret] = useState(null)
+
+    const dispatch = useDispatch()
 
     useEffect(() => {
         doGetRequest('event-mode').then((value) => {
@@ -31,13 +36,19 @@ const EventQrPage = () => {
                 setStatus(value.content)
             }
         })
-    }, [])
+        doGetRequest('event/secret').then((value) => {
+            if (value.code === 200 && value.content && value.content.secret) {
+                setSecret(value.content.secret)
+            } else if (value.code === 403) {
+                dispatch(openErrorToast())
+            }
+        })
+    }, [dispatch])
 
     const isKasse = target === 'kasse'
     const label = isKasse ? EVENT_KASSE : EVENT_GAST
-    const path = isKasse ? '/event/kasse' : '/event/guest'
     const baseUrl = buildFrontendBase(status?.frontendDomain ?? null)
-    const fullUrl = `${baseUrl}${path}`
+    const fullUrl = isKasse ? (secret ? `${baseUrl}/event/${secret}/kasse` : `${baseUrl}/event/kasse`) : `${baseUrl}/event/guest`
 
     if (status?.enabled === false) {
         return (

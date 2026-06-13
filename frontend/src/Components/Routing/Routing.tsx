@@ -49,11 +49,11 @@ const Routing = (props: Props) => {
                 <Route path="/admin/event-mode/qr/:target" element={<EventQrPage />} />
                 <Route path="/admin/event-mode/summary" element={<EventSummary />} />
                 <Route path="/admin/event-mode/summary/print" element={<EventSummaryPrint />} />
-                <Route path="/event/kasse" element={<EventKasse />} />
-                <Route path="/event/kasse/checkout" element={<EventKasseCheckout />} />
-                <Route path="/event/kasse/new-guest" element={<EventKasseRegister />} />
-                <Route path="/event/kasse/deposit" element={<EventKasseDeposit />} />
-                <Route path="/event/kasse/payout" element={<EventKassePayout />} />
+                <Route path="/event/:secret/kasse" element={<EventKasse />} />
+                <Route path="/event/:secret/kasse/checkout" element={<EventKasseCheckout />} />
+                <Route path="/event/:secret/kasse/new-guest" element={<EventKasseRegister />} />
+                <Route path="/event/:secret/kasse/deposit" element={<EventKasseDeposit />} />
+                <Route path="/event/:secret/kasse/payout" element={<EventKassePayout />} />
                 <Route path="/event/guest" element={<EventGuest />} />
             </Routes>
         </>

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
-import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
+import { doGetRequest, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
 import { EventGuestResponse, EventModeStatus, Member } from '../../types/ResponseTypes'
 import { BETRAG, EVENT_EINZAHLEN, EVENT_EINZAHLUNG_ERFOLG, EVENT_GAST_GELADEN, EVENT_KASSE, EVENT_MARKE_KAUFEN, EVENT_MODE_DISABLED, EVENT_SCANNEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
@@ -29,6 +29,9 @@ const EventKasseDeposit = () => {
         })
     }, [])
 
+    const params = useParams()
+    const secret = params.secret
+
     useEffect(() => {
         if (!autoOpenedRef.current && status?.enabled && activeGuest === null && !lookupLoading) {
             autoOpenedRef.current = true
@@ -38,7 +41,11 @@ const EventKasseDeposit = () => {
 
     const handleLookup = (code: string) => {
         setLookupLoading(true)
-        return doPostRequest('event/guest/lookup', { code }).then((value) => {
+        return doPostRequestWithEventSecret('event/guest/lookup', { code }, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                return
+            }
             if (value.code === 200) {
                 const payload: EventGuestResponse = value.content
                 setActiveGuest(payload.member)
@@ -64,10 +71,14 @@ const EventKasseDeposit = () => {
             return
         }
         setDepositLoading(true)
-        doPostRequest('event/guest/deposit', { code: activeGuestCode, amount }).then((value) => {
+        doPostRequestWithEventSecret('event/guest/deposit', { code: activeGuestCode, amount }, secret).then((value) => {
+            if (value.code === 403) {
+                dispatch(openErrorToast())
+                return
+            }
             if (value.code === 200) {
                 dispatch(openToast({ message: EVENT_EINZAHLUNG_ERFOLG }))
-                navigate('/event/kasse')
+                navigate(`/event/${secret}/kasse`)
             } else {
                 dispatch(openErrorToast())
             }
@@ -91,7 +102,7 @@ const EventKasseDeposit = () => {
         <div className={style.container}>
             <div className={style.headerRow}>
                 <Typography variant="h4">{EVENT_MARKE_KAUFEN}</Typography>
-                <Button variant="outlined" onClick={() => navigate('/event/kasse')}>{ZURUECK}</Button>
+                <Button variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
             </div>
 
             {!activeGuest ? (

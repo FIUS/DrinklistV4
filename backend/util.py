@@ -1,4 +1,6 @@
 from flask import Response
+import base64
+import hashlib
 import json
 import os
 import datetime
@@ -16,6 +18,11 @@ event_mode_enabled = os.environ.get(
 
 token = os.environ.get("X_AUTH_TOKEN")
 old_domain = os.environ.get("OLD_DOMAIN")
+
+event_secret_key = os.environ.get("EVENT_SECRET_KEY") if os.environ.get(
+    "EVENT_SECRET_KEY") else "default_unsafe_event_secret"
+event_secret_length = int(os.environ.get(
+    "EVENT_SECRET_LENGTH")) if os.environ.get("EVENT_SECRET_LENGTH") else 16
 
 admin_username = os.environ.get("ADMIN_USERNAME") if os.environ.get(
     "ADMIN_USERNAME") else "admin"
@@ -186,6 +193,36 @@ def build_low_balance_paypal_qr_text(amount_eur: float):
 
     amount_str = f"{amount_eur:.2f}".replace(".", ",")
     return f"https://paypal.me/{username}/{amount_str}"
+
+
+def get_event_secret_for_date(date: datetime.date = None):
+    if date is None:
+        date = datetime.date.today()
+
+    date_str = date.strftime("%Y-%m-%d")
+    digest = hashlib.sha256(
+        f"{event_secret_key}|{date_str}".encode("utf-8")
+    ).digest()
+    encoded = base64.b32encode(digest).decode("ascii").lower()
+    return encoded[:event_secret_length]
+
+
+def get_event_secret_candidates():
+    today = datetime.date.today()
+    yesterday = today - datetime.timedelta(days=1)
+    return [
+        get_event_secret_for_date(today),
+        get_event_secret_for_date(yesterday)
+    ]
+
+
+def is_event_secret_valid(secret):
+    if secret is None:
+        return False
+    secret = str(secret).strip()
+    if secret == "":
+        return False
+    return secret in get_event_secret_candidates()
 
 
 checkout_mail_text = """Hallo {name},

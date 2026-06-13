@@ -1,8 +1,20 @@
 import Cookies from "js-cookie";
 import { convertToLocalDate } from './StaticFunctionsTyped';
 
+const apiBase = () => {
+    return window.globalTS.DOMAIN.endsWith('/') ? window.globalTS.DOMAIN : `${window.globalTS.DOMAIN}/`
+}
+
+export const buildEventRoute = (secret, path) => {
+    if (!secret) {
+        return `/event${path.startsWith('/') ? path : `/${path}`}`
+    }
+    const normalizedPath = path.startsWith('/') ? path.slice(1) : path
+    return `/event/${secret}/${normalizedPath}`
+}
+
 export const doPostRequest = async (path, data) => {
-    const resp = await fetch(window.globalTS.DOMAIN + path,
+    const resp = await fetch(apiBase() + path,
         {
             credentials: 'include',
             method: "POST",
@@ -17,6 +29,45 @@ export const doPostRequest = async (path, data) => {
 
 };
 
+export const doPostRequestWithEventSecret = async (path, data, eventSecret) => {
+    const url = new URL(path, apiBase())
+    if (eventSecret) {
+        url.searchParams.set('eventSecret', eventSecret)
+    }
+    const resp = await fetch(url.toString(), {
+        credentials: 'include',
+        method: "POST",
+        headers: { "Content-type": "application/json", "Access-Control-Allow-Origin": "/*" },
+        body: JSON.stringify(data)
+    })
+    const status_code = resp.status
+    const userJson = await resp.json();
+    return { code: status_code, content: userJson }
+}
+
+export const doGetRequestWithEventSecret = async (path, eventSecret) => {
+    const url = new URL(path, apiBase())
+    if (eventSecret) {
+        url.searchParams.set('eventSecret', eventSecret)
+    }
+    const resp = await fetch(url.toString(),
+        {
+            credentials: 'include',
+            method: "GET",
+            headers: { "Content-type": "application/json", "Access-Control-Allow-Origin": "*" },
+        });
+
+    const status_code = resp.status
+
+    if (status_code === 200) {
+        const userJson = await resp.json();
+        return { code: status_code, content: userJson }
+    } else if (status_code === 403) {
+        return { code: status_code }
+    } else {
+        return { code: status_code }
+    }
+};
 
 export const doRequest = async (method, path, data) => {
     const resp = await fetch(window.globalTS.DOMAIN + path,
