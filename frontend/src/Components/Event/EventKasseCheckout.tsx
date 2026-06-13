@@ -388,7 +388,7 @@ const EventKasseCheckout = () => {
                 onScanned={handleScan}
             />
 
-            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+            <Dialog open={confirmOpen || confirming} onClose={() => setConfirmOpen(false)}>
                 <DialogTitle>{EVENT_ZAHLUNG_BESTAETIGEN}</DialogTitle>
                 <DialogContent>
                     <Stack spacing={1}>
