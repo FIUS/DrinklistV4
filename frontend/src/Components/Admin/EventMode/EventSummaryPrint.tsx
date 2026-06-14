@@ -20,7 +20,7 @@ const EventSummaryPrint = () => {
     const [transactions, setTransactions] = useState<Array<Transaction>>([])
     const [drinks, setDrinks] = useState<Array<Drink>>([])
     const [loading, setLoading] = useState(true)
-
+    const [finalizeInProgress, setfinalizeInProgress] = useState(false)
     const [retryAttempted, setRetryAttempted] = useState(false)
 
     const loadData = useCallback(async () => {
@@ -156,7 +156,9 @@ const EventSummaryPrint = () => {
     }, [loading])
 
     const finalize = async () => {
+        setfinalizeInProgress(true)
         const resp = await doPostRequest('event/checkout/finalize', { action: action, dryRun: false })
+        setfinalizeInProgress(false)
         if (resp.code === 200) {
             dispatch(openToast({ message: 'Event wurde finalisiert. Alle Guthaben wurden zurückgesetzt und die Endabrechnung wurde gespeichert.' }))
             navigate('/admin/event-mode')
@@ -200,7 +202,7 @@ const EventSummaryPrint = () => {
             <Stack flexDirection="row" gap={2}>
                 <Button sx={{ ml: 2 }} onClick={() => navigate('/admin/event-mode')}>Abbrechen</Button>
                 <Button variant="contained" onClick={() => { window.print() }}>Drucken</Button>
-                <Button variant="contained" color="error" onClick={finalize}>Finalisieren</Button>
+                <Button variant="contained" disabled={finalizeInProgress} color="error" onClick={finalize}>Finalisieren</Button>
             </Stack>
         </div>
     )
