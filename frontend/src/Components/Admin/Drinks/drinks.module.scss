@@ -1,81 +1,242 @@
 @use "../../Common/variables.module.scss";
 
-.drinksContainer {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: variables.$flex-gap;
-}
-
-.drinksContainerInner {
-    @extend .drinksContainer;
-    flex-direction: column;
-    align-items: stretch;
-    margin-top: variables.$padding;
+.container {
+    box-sizing: border-box;
     width: 100%;
-}
-
-.drinkPaper {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: clamp(16px, 3vw, 32px);
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    min-height: 60px;
-    width: fit-content;
-    min-width: 300px;
-    padding: variables.$padding;
-    @media screen and (max-width: variables.$PHONE_SIZE_THRESHOLD) {
-        width: 100%;
-    }
+    gap: 32px;
+    overflow-x: hidden;
 }
 
-.addDrinkPaper {
-    @extend .drinkPaper;
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
 }
 
-.smallTextFieldContainer {
+.resultSummary {
+    min-width: 240px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 
-.buttonsContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: variables.$flex-gap;
-}
-
-.drinksOutterContainer {
-    padding: variables.$padding;
+.section {
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    gap: variables.$flex-gap;
+    gap: 16px;
+    min-width: 0;
 }
 
-.smallTextField {
-    width: 150px;
+.metricGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
 }
 
-.stockDialog {
-    width: 100%;
+.metricCard {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 126px;
+    padding: 18px;
+    border-top: 3px solid;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.metricValue {
+    margin: 3px 0 2px !important;
+    overflow-wrap: anywhere;
+}
+
+.addDrinkCard {
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    gap: 18px;
 }
 
-.stockDialogInner {
-    width: 100%;
+.addDrinkHeading {
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: flex-end;
-    gap: variables.$flex-gap;
+    align-items: center;
+    gap: 14px;
 }
 
-.topContainer {
+.addDrinkForm {
+    display: grid;
+    grid-template-columns: minmax(200px, 1.3fr) minmax(180px, 1fr) minmax(140px, 0.7fr) minmax(140px, 0.7fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.fieldIcon {
+    margin-right: 8px;
+    color: currentColor;
+    opacity: 0.65;
+}
+
+.addDrinkButton {
+    height: 40px;
+    white-space: nowrap;
+}
+
+.directoryHeader {
     display: flex;
-    flex-wrap: wrap;
-    gap: variables.$flex-gap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.stockWarning {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filterCard {
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filterCard button {
+    white-space: nowrap;
+}
+
+.categoryList {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.categorySection {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+}
+
+.categoryHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.categoryHeading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.categoryEditor {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-radius: 4px;
+    background: rgb(128 128 128 / 8%);
+}
+
+.categoryEditorRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.categoryEditorField {
+    width: 260px;
+}
+
+.drinkGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.drinkCard {
+    min-width: 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.drinkCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 12%);
+}
+
+.drinkCardHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.drinkTitle {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.drinkTitle h6 {
+    overflow-wrap: anywhere;
+}
+
+.drinkHeaderActions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.drinkFacts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.factButton {
+    min-width: 0 !important;
+    padding: 12px !important;
+    border: 1px solid rgb(128 128 128 / 22%) !important;
+    color: inherit !important;
+    text-transform: none !important;
+    justify-content: flex-start !important;
+    gap: 10px;
+}
+
+.factText {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.emptyState {
+    min-height: 220px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
 }
 
 .editDrinkRow {
@@ -91,36 +252,111 @@
     gap: variables.$flex-gap;
 }
 
-.categoryHeader {
+.stockDialog {
     width: 100%;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: variables.$flex-gap;
-}
-
-.categoryTitle {
-    flex: 1;
-}
-
-.categoryEditButton {
-    margin-left: auto;
-}
-
-.sortingIndexControls {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: flex-end;
     gap: variables.$flex-gap;
 }
 
-.sortingIndexCollapse {
+.stockDialogInner {
     width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: variables.$flex-gap;
 }
 
-.sortingIndexField {
-    width: 150px;
+@media (max-width: 1200px) {
+    .addDrinkForm {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .addDrinkButton {
+        width: fit-content;
+    }
+}
+
+@media (max-width: variables.$COMPACT_SIZE_THRESHOLD) {
+    .header {
+        flex-direction: column;
+    }
+
+    .resultSummary {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .metricGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .directoryHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 650px) {
+    .container {
+        padding: 14px;
+        gap: 24px;
+    }
+
+    .addDrinkCard,
+    .categorySection {
+        padding: 16px;
+    }
+
+    .addDrinkForm {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .addDrinkButton {
+        width: 100%;
+    }
+
+    .filterCard {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filterCard button {
+        align-self: flex-start;
+    }
+
+    .categoryHeading {
+        align-items: flex-start;
+    }
+
+    .categoryEditorRow {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .categoryEditorField {
+        width: 100%;
+    }
+
+    .drinkGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .editDrinkRow,
+    .stockDialogInner {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: variables.$PHONE_SIZE_THRESHOLD) {
+    .metricGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .metricCard {
+        min-height: 112px;
+    }
 }

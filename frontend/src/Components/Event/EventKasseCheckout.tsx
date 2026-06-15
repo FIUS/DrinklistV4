@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography, Skeleton } from '@mui/material'
-import AddBoxIcon from '@mui/icons-material/AddBox';
+import { AddBox, ArrowBack, PointOfSale, QrCodeScanner, ShoppingCart } from '@mui/icons-material'
+import { Alert, Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography, Skeleton } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
@@ -242,32 +242,48 @@ const EventKasseCheckout = () => {
     return (
         <div className={style.container}>
             <div className={style.headerRow}>
-                <Typography variant="h4">{EVENT_KASSE}</Typography>
+                <div className={style.titleBlock}>
+                    <Avatar className={style.heroIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                        <PointOfSale />
+                    </Avatar>
+                    <div>
+                        <Typography variant="overline" color="text.secondary">Event Mode</Typography>
+                        <Typography variant="h3">{EVENT_KASSE}</Typography>
+                        <Typography variant="body1" color="text.secondary">Getränke auswählen und Zahlung abschließen.</Typography>
+                    </div>
+                </div>
                 <Stack direction="row" spacing={2} className={style.headerActions}>
-                    <Button variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
-
+                    <Button startIcon={<ArrowBack />} variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
                 </Stack>
             </div>
 
             {activeGuest ? (
                 <Paper className={style.balanceCard} elevation={2}>
+                    <Typography variant="overline" color="text.secondary">Guthabenkarte</Typography>
                     <Typography variant="h6">{guestName}</Typography>
                     <Typography variant="h2" sx={{ color: balanceColor }}>
                         {balance.toFixed(2)} EUR
                     </Typography>
                 </Paper>
             ) : (
-                <Paper className={style.section} elevation={2}>
-                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={!eventEnabled}>
+                <Paper className={`${style.section} ${style.guestCard}`} elevation={2}>
+                    <Typography variant="h5">Guthabenkarte</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Optional scannen oder den Einkauf direkt bar bezahlen.
+                    </Typography>
+                    <Button startIcon={<QrCodeScanner />} variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={!eventEnabled}>
                         {EVENT_SCANNEN}
                     </Button>
                 </Paper>
             )}
 
-            <Paper className={style.section} elevation={2}>
-                <Typography variant="h4">{EVENT_WARENKORB}</Typography>
+            <Paper className={`${style.section} ${style.cartSection}`} elevation={2}>
+                <div className={style.sectionHeading}>
+                    <Typography variant="h4">{EVENT_WARENKORB}</Typography>
+                    <ShoppingCart color="action" />
+                </div>
                 {cart.length === 0 ? (
-                    <Typography variant="body2">
+                    <Typography variant="body2" color="text.secondary">
                         {activeGuest ? EVENT_WARENKORB_LEER : EVENT_SCANNEN}
                     </Typography>
                 ) : (
@@ -342,6 +358,12 @@ const EventKasseCheckout = () => {
             </Paper>
 
             <div className={style.drinkGrid}>
+                <div className={style.catalogHeading}>
+                    <div>
+                        <Typography variant="h4">Getränke</Typography>
+                        <Typography variant="body2" color="text.secondary">Tippe auf ein Getränk, um es hinzuzufügen.</Typography>
+                    </div>
+                </div>
                 {drinksLoading ? (
                     <Paper className={style.section} elevation={1}>
                         <Skeleton variant="rectangular" height={200} />
@@ -370,7 +392,7 @@ const EventKasseCheckout = () => {
                                                 onClick={() => addToCart(drink)}
                                                 disabled={!eventEnabled}
                                             >
-                                                <AddBoxIcon />
+                                                <AddBox />
                                             </Button>
                                         </Stack>
                                     </Paper>

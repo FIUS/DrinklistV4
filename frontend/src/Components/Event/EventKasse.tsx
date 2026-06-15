@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Alert, Button, IconButton, List, ListItem, ListItemText, Paper, Stack, Typography, Skeleton } from '@mui/material'
+import { AccountBalanceWallet, AddCard, PersonAdd, PointOfSale, ReceiptLong } from '@mui/icons-material'
+import { Alert, Avatar, Button, IconButton, List, ListItem, ListItemText, Paper, Stack, Typography, Skeleton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate, useParams } from 'react-router-dom'
 import { doGetRequest, doGetRequestWithEventSecret, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
@@ -88,91 +89,117 @@ const EventKasse = () => {
     }, [])
 
     return (
-        <div className={style.container}>
-            <Typography variant="h4">{EVENT_KASSE}</Typography>
+        <main className={style.container}>
+            <header className={style.header}>
+                <div className={style.titleBlock}>
+                    <Avatar className={style.heroIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                        <PointOfSale />
+                    </Avatar>
+                    <div>
+                        <Typography variant="overline" color="text.secondary">Event Mode</Typography>
+                        <Typography variant="h3">{EVENT_KASSE}</Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            Verkäufe und Guthabenkarten schnell abwickeln.
+                        </Typography>
+                    </div>
+                </div>
+            </header>
             {status?.enabled === false ? (
                 <Alert severity="warning">{EVENT_MODE_DISABLED}</Alert>
             ) : null}
-            <Stack spacing={2} className={style.buttonStack}>
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={() => navigate(`/event/${secret}/kasse/checkout`)}
-                    disabled={!eventEnabled}
-                >
-                    {EVENT_KASSE}
-                </Button>
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={() => navigate(`/event/${secret}/kasse/new-guest`)}
-                    disabled={!eventEnabled}
-                >
-                    {EVENT_NEUER_GAST}
-                </Button>
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={() => navigate(`/event/${secret}/kasse/deposit`)}
-                    disabled={!eventEnabled}
-                >
-                    {EVENT_MARKE_KAUFEN}
-                </Button>
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={() => navigate(`/event/${secret}/kasse/payout`)}
-                    disabled={!eventEnabled}
-                >
-                    {EVENT_RESTGELD_AUSZAHLEN}
-                </Button>
-            </Stack>
+            <div className={style.contentGrid}>
+                <Paper className={style.actionPanel} elevation={2}>
+                    <Typography variant="h5">Aktionen</Typography>
+                    <Typography variant="body2" color="text.secondary">Was möchtest du als Nächstes tun?</Typography>
+                    <div className={style.actionGrid}>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={<PointOfSale />}
+                            onClick={() => navigate(`/event/${secret}/kasse/checkout`)}
+                            disabled={!eventEnabled}
+                        >
+                            Verkauf
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="large"
+                            startIcon={<PersonAdd />}
+                            onClick={() => navigate(`/event/${secret}/kasse/new-guest`)}
+                            disabled={!eventEnabled}
+                        >
+                            {EVENT_NEUER_GAST}
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="large"
+                            startIcon={<AddCard />}
+                            onClick={() => navigate(`/event/${secret}/kasse/deposit`)}
+                            disabled={!eventEnabled}
+                        >
+                            {EVENT_MARKE_KAUFEN}
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="large"
+                            startIcon={<AccountBalanceWallet />}
+                            onClick={() => navigate(`/event/${secret}/kasse/payout`)}
+                            disabled={!eventEnabled}
+                        >
+                            {EVENT_RESTGELD_AUSZAHLEN}
+                        </Button>
+                    </div>
+                </Paper>
 
-            <Paper className={style.section} elevation={2}>
-                <Stack gap={2}>
-                    <Typography variant="h6">{LETZTE_KAEUFE}</Typography>
-                    {transactionsLoading ? (
-                        <Stack gap={2}>
-                            <Skeleton variant="rectangular" height={40} />
-                            <Skeleton variant="rectangular" height={40} />
-                            <Skeleton variant="rectangular" height={40} />
-                        </Stack>
-                    ) : transactions.length === 0 ? (
-                        <Typography variant="body2">-</Typography>
-                    ) : (
-                        <Stack gap={2}>
-                            {groupedTransactions.map((group) => (
-                                <Paper key={group.time} className={style.transactionGroup} elevation={1}>
-                                    <Typography variant="caption" className={style.groupTimestamp}>{group.time}</Typography>
-                                    <List dense>
-                                        {group.items.map((transaction) => (
-                                            <ListItem
-                                                key={transaction.id}
-                                                secondaryAction={isDeletableTransaction(transaction)
-                                                    ? (
-                                                        <IconButton edge="end" onClick={() => undoTransaction(transaction.id)} aria-label={ENTFERNEN} disabled={undoingIds.includes(transaction.id)}>
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                    )
-                                                    : undefined}
-                                            >
-                                                <ListItemText
-                                                    primary={`${transaction.description} (${transaction.amount.toFixed(2)} EUR)`}
-                                                />
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                </Paper>
-                            ))}
-                        </Stack>
-                    )}
-                </Stack>
-            </Paper>
-        </div >
+                <Paper className={style.section} elevation={2}>
+                    <Stack gap={2}>
+                        <div className={style.sectionHeading}>
+                            <div>
+                                <Typography variant="h5">{LETZTE_KAEUFE}</Typography>
+                                <Typography variant="body2" color="text.secondary">Die letzten Buchungen dieser Kasse</Typography>
+                            </div>
+                            <ReceiptLong color="action" />
+                        </div>
+                        {transactionsLoading ? (
+                            <Stack gap={2}>
+                                <Skeleton variant="rectangular" height={56} />
+                                <Skeleton variant="rectangular" height={56} />
+                                <Skeleton variant="rectangular" height={56} />
+                            </Stack>
+                        ) : transactions.length === 0 ? (
+                            <Typography variant="body2" color="text.secondary">Noch keine Käufe vorhanden.</Typography>
+                        ) : (
+                            <Stack gap={2}>
+                                {groupedTransactions.map((group) => (
+                                    <Paper key={group.time} className={style.transactionGroup} variant="outlined">
+                                        <Typography variant="caption" className={style.groupTimestamp}>{group.time}</Typography>
+                                        <List dense disablePadding>
+                                            {group.items.map((transaction) => (
+                                                <ListItem
+                                                    key={transaction.id}
+                                                    secondaryAction={isDeletableTransaction(transaction)
+                                                        ? (
+                                                            <IconButton edge="end" onClick={() => undoTransaction(transaction.id)} aria-label={ENTFERNEN} disabled={undoingIds.includes(transaction.id)}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        )
+                                                        : undefined}
+                                                >
+                                                    <ListItemText
+                                                        primary={transaction.description}
+                                                        secondary={`${transaction.amount.toFixed(2)} EUR`}
+                                                    />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    </Paper>
+                                ))}
+                            </Stack>
+                        )}
+                    </Stack>
+                </Paper>
+            </div>
+        </main>
     )
 }
 

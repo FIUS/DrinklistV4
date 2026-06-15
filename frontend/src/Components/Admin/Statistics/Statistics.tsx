@@ -1,34 +1,100 @@
-import { Button, Slider, Stack, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import StatisticBox from '../../Common/InfoBox/StatisticBox'
-import { BENUTZER_ZAHL, BUDGET, GELD_VERTEILUNG, GESAMT_UMSATZ_GETRAENKE, LETZTE_KAEUFE, MITGLIEDER, TOP_10_GETRAENKE, UMSATZ, UMSATZ_NACH_WOCHENTAG, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n'
-import { Money, Person, VisibilityOff } from '@mui/icons-material'
-import TopDepter from '../Common/TopDepter/TopDepter'
-import { CommonReducerType } from '../../../Reducer/CommonReducer'
+import {
+    Avatar,
+    Button,
+    Paper,
+    Slider,
+    Typography,
+    useMediaQuery,
+    useTheme
+} from '@mui/material'
+import {
+    CalendarMonth,
+    Euro,
+    Groups,
+    LocalBar,
+    LocalFireDepartment,
+    Money,
+    Person,
+    ReceiptLong,
+    VisibilityOff
+} from '@mui/icons-material'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../../../Reducer/reducerCombiner'
-import { dateToString, doGetRequest } from '../../Common/StaticFunctions'
+import {
+    Area,
+    AreaChart,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from 'recharts'
 import { setMembers } from '../../../Actions/CommonAction'
+import { CommonReducerType } from '../../../Reducer/CommonReducer'
+import { RootState } from '../../../Reducer/reducerCombiner'
 import { Transaction } from '../../../types/ResponseTypes'
-import style from './statistics.module.scss';
-import Infobox from '../../Common/InfoBox/Infobox'
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
+import { dateToString, doGetRequest } from '../../Common/StaticFunctions'
 import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import { MITGLIEDER, UMSATZ } from '../../Common/Internationalization/i18n'
+import PauseIcon from '@mui/icons-material/Pause'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import style from './statistics.module.scss'
 
-type Props = {}
+type MetricCardProps = {
+    label: string,
+    value: string,
+    helper?: string,
+    icon: React.ReactNode,
+    accent?: string
+}
 
-const Statistics = (props: Props) => {
+type WeekdayData = {
+    day: string,
+    shortDay: string,
+    revenue: number,
+    purchases: number,
+    average: number
+}
 
-    const common: CommonReducerType = useSelector((state: RootState) => state.common);
+const ignoredDescriptions = [
+    'checkout',
+    'deposit',
+    'transfer',
+    'barzahlung',
+    'auszahlung',
+    'event payout',
+    'payout'
+]
+
+const roundCurrency = (value: number) => Math.round(value * 100) / 100
+
+const MetricCard = ({ label, value, helper, icon, accent = window.globalTS.ICON_COLOR }: MetricCardProps) => (
+    <Paper className={style.metricCard} elevation={1} sx={{ borderTopColor: accent }}>
+        <div className={style.metricContent}>
+            <div>
+                <Typography variant="overline" color="text.secondary">{label}</Typography>
+                <Typography variant="h5" className={style.metricValue}>{value}</Typography>
+                {helper ? <Typography variant="body2" color="text.secondary">{helper}</Typography> : null}
+            </div>
+            <Avatar sx={{ bgcolor: accent }}>{icon}</Avatar>
+        </div>
+    </Paper>
+)
+
+const Statistics = () => {
+    const common: CommonReducerType = useSelector((state: RootState) => state.common)
     const dispatch = useDispatch()
-    const [transactions, settransactions] = useState<Array<Transaction>>([])
-    const [dateRange, setdateRange] = useState([70, 100])
-    const [isRunning, setisRunning] = useState(false)
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+    const [transactions, setTransactions] = useState<Array<Transaction>>([])
+    const [dateRange, setDateRange] = useState<[number, number]>([70, 100])
+    const [isRunning, setIsRunning] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        doGetRequest("users").then((value) => {
+        doGetRequest('users').then((value) => {
             if (value.code === 200) {
                 dispatch(setMembers(value.content))
             }
@@ -36,274 +102,398 @@ const Statistics = (props: Props) => {
     }, [dispatch])
 
     useEffect(() => {
-        doGetRequest("transactions/limit/10000").then((value) => {
-            if (value.code === 200) {
-                const t = (value.content as Array<Transaction>);
-                settransactions(t.reverse())
+        let isActive = true
+
+        doGetRequest('transactions/limit/10000').then((value) => {
+            if (!isActive) {
+                return
             }
+
+            if (value.code === 200) {
+                const sortedTransactions = (value.content as Array<Transaction>)
+                    .slice()
+                    .sort((left, right) => convertToLocalDate(left.date).valueOf() - convertToLocalDate(right.date).valueOf())
+                setTransactions(sortedTransactions)
+            }
+            setIsLoading(false)
         })
-    }, [dispatch])
+
+        return () => {
+            isActive = false
+        }
+    }, [])
 
     useEffect(() => {
-        if (isRunning) {
-            const interval = setInterval(() => {
-                const toSet = [Math.min(dateRange[0] + 1, 99), Math.min(dateRange[1] + 1, 100)]
-                if (toSet[0] === 99 && toSet[1] === 100) {
-                    setisRunning(false)
-                }
-                setdateRange(toSet)
-            }, 1000)
-            return () => clearInterval(interval)
+        if (!isRunning) {
+            return
         }
-    }, [isRunning, dateRange])
 
-    const calcBudget = () => {
-        let budget = 0
-        common.members?.forEach(member => budget += member.balance)
-        return budget
-    }
+        const interval = window.setInterval(() => {
+            setDateRange((currentRange) => {
+                const windowSize = currentRange[1] - currentRange[0]
+                const nextEnd = Math.min(currentRange[1] + 1, 100)
+                const nextStart = Math.max(0, nextEnd - windowSize)
 
-    const calcHiddenUsers = () => {
-        let amount = 0
-        common.members?.forEach(member => amount += member.hidden ? 1 : 0)
-        return amount
-    }
-    //get the upper and lower bound of the date range
-    const transactionsIndices = (): Array<number> => {
-        if (transactions.length === 0) { return [0, 0] }
-        const percent = (transactions.length - 1) / 100
+                if (nextEnd === 100) {
+                    setIsRunning(false)
+                }
+                return [nextStart, nextEnd]
+            })
+        }, 700)
 
-        const lowerBound = Math.floor(dateRange[0] * percent)
-        const upperBound = Math.ceil(dateRange[1] * percent)
-        return [lowerBound, upperBound]
-    }
+        return () => window.clearInterval(interval)
+    }, [isRunning])
 
-    const indices = transactionsIndices()
+    const percentToIndex = useCallback((percent: number) => {
+        if (transactions.length <= 1) {
+            return 0
+        }
+        return Math.round((percent / 100) * (transactions.length - 1))
+    }, [transactions.length])
 
-    const getTransactionHistoryDiagramData = () => {
-        const sortedTransactions = transactions.slice(indices[0], indices[1]).toSorted((value1, value2) => convertToLocalDate(value2.date).valueOf() - convertToLocalDate(value1.date).valueOf())
-        const output = new Map<string, { date: Date, number: number }>()
+    const rangeIndices = useMemo<[number, number]>(() => {
+        return [percentToIndex(dateRange[0]), percentToIndex(dateRange[1])]
+    }, [dateRange, percentToIndex])
 
-        sortedTransactions.forEach(value => {
-            const dateString = dateToString(convertToLocalDate(value.date))
-            const currentValue = output.get(dateString)
-            output.set(dateString, currentValue !== undefined ? { date: convertToLocalDate(value.date), number: currentValue.number + 1 } : { date: convertToLocalDate(value.date), number: 1 })
+    const selectedTransactions = useMemo(() => {
+        if (transactions.length === 0) {
+            return []
+        }
+        return transactions.slice(rangeIndices[0], rangeIndices[1] + 1)
+    }, [rangeIndices, transactions])
+
+    const sales = useMemo(() => {
+        return selectedTransactions.filter((transaction) => {
+            const description = transaction.description.toLocaleLowerCase()
+            return transaction.amount < 0 &&
+                !ignoredDescriptions.some((ignored) => description.includes(ignored))
+        })
+    }, [selectedTransactions])
+
+    const totalBalance = useMemo(() => {
+        return roundCurrency(common.members?.reduce((sum, member) => sum + member.balance, 0) ?? 0)
+    }, [common.members])
+
+    const hiddenUsers = useMemo(() => {
+        return common.members?.filter((member) => member.hidden).length ?? 0
+    }, [common.members])
+
+    const topDebtor = useMemo(() => {
+        if (!common.members?.length) {
+            return null
+        }
+        return common.members.reduce((lowest, member) => member.balance < lowest.balance ? member : lowest)
+    }, [common.members])
+
+    const totalRevenue = useMemo(() => {
+        return roundCurrency(sales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0))
+    }, [sales])
+
+    const averagePurchase = sales.length > 0 ? roundCurrency(totalRevenue / sales.length) : 0
+    const activeBuyers = useMemo(() => new Set(sales.map((transaction) => transaction.memberID)).size, [sales])
+
+    const purchasesByDate = useMemo(() => {
+        const output = new Map<string, { date: Date, purchases: number }>()
+        sales.forEach((transaction) => {
+            const date = convertToLocalDate(transaction.date)
+            const key = dateToString(date)
+            const current = output.get(key)
+            output.set(key, { date, purchases: (current?.purchases ?? 0) + 1 })
         })
 
-        const dataList: Array<{ date: Date, "Anzahl Transaktionen": number }> = []
-        output.forEach((value, _) => dataList.push({ date: value.date, "Anzahl Transaktionen": value.number }))
+        return Array.from(output.values())
+            .sort((left, right) => left.date.valueOf() - right.date.valueOf())
+            .map((entry) => ({
+                date: dateToString(entry.date),
+                Käufe: entry.purchases
+            }))
+    }, [sales])
 
-        const sortedList = dataList.sort((value1, value2) => {
-            const a = (value1.date).valueOf();
-            const b = (value2.date).valueOf();
-            return a - b;
-        }).map((value) => {
-            return { date: dateToString(value.date), "Anzahl Transaktionen": value['Anzahl Transaktionen'] }
-        })
-        return sortedList
-    }
-
-    //Calculate the sales volume per week day
-    const getTransactionHistoryDiagramDataWeekday = () => {
-        //Get the weekday for each transaction and map it to the amount
-        const output: Array<{ day: string, total: number, amount: number, avg: number }> = [
-            { day: "Sonntag", total: 0, amount: 0, avg: 0 },
-            { day: "Montag", total: 0, amount: 0, avg: 0 },
-            { day: "Dienstag", total: 0, amount: 0, avg: 0 },
-            { day: "Mittwoch", total: 0, amount: 0, avg: 0 },
-            { day: "Donnerstag", total: 0, amount: 0, avg: 0 },
-            { day: "Freitag", total: 0, amount: 0, avg: 0 },
-            { day: "Samstag", total: 0, amount: 0, avg: 0 }
+    const weekdayData = useMemo<Array<WeekdayData>>(() => {
+        const output: Array<WeekdayData> = [
+            { day: 'Sonntag', shortDay: 'So', revenue: 0, purchases: 0, average: 0 },
+            { day: 'Montag', shortDay: 'Mo', revenue: 0, purchases: 0, average: 0 },
+            { day: 'Dienstag', shortDay: 'Di', revenue: 0, purchases: 0, average: 0 },
+            { day: 'Mittwoch', shortDay: 'Mi', revenue: 0, purchases: 0, average: 0 },
+            { day: 'Donnerstag', shortDay: 'Do', revenue: 0, purchases: 0, average: 0 },
+            { day: 'Freitag', shortDay: 'Fr', revenue: 0, purchases: 0, average: 0 },
+            { day: 'Samstag', shortDay: 'Sa', revenue: 0, purchases: 0, average: 0 }
         ]
 
-        transactions.slice(indices[0], indices[1]).forEach(value => {
-            if (value.description.includes("Checkout") || value.description.includes("Deposit") || value.description.includes("Transfer")) { return }
-            if (value.amount > 0) { return }
-
-            const weekdayNumber = convertToLocalDate(value.date).getDay()
-
-            //Add the amount to the corresponding weekday
-            output[weekdayNumber].total += Math.abs(value.amount)
-            output[weekdayNumber].amount += 1
+        sales.forEach((transaction) => {
+            const entry = output[convertToLocalDate(transaction.date).getDay()]
+            entry.revenue += Math.abs(transaction.amount)
+            entry.purchases += 1
         })
 
-        //Round the amount to two decimal places
-        output.forEach(value => {
-            value.total = Math.round(value.total * 100) / 100
-        })
-
-        //Calculate the average amount per transaction
-        output.forEach(value => {
-            if (value.amount === 0) {
-                value.avg = 0
-            } else {
-                value.avg = Math.round((value.total / value.amount) * 100) / 100
-            }
+        output.forEach((entry) => {
+            entry.revenue = roundCurrency(entry.revenue)
+            entry.average = entry.purchases > 0 ? roundCurrency(entry.revenue / entry.purchases) : 0
         })
 
         return [output[1], output[2], output[3], output[4], output[5], output[6], output[0]]
+    }, [sales])
 
-    }
+    const strongestWeekday = useMemo(() => {
+        return weekdayData.reduce((strongest, day) => day.revenue > strongest.revenue ? day : strongest, weekdayData[0])
+    }, [weekdayData])
 
-    const getMostBoughtDrinks = () => {
-        const output = new Map<string, number>()
-
-        transactions.slice(indices[0], indices[1]).forEach(value => {
-            if (value.description.includes("Checkout") || value.description.includes("Deposit") || value.description.includes("Transfer")) { return }
-            if (value.amount > 0) { return }
-
-            const drinkName = value.description
-            const currentValue = output.get(drinkName)
-            output.set(drinkName, currentValue !== undefined ? currentValue + 1 : 1)
+    const topDrinks = useMemo(() => {
+        const output = new Map<string, { name: string, purchases: number, revenue: number }>()
+        sales.forEach((transaction) => {
+            const current = output.get(transaction.description)
+            output.set(transaction.description, {
+                name: transaction.description,
+                purchases: (current?.purchases ?? 0) + 1,
+                revenue: roundCurrency((current?.revenue ?? 0) + Math.abs(transaction.amount))
+            })
         })
 
-        const dataList: Array<{ name: string, "amount": number }> = []
-        output.forEach((value, key) => dataList.push({ name: key, "amount": value }))
+        return Array.from(output.values())
+            .sort((left, right) => right.purchases - left.purchases || right.revenue - left.revenue)
+            .slice(0, 10)
+            .reverse()
+    }, [sales])
 
-        const sortedList = dataList.sort((value1, value2) => {
-            return value2["amount"] - value1["amount"]
-        }).slice(0, 10)
-        return sortedList
-    }
+    const balanceData = useMemo(() => {
+        return (common.members ?? [])
+            .slice()
+            .sort((left, right) => left.balance - right.balance)
+            .map((member, index) => ({
+                member: index + 1,
+                Guthaben: roundCurrency(member.balance)
+            }))
+    }, [common.members])
 
-    const totalSales = () => {
-        let sales = 0
-        transactions.slice(indices[0], indices[1]).forEach(value => {
-            if (value.description.includes("Checkout") || value.description.includes("Deposit") || value.description.includes("Transfer")) { return }
-            if (value.amount > 0) { return }
-
-            sales += Math.abs(value.amount)
-
-        })
-        //Round the amount to two decimal places
-        sales = Math.round(sales * 100) / 100
-        return sales
-    }
-
-    const getDateRangeString = () => {
+    const formatRangeDate = (percent: number) => {
         if (transactions.length === 0) {
-            return "??? - ???";
+            return ''
         }
-        const startDate = dateToString(convertToLocalDate(transactions[indices[0]].date));
-        const endDate = dateToString(convertToLocalDate(transactions[indices[1]].date));
-        return `Zeitraum ${startDate} - ${endDate}`;
-    };
+        return dateToString(convertToLocalDate(transactions[percentToIndex(percent)].date))
+    }
+
+    const rangeLabel = transactions.length > 0
+        ? `${formatRangeDate(dateRange[0])} - ${formatRangeDate(dateRange[1])}`
+        : 'Keine Transaktionen verfügbar'
+
+    const togglePlayback = () => {
+        if (!isRunning && dateRange[1] === 100) {
+            const windowSize = Math.max(10, dateRange[1] - dateRange[0])
+            setDateRange([0, Math.min(windowSize, 100)])
+        }
+        setIsRunning((running) => !running)
+    }
+
+    const currencyTooltip = (value: number | string) => `${Number(value).toFixed(2)} €`
+    const chartMargin = isMobile
+        ? { top: 8, right: 4, left: -24, bottom: 0 }
+        : { top: 8, right: 16, left: 0, bottom: 0 }
 
     return (
-        <Stack className={style.container}>
-            <Typography variant="h4">{MITGLIEDER}</Typography>
-            <Stack direction="row" spacing={2} flexWrap={"wrap"}>
-                <StatisticBox
-                    headline={BUDGET}
-                    text={calcBudget().toFixed(2) + "€"}
-                    icon={<Money />}
-                    colorCode={window.globalTS.ICON_COLOR} />
-                <StatisticBox
-                    headline={BENUTZER_ZAHL}
-                    text={common.members ? common.members.length.toString() : "0"}
-                    icon={<Person />}
-                    colorCode={window.globalTS.ICON_COLOR} />
-                <StatisticBox
-                    headline={VERSTECKTE_NUTZER}
-                    text={calcHiddenUsers().toString()}
-                    icon={< VisibilityOff />}
-                    colorCode={window.globalTS.ICON_COLOR} />
-                <TopDepter members={common.members} />
-            </Stack>
-            <Typography variant="h4">{UMSATZ}</Typography>
-            <Infobox headline={GELD_VERTEILUNG} >
-                <AreaChart width={window.innerWidth / 3} height={200} data={common.members?.sort(
-                    (m1, m2) => m1.balance - m2.balance).map(
-                        (value) => {
-                            return {
-                                Guthaben: value.balance
-                            }
-                        }
-                    )
-                }>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <YAxis unit="€" />
-                    <Tooltip contentStyle={{ color: "black" }} />
-                    <Legend />
-                    <Area type="monotone" dataKey="Guthaben" stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
-                </AreaChart >
-            </Infobox>
-            <Stack direction="row" spacing={2} flexWrap={"wrap"} alignItems={"center"}>
-                <Typography variant="overline">{getDateRangeString()}</Typography>
+        <main className={style.container}>
+            <header className={style.header}>
+                <div>
+                    <Typography variant="overline" color="text.secondary">Administration</Typography>
+                    <Typography variant="h4">Statistiken</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Mitglieder, Guthaben und Konsum auf einen Blick
+                    </Typography>
+                </div>
+                <Paper className={style.rangeSummary} variant="outlined">
+                    <CalendarMonth color="action" />
+                    <div>
+                        <Typography variant="caption" color="text.secondary">Ausgewählter Zeitraum</Typography>
+                        <Typography variant="body2" fontWeight={600}>{rangeLabel}</Typography>
+                    </div>
+                </Paper>
+            </header>
 
-                <Button color='success' onClick={() => {
-                    setisRunning(!isRunning)
-                }}>
-                    {!isRunning ? <PlayArrowIcon /> : <PauseIcon />}
-                </Button>
-            </Stack>
+            <section className={style.section}>
+                <Typography variant="h5">{MITGLIEDER}</Typography>
+                <div className={style.metricGrid}>
+                    <MetricCard label="Gesamtguthaben" value={`${totalBalance.toFixed(2)} €`} icon={<Money />} />
+                    <MetricCard label="Mitglieder" value={`${common.members?.length ?? 0}`} icon={<Person />} />
+                    <MetricCard label="Versteckte Nutzer" value={`${hiddenUsers}`} icon={<VisibilityOff />} />
+                    <MetricCard
+                        label="Niedrigstes Guthaben"
+                        value={topDebtor ? `${topDebtor.balance.toFixed(2)} €` : '–'}
+                        helper={topDebtor?.name}
+                        icon={<LocalFireDepartment />}
+                    />
+                </div>
+            </section>
 
-            <Slider
-                style={{ maxWidth: innerWidth - 50 }}
-                getAriaLabel={() => "Zeitraum"}
-                value={dateRange}
-                onChange={(_, value) => {
-                    setdateRange(value as [number, number])
-                }}
-                valueLabelFormat={(value) => {
-                    if (transactions.length === 0) { return "" }
-                    const indices = transactionsIndices()
-                    if (value === dateRange[0]) {
-                        return dateToString(convertToLocalDate(transactions[indices[0]].date))
-                    }
-                    if (value === dateRange[1]) {
-                        return dateToString(convertToLocalDate(transactions[indices[1]].date))
-                    }
+            <section className={style.section}>
+                <div>
+                    <Typography variant="h5">{UMSATZ}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Alle Kennzahlen und Diagramme folgen dem gewählten Zeitraum.
+                    </Typography>
+                </div>
 
+                <Paper className={style.rangeCard} variant="outlined">
+                    <div className={style.rangeHeader}>
+                        <div>
+                            <Typography variant="overline" color="text.secondary">Zeitraum filtern</Typography>
+                            <Typography variant="body1" fontWeight={600}>{rangeLabel}</Typography>
+                        </div>
+                        <Button
+                            variant={isRunning ? 'contained' : 'outlined'}
+                            color="success"
+                            onClick={togglePlayback}
+                            startIcon={isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                            disabled={transactions.length < 2}
+                        >
+                            {isRunning ? 'Pausieren' : 'Abspielen'}
+                        </Button>
+                    </div>
+                    <Slider
+                        getAriaLabel={() => 'Zeitraum'}
+                        value={dateRange}
+                        onChange={(_, value) => {
+                            setIsRunning(false)
+                            setDateRange(value as [number, number])
+                        }}
+                        valueLabelFormat={formatRangeDate}
+                        valueLabelDisplay="auto"
+                        disableSwap
+                        disabled={transactions.length < 2}
+                    />
+                </Paper>
 
-                }
-                }
-                valueLabelDisplay="auto"
-            />
-            <Stack direction="row" spacing={2} flexWrap={"wrap"}>
-                <StatisticBox
-                    headline={GESAMT_UMSATZ_GETRAENKE}
-                    text={totalSales().toFixed(2) + "€"}
-                    icon={<Money />}
-                    colorCode={window.globalTS.ICON_COLOR} />
+                <div className={style.metricGrid}>
+                    <MetricCard label="Getränkeumsatz" value={`${totalRevenue.toFixed(2)} €`} icon={<Euro />} />
+                    <MetricCard label="Verkaufte Getränke" value={`${sales.length}`} icon={<ReceiptLong />} />
+                    <MetricCard label="Ø pro Kauf" value={`${averagePurchase.toFixed(2)} €`} icon={<LocalBar />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
+                    <MetricCard label="Aktive Mitglieder" value={`${activeBuyers}`} helper="mit mindestens einem Kauf" icon={<Groups />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
+                </div>
 
-                <Infobox headline={LETZTE_KAEUFE} >
-                    <AreaChart width={window.innerWidth / 3} height={200} data={getTransactionHistoryDiagramData()}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <YAxis unit="€" />
-                        <XAxis dataKey="date" />
-                        <Tooltip contentStyle={{ color: "black" }} />
-                        <Legend />
-                        <Area type="monotone" dataKey="Anzahl Transaktionen" name='Umsatz' stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
-                    </AreaChart >
-                </Infobox>
-                <Infobox headline={UMSATZ_NACH_WOCHENTAG} >
-                    <AreaChart width={window.innerWidth / 3} height={200} data={getTransactionHistoryDiagramDataWeekday()}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <YAxis unit="€" yAxisId={"left"} />
-                        <YAxis unit="€" yAxisId={"right"} orientation="right" />
-                        <XAxis dataKey="day" />
-                        <Tooltip contentStyle={{ color: "black" }} />
-                        <Legend />
-                        <Area type="monotone" yAxisId="right" dataKey="avg" name='Durchschnittliche Getränkekosten' stroke={window.globalTS.ICON_COLOR_SECONDARY} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR_SECONDARY} />
-                        <Area type="monotone" yAxisId="left" dataKey="amount" name='Umsatz' stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
-                    </AreaChart >
-                </Infobox>
-                <Infobox headline={TOP_10_GETRAENKE} width={window.innerWidth / 3 + "px"}>
-                    <ResponsiveContainer width="95%" height={400}>
-                        <BarChart data={getMostBoughtDrinks().reverse()} layout="vertical" >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <YAxis dataKey="name" type="category" reversed />
-                            <XAxis name="Anzahl Transaktionen" />
-                            <Tooltip contentStyle={{ color: "black" }} />
-                            <Legend />
-                            <Bar name="Anzahl Transaktionen" dataKey="amount" fill={window.globalTS.ICON_COLOR} />
-                        </BarChart >
-                    </ResponsiveContainer>
-                </Infobox>
+                <div className={style.insightGrid}>
+                    <Paper className={style.insightCard} variant="outlined">
+                        <CalendarMonth color="primary" />
+                        <div>
+                            <Typography variant="caption" color="text.secondary">Stärkster Wochentag</Typography>
+                            <Typography variant="h6">{strongestWeekday?.revenue > 0 ? strongestWeekday.day : '–'}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {strongestWeekday?.revenue > 0 ? `${strongestWeekday.revenue.toFixed(2)} € Umsatz` : 'Noch keine Verkäufe'}
+                            </Typography>
+                        </div>
+                    </Paper>
+                    <Paper className={style.insightCard} variant="outlined">
+                        <LocalBar color="primary" />
+                        <div>
+                            <Typography variant="caption" color="text.secondary">Beliebtestes Getränk</Typography>
+                            <Typography variant="h6">{topDrinks.at(-1)?.name ?? '–'}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {topDrinks.at(-1) ? `${topDrinks.at(-1)?.purchases} Käufe` : 'Noch keine Verkäufe'}
+                            </Typography>
+                        </div>
+                    </Paper>
+                </div>
 
-            </Stack>
-        </Stack>
+                {isLoading ? (
+                    <Paper className={style.emptyState} variant="outlined">
+                        <Typography color="text.secondary">Statistiken werden geladen…</Typography>
+                    </Paper>
+                ) : null}
+
+                {!isLoading && transactions.length === 0 ? (
+                    <Paper className={style.emptyState} variant="outlined">
+                        <ReceiptLong color="disabled" />
+                        <Typography variant="h6">Noch keine Transaktionen</Typography>
+                        <Typography color="text.secondary">Sobald Käufe vorhanden sind, erscheinen hier die Auswertungen.</Typography>
+                    </Paper>
+                ) : null}
+
+                {transactions.length > 0 ? (
+                    <div className={style.chartGrid}>
+                        <Paper className={`${style.chartCard} ${style.chartWide}`} elevation={1}>
+                            <div>
+                                <Typography variant="h6">Käufe im Zeitverlauf</Typography>
+                                <Typography variant="body2" color="text.secondary">Anzahl verkaufter Getränke pro Tag</Typography>
+                            </div>
+                            <div className={style.chart}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={purchasesByDate} margin={chartMargin}>
+                                        <defs>
+                                            <linearGradient id="purchaseGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor={window.globalTS.ICON_COLOR} stopOpacity={0.55} />
+                                                <stop offset="95%" stopColor={window.globalTS.ICON_COLOR} stopOpacity={0.05} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="date" minTickGap={isMobile ? 36 : 18} />
+                                        <YAxis allowDecimals={false} />
+                                        <Tooltip contentStyle={{ color: 'black' }} />
+                                        <Area type="monotone" dataKey="Käufe" stroke={window.globalTS.ICON_COLOR} strokeWidth={2} fill="url(#purchaseGradient)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </Paper>
+
+                        <Paper className={style.chartCard} elevation={1}>
+                            <div>
+                                <Typography variant="h6">Umsatz nach Wochentag</Typography>
+                                <Typography variant="body2" color="text.secondary">Welcher Tag trägt am meisten zum Umsatz bei?</Typography>
+                            </div>
+                            <div className={style.chart}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={weekdayData} margin={chartMargin}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey={isMobile ? 'shortDay' : 'day'} />
+                                        <YAxis unit=" €" />
+                                        <Tooltip formatter={currencyTooltip} contentStyle={{ color: 'black' }} />
+                                        <Bar dataKey="revenue" name="Umsatz" fill={window.globalTS.ICON_COLOR_SECONDARY} radius={[6, 6, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </Paper>
+
+                        <Paper className={style.chartCard} elevation={1}>
+                            <div>
+                                <Typography variant="h6">Guthabenverteilung</Typography>
+                                <Typography variant="body2" color="text.secondary">Mitgliederguthaben, vom niedrigsten zum höchsten</Typography>
+                            </div>
+                            <div className={style.chart}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={balanceData} margin={chartMargin}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="member" hide />
+                                        <YAxis unit=" €" />
+                                        <Tooltip formatter={currencyTooltip} labelFormatter={() => 'Guthaben'} contentStyle={{ color: 'black' }} />
+                                        <Area type="monotone" dataKey="Guthaben" stroke={window.globalTS.ICON_COLOR} strokeWidth={2} fill={window.globalTS.ICON_COLOR} fillOpacity={0.22} />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </Paper>
+
+                        <Paper className={`${style.chartCard} ${style.chartWide}`} elevation={1}>
+                            <div>
+                                <Typography variant="h6">Top 10 Getränke</Typography>
+                                <Typography variant="body2" color="text.secondary">Die meistgekauften Getränke im Zeitraum</Typography>
+                            </div>
+                            <div className={style.topDrinksChart}>
+                                {topDrinks.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={topDrinks} layout="vertical" margin={{ top: 8, right: 20, left: isMobile ? 0 : 28, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                            <XAxis type="number" allowDecimals={false} />
+                                            <YAxis dataKey="name" type="category" width={isMobile ? 88 : 130} tick={{ fontSize: isMobile ? 11 : 12 }} />
+                                            <Tooltip contentStyle={{ color: 'black' }} />
+                                            <Bar dataKey="purchases" name="Käufe" fill={window.globalTS.ICON_COLOR} radius={[0, 6, 6, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className={style.chartEmpty}>
+                                        <Typography color="text.secondary">Keine Verkäufe im gewählten Zeitraum</Typography>
+                                    </div>
+                                )}
+                            </div>
+                        </Paper>
+                    </div>
+                ) : null}
+            </section>
+        </main>
     )
 }
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Button, Paper, Stack, Typography } from '@mui/material'
+import { AccountBalanceWallet, ArrowBack, QrCodeScanner } from '@mui/icons-material'
+import { Alert, Avatar, Button, Paper, Stack, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
@@ -98,13 +99,24 @@ const EventKassePayout = () => {
     return (
         <div className={style.container}>
             <div className={style.headerRow}>
-                <Typography variant="h4">{EVENT_RESTGELD_AUSZAHLEN}</Typography>
-                <Button variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
+                <div className={style.titleBlock}>
+                    <Avatar className={style.heroIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                        <AccountBalanceWallet />
+                    </Avatar>
+                    <div>
+                        <Typography variant="overline" color="text.secondary">{EVENT_KASSE}</Typography>
+                        <Typography variant="h3">{EVENT_RESTGELD_AUSZAHLEN}</Typography>
+                        <Typography variant="body1" color="text.secondary">Restguthaben prüfen und vollständig auszahlen.</Typography>
+                    </div>
+                </div>
+                <Button startIcon={<ArrowBack />} variant="outlined" onClick={() => navigate(`/event/${secret}/kasse`)}>{ZURUECK}</Button>
             </div>
 
             {!activeGuest ? (
                 <Paper className={style.section} elevation={2}>
-                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={lookupLoading}>
+                    <Typography variant="h5">Guthabenkarte auswählen</Typography>
+                    <Typography variant="body2" color="text.secondary">Scanne die Karte, deren Restguthaben ausgezahlt wird.</Typography>
+                    <Button startIcon={<QrCodeScanner />} variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={lookupLoading}>
                         {EVENT_SCANNEN}
                     </Button>
                 </Paper>

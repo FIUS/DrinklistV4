@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Button, Typography } from '@mui/material'
+import { Badge, QrCodeScanner } from '@mui/icons-material'
+import { Alert, Avatar, Button, Paper, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { openErrorToast } from '../../Actions/CommonAction'
 import { doGetRequest, doPostRequest } from '../Common/StaticFunctions'
@@ -64,15 +65,32 @@ const EventGuest = () => {
 
     return (
         <>
-
             {memberId === null ? (
                 <div className={style.scanCenter}>
-                    <Button variant="contained" size="large" onClick={() => setScanOpen(true)} disabled={lookupLoading}>{EVENT_SCANNEN}</Button>
+                    <Paper className={style.scanCard} elevation={2}>
+                        <Avatar className={style.scanIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                            <Badge />
+                        </Avatar>
+                        <div>
+                            <Typography variant="overline" color="text.secondary">Event Mode</Typography>
+                            <Typography variant="h3">{EVENT_GAST}</Typography>
+                            <Typography variant="body1" color="text.secondary">
+                                Scanne deine Guthabenkarte, um Kontostand und Käufe zu sehen.
+                            </Typography>
+                        </div>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={<QrCodeScanner />}
+                            onClick={() => setScanOpen(true)}
+                            disabled={lookupLoading}
+                        >
+                            {EVENT_SCANNEN}
+                        </Button>
+                    </Paper>
                 </div>
             ) : (
-                <>
-                    <Details readOnly memberIdOverride={memberId.toString()} />
-                </>
+                <Details readOnly memberIdOverride={memberId.toString()} />
             )}
 
             <EventScanDialog
@@ -81,7 +99,6 @@ const EventGuest = () => {
                 onClose={() => setScanOpen(false)}
                 onScanned={handleScan}
             />
-
         </>
     )
 }

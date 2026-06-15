@@ -207,7 +207,7 @@ const EventSummary = () => {
                 </Stack>
             </div>
 
-            <Stack direction="row" spacing={2} flexWrap="wrap">
+            <div className={style.metricGrid}>
                 <Paper className={style.statBox} elevation={2}>
                     <Typography variant="overline">{UMSATZ}</Typography>
                     <Typography variant="h4">{totalRevenue.toFixed(2)} EUR</Typography>
@@ -232,7 +232,7 @@ const EventSummary = () => {
                         }}>Guthabenkarten Beibehalten</Button>
                     </Stack>
                 </Paper>
-            </Stack>
+            </div>
 
             <div className={style.grid}>
                 <Paper className={style.card} elevation={2}>

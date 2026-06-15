@@ -1,85 +1,185 @@
 @use "../../Common/variables.module.scss";
 
-.balanceContainer {
-    width: fit-content;
+.container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: clamp(16px, 3vw, 32px);
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    gap: variables.$flex-gap;
+    gap: 28px;
+    overflow-x: hidden;
 }
 
-.balanceTop {
+.readOnlyContainer {
+    max-width: none;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.avatar {
+    width: 58px !important;
+    height: 58px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto;
+    line-height: 1 !important;
+}
+
+.identity > div {
+    min-width: 0;
+}
+
+.identity h4,
+.identity p {
+    overflow-wrap: anywhere;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dashboardGrid {
+    display: grid;
+    grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.readOnlyGrid {
+    grid-template-columns: minmax(0, 720px);
+}
+
+.accountColumn,
+.purchaseColumn {
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    padding: variables.$padding;
-    gap: variables.$flex-gap;
-    max-width: 440px;
+    gap: 18px;
+}
+
+.balanceCard {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.balanceLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.historyCard {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.cardHeading,
+.catalogHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+}
+
+.historyItem {
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgb(128 128 128 / 20%);
+}
+
+.historyItem:last-child {
+    border-bottom: 0;
+}
+
+.historyMain {
+    min-width: 0;
+}
+
+.historyMain > span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.historyAmount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+
+.positiveAmount {
+    color: #2e7d32;
+}
+
+.negativeAmount {
+    color: #c62828;
+}
+
+.historyEmpty,
+.emptyState {
+    min-height: 180px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.search {
+    max-width: 720px;
+}
+
+.categoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    align-items: start;
 }
 
 .drinkButtonContainer {
-    display: flex;
-    gap: variables.$flex-gap;
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 65vw;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 12px;
 }
 
 .balanceBoxContainer {
     display: flex;
     flex-direction: column;
-    gap: variables.$flex-gap;
-}
-
-.buyDrinkContainer {
-    display: flex;
-    flex-direction: column;
-    gap: variables.$flex-gap;
-    min-width: 330px;
-    flex-grow: 1;
-}
-
-.buyDrinkContainerInner {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    grid-gap: variables.$flex-gap;
-}
-
-.details {
-    display: flex;
-    gap: calc(3 * variables.$flex-gap);
-    padding: variables.$padding;
-    flex-wrap: wrap;
-}
-
-.historyContainer {
-    display: flex;
-    flex-direction: column;
-    gap: variables.$flex-gap;
-    min-width: 340px;
-    max-width: 410px;
-}
-
-.footer {
-    position: fixed;
-    bottom: 0;
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    padding: calc(variables.$padding/2);
-}
-
-.footerButton {
-    width: 100%;
-}
-
-.deleteContainer {
-    width: fit-content;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
+    gap: 12px;
 }
 
 .recommendationBox {
@@ -90,7 +190,7 @@
     gap: variables.$flex-gap;
 }
 
-.transferBox{
+.transferBox {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -98,17 +198,17 @@
     width: 100%;
 }
 
-.headline{
+.headline {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
-.nameHeadline{
+.nameHeadline {
     display: flex;
 }
 
-.confirmButtonContainer{
+.confirmButtonContainer {
     width: 100%;
     display: flex;
     flex-direction: row-reverse;
@@ -118,6 +218,59 @@ em-emoji-picker {
     max-width: 60vw;
 }
 
-.userList{
+.userList {
     width: 100%;
+}
+
+@media (max-width: 1050px) {
+    .dashboardGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .accountColumn {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .container {
+        padding: 14px;
+        gap: 22px;
+    }
+
+    .header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .headerActions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .headerActions button {
+        flex: 1 1 150px;
+    }
+
+    .accountColumn {
+        display: flex;
+    }
+
+    .balanceCard {
+        padding: 18px;
+    }
+
+    .balanceCard h2 {
+        font-size: 2.8rem;
+    }
+
+    .categoryGrid,
+    .drinkButtonContainer {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .historyItem {
+        align-items: flex-start;
+    }
 }

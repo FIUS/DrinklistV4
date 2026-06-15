@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Paper, Stack, Typography } from '@mui/material'
+import { Assessment, EventAvailable, Person, PointOfSale, QrCode } from '@mui/icons-material'
+import { Alert, Avatar, Button, Chip, Paper, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { doGetRequest } from '../../Common/StaticFunctions'
 import { useDispatch } from 'react-redux'
@@ -10,6 +11,8 @@ import style from './eventMode.module.scss'
 
 type EventCardProps = {
     title: string,
+    description: string,
+    icon: React.ReactNode,
     onOpen: () => void,
     onShowQr?: () => void,
     enabled: boolean
@@ -18,13 +21,23 @@ type EventCardProps = {
 const EventCard = (props: EventCardProps) => {
     return (
         <Paper className={style.card} elevation={2}>
-            <Typography variant="h5">{props.title}</Typography>
-            <Stack spacing={1} className={style.cardActions}>
+            <div className={style.cardHeader}>
+                <Avatar className={style.cardIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                    {props.icon}
+                </Avatar>
+                <div>
+                    <Typography variant="h5">{props.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">{props.description}</Typography>
+                </div>
+            </div>
+            <div className={style.cardActions}>
                 <Button variant="contained" onClick={props.onOpen} disabled={!props.enabled}>{OEFFNEN}</Button>
                 {props.onShowQr ? (
-                    <Button variant="outlined" onClick={props.onShowQr} disabled={!props.enabled}>{EVENT_QR_ANZEIGEN}</Button>
+                    <Button variant="outlined" startIcon={<QrCode />} onClick={props.onShowQr} disabled={!props.enabled}>
+                        {EVENT_QR_ANZEIGEN}
+                    </Button>
                 ) : null}
-            </Stack>
+            </div>
         </Paper>
     )
 }
@@ -66,31 +79,55 @@ const EventMode = () => {
     }
 
     return (
-        <div className={style.container}>
-            <Typography variant="h4">{EVENT_MODE}</Typography>
+        <main className={style.container}>
+            <header className={style.header}>
+                <div className={style.titleBlock}>
+                    <Avatar className={style.heroIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                        <EventAvailable />
+                    </Avatar>
+                    <div>
+                        <Typography variant="overline" color="text.secondary">Veranstaltung</Typography>
+                        <Typography variant="h3">{EVENT_MODE}</Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            Kasse, Gastzugang und Auswertung zentral verwalten.
+                        </Typography>
+                    </div>
+                </div>
+                <Chip
+                    color={enabled ? 'success' : 'default'}
+                    label={loading ? 'Status wird geladen' : enabled ? 'Aktiv' : 'Deaktiviert'}
+                    variant={enabled ? 'filled' : 'outlined'}
+                />
+            </header>
             {!loading && status?.enabled === false ? (
                 <Alert severity="warning">{EVENT_MODE_DISABLED}</Alert>
             ) : null}
             <div className={style.cardRow}>
                 <EventCard
                     title={EVENT_KASSE}
+                    description="Verkäufe, Guthaben und Auszahlungen bearbeiten."
+                    icon={<PointOfSale />}
                     onOpen={() => openEvent('kasse')}
                     onShowQr={() => navigate('/admin/event-mode/qr/kasse')}
                     enabled={enabled}
                 />
                 <EventCard
                     title={EVENT_GAST}
+                    description="Öffentlicher Zugang zur Guthabenkarte."
+                    icon={<Person />}
                     onOpen={() => openEvent('guest')}
                     onShowQr={() => navigate('/admin/event-mode/qr/guest')}
                     enabled={enabled}
                 />
                 <EventCard
                     title={EVENT_ZUSAMMENFASSUNG}
+                    description="Umsatz, Verkäufe und Eventabschluss prüfen."
+                    icon={<Assessment />}
                     onOpen={() => navigate('/admin/event-mode/summary')}
                     enabled={enabled}
                 />
             </div>
-        </div>
+        </main>
     )
 }
 
