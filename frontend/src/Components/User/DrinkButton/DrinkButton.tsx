@@ -20,7 +20,7 @@ import { RootState } from '../../../Reducer/reducerCombiner'
 import { Drink } from '../../../types/ResponseTypes'
 import { ABGESTRICHEN } from '../../Common/Internationalization/i18n'
 import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions'
-import style from './drinkButton.module.scss'
+import style from './drinkbutton.module.scss'
 
 type Props = {
     drink: Drink,
