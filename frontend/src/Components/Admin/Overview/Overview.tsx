@@ -1,197 +1,349 @@
-import { Button, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import SportsBarIcon from '@mui/icons-material/SportsBar';
-import PersonIcon from '@mui/icons-material/Person';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import { Settings } from '@mui/icons-material';
+import {
+    AccountBalance,
+    ArrowForward,
+    InsertChart,
+    Money,
+    Person,
+    ReceiptLong,
+    Settings,
+    SportsBar,
+    VisibilityOff
+} from '@mui/icons-material'
+import { Avatar, ButtonBase, Paper, Typography, useMediaQuery, useTheme } from '@mui/material'
+import React, { useEffect, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import {
+    Area,
+    AreaChart,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from 'recharts'
+import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction'
+import { CommonReducerType } from '../../../Reducer/CommonReducer'
+import { RootState } from '../../../Reducer/reducerCombiner'
+import { Transaction } from '../../../types/ResponseTypes'
+import {
+    ABRECHNUNGEN,
+    EINSTELLUNGEN,
+    GETRAENKE,
+    MITGLIEDER,
+    STATISTIKEN,
+    TRANSAKTIONEN
+} from '../../Common/Internationalization/i18n'
+import { dateToString, doGetRequest } from '../../Common/StaticFunctions'
+import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
 import style from './overview.module.scss'
-import { useNavigate } from 'react-router-dom';
-import Spacer from '../../Common/Spacer';
-import StatisticBox from '../../Common/InfoBox/StatisticBox';
-import { useDispatch, useSelector } from 'react-redux';
-import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { Money, Person, VisibilityOff } from '@mui/icons-material';
-import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
-import { dateToString, doGetRequest } from '../../Common/StaticFunctions';
-import Infobox from '../../Common/InfoBox/Infobox';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
-import TopDepter from '../Common/TopDepter/TopDepter';
-import { RootState } from '../../../Reducer/reducerCombiner';
-import { BENUTZER_ZAHL, BUDGET, EINSTELLUNGEN, GELD_VERTEILUNG, GETRAENKE, LETZTE_100_KAEUFE, MITGLIEDER, TRANSAKTIONEN, VERSTECKTE_NUTZER } from '../../Common/Internationalization/i18n';
-import { Transaction } from '../../../types/ResponseTypes';
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped';
 
+type MetricCardProps = {
+    label: string,
+    value: string,
+    helper?: string,
+    icon: React.ReactNode,
+    accent?: string
+}
 
-type Props = {}
+type NavigationItem = {
+    title: string,
+    description: string,
+    path: string,
+    icon: React.ReactNode
+}
 
-const Overview = (props: Props) => {
-    const navigate = useNavigate();
-    const [transactions, settransactions] = useState<Array<Transaction>>([])
-    const headingType = "h6"
-    const buttonSize = { width: 50, height: 50 }
-    const dispatch = useDispatch();
+const ignoredDescriptions = ['checkout', 'deposit', 'transfer', 'barzahlung', 'auszahlung', 'payout']
 
-    const common: CommonReducerType = useSelector((state: RootState) => state.common);
+const MetricCard = ({ label, value, helper, icon, accent = window.globalTS.ICON_COLOR }: MetricCardProps) => (
+    <Paper className={style.metricCard} elevation={1} sx={{ borderTopColor: accent }}>
+        <div>
+            <Typography variant="overline" color="text.secondary">{label}</Typography>
+            <Typography variant="h5" className={style.metricValue}>{value}</Typography>
+            {helper ? <Typography variant="body2" color="text.secondary">{helper}</Typography> : null}
+        </div>
+        <Avatar sx={{ bgcolor: accent }}>{icon}</Avatar>
+    </Paper>
+)
+
+const Overview = () => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+    const common: CommonReducerType = useSelector((state: RootState) => state.common)
+    const [transactions, setTransactions] = React.useState<Array<Transaction>>([])
 
     useEffect(() => {
-        doGetRequest("transactions/limit/100").then((value) => {
-            if (value.code === 200) {
-                settransactions(value.content)
+        let isActive = true
+
+        doGetRequest('transactions/limit/100').then((value) => {
+            if (isActive && value.code === 200) {
+                setTransactions(value.content as Array<Transaction>)
             }
         })
+
+        return () => {
+            isActive = false
+        }
     }, [])
 
     useEffect(() => {
-        if (common.drinks === null || common.members === null || common.drinkCategories === null) {
-            doGetRequest("drinks").then((value) => {
+        if (common.drinks === null) {
+            doGetRequest('drinks').then((value) => {
                 if (value.code === 200) {
                     dispatch(setDrinks(value.content))
                 }
             })
-            doGetRequest("drinks/categories").then((value) => {
+        }
+
+        if (common.drinkCategories === null) {
+            doGetRequest('drinks/categories').then((value) => {
                 if (value.code === 200) {
                     dispatch(setDrinkCategories(value.content))
                 }
             })
-            doGetRequest("users").then((value) => {
+        }
+
+        if (common.members === null) {
+            doGetRequest('users').then((value) => {
                 if (value.code === 200) {
                     dispatch(setMembers(value.content))
                 }
             })
-            doGetRequest("transactions/limit/100").then((value) => {
-                if (value.code === 200) {
-                    settransactions(value.content)
-                }
-            })
         }
-    }, [common.drinks, common.members, common.drinkCategories, dispatch])
+    }, [common.drinkCategories, common.drinks, common.members, dispatch])
 
-    const calcBudget = () => {
-        let budget = 0
-        common.members?.forEach(member => budget += member.balance)
-        return budget
-    }
+    const totalBalance = useMemo(() => {
+        return common.members?.reduce((sum, member) => sum + member.balance, 0) ?? 0
+    }, [common.members])
 
-    const calcHiddenUsers = () => {
-        let amount = 0
-        common.members?.forEach(member => amount += member.hidden ? 1 : 0)
-        return amount
-    }
+    const hiddenUsers = useMemo(() => {
+        return common.members?.filter((member) => member.hidden).length ?? 0
+    }, [common.members])
 
-    const getDiagramData = () => {
-        const sortedTransactions = transactions.sort((value1, value2) => convertToLocalDate(value2.date).valueOf() - convertToLocalDate(value1.date).valueOf())
-        const output = new Map<string, { date: Date, number: number }>()
+    const lowestBalanceMember = useMemo(() => {
+        if (!common.members?.length) {
+            return null
+        }
+        return common.members.reduce((lowest, member) => member.balance < lowest.balance ? member : lowest)
+    }, [common.members])
 
-        sortedTransactions.forEach(value => {
-            const dateString = dateToString(convertToLocalDate(value.date))
-            const currentValue = output.get(dateString)
-            output.set(dateString, currentValue !== undefined ? { date: convertToLocalDate(value.date), number: currentValue.number + 1 } : { date: convertToLocalDate(value.date), number: 1 })
+    const sales = useMemo(() => {
+        return transactions.filter((transaction) => {
+            const description = transaction.description.toLocaleLowerCase()
+            return transaction.amount < 0 &&
+                !ignoredDescriptions.some((ignored) => description.includes(ignored))
+        })
+    }, [transactions])
+
+    const recentRevenue = useMemo(() => {
+        return sales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0)
+    }, [sales])
+
+    const purchasesByDate = useMemo(() => {
+        const output = new Map<string, { date: Date, purchases: number }>()
+
+        sales.forEach((transaction) => {
+            const date = convertToLocalDate(transaction.date)
+            const dateLabel = dateToString(date)
+            const current = output.get(dateLabel)
+            output.set(dateLabel, {
+                date,
+                purchases: (current?.purchases ?? 0) + 1
+            })
         })
 
-        const dataList: Array<{ date: Date, "Anzahl Transaktionen": number }> = []
-        output.forEach((value, _) => dataList.push({ date: value.date, "Anzahl Transaktionen": value.number }))
+        return Array.from(output.values())
+            .sort((left, right) => left.date.valueOf() - right.date.valueOf())
+            .map((entry) => ({
+                date: dateToString(entry.date),
+                Käufe: entry.purchases
+            }))
+    }, [sales])
 
-        const sortedList = dataList.sort((value1, value2) => {
-            const a = (value1.date).valueOf();
-            const b = (value2.date).valueOf();
-            return a - b;
-        }).map((value) => {
-            return { date: dateToString(value.date), "Anzahl Transaktionen": value['Anzahl Transaktionen'] }
-        })
-        return sortedList
-    }
+    const balanceData = useMemo(() => {
+        return (common.members ?? [])
+            .slice()
+            .sort((left, right) => left.balance - right.balance)
+            .map((member, index) => ({
+                member: index + 1,
+                Guthaben: Math.round(member.balance * 100) / 100
+            }))
+    }, [common.members])
+
+    const navigationItems: Array<NavigationItem> = [
+        {
+            title: GETRAENKE,
+            description: 'Sortiment, Preise und Bestand verwalten',
+            path: '/admin/drinks',
+            icon: <SportsBar />
+        },
+        {
+            title: MITGLIEDER,
+            description: 'Konten, Guthaben und Zugänge verwalten',
+            path: '/admin/members',
+            icon: <Person />
+        },
+        {
+            title: TRANSAKTIONEN,
+            description: 'Buchungen prüfen und rückgängig machen',
+            path: '/admin/transactions',
+            icon: <ReceiptLong />
+        },
+        {
+            title: ABRECHNUNGEN,
+            description: 'Abrechnungen erstellen und einsehen',
+            path: '/admin/checkout',
+            icon: <AccountBalance />
+        },
+        {
+            title: STATISTIKEN,
+            description: 'Umsatz und Konsum genauer auswerten',
+            path: '/admin/statistics',
+            icon: <InsertChart />
+        },
+        {
+            title: EINSTELLUNGEN,
+            description: 'Drinklist konfigurieren und anpassen',
+            path: '/admin/settings',
+            icon: <Settings />
+        }
+    ]
+
+    const chartMargin = isMobile
+        ? { top: 8, right: 4, left: -24, bottom: 0 }
+        : { top: 8, right: 16, left: 0, bottom: 0 }
 
     return (
-        <>
-            <div className={style.overview}>
-                <StatisticBox
-                    headline={BUDGET}
-                    text={calcBudget().toFixed(2) + "€"}
-                    icon={<Money />}
-                    colorCode={window.globalTS.ICON_COLOR} />
-                <StatisticBox
-                    headline={BENUTZER_ZAHL}
-                    text={common.members ? common.members.length.toString() : "0"}
-                    icon={<Person />}
-                    colorCode={window.globalTS.ICON_COLOR} />
-                <StatisticBox
-                    headline={VERSTECKTE_NUTZER}
-                    text={calcHiddenUsers().toString()}
-                    icon={< VisibilityOff />}
-                    colorCode={window.globalTS.ICON_COLOR} />
-                <TopDepter members={common.members} />
-                <Infobox headline={GELD_VERTEILUNG} >
-                    <AreaChart width={window.innerWidth / 3} height={200} data={common.members?.sort(
-                        (m1, m2) => m1.balance - m2.balance).map(
-                            (value) => {
-                                return {
-                                    Guthaben: value.balance
-                                }
-                            }
-                        )
-                    }>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <YAxis unit="€" />
-                        <Tooltip contentStyle={{ color: "black" }} />
-                        <Legend />
-                        <Area type="monotone" dataKey="Guthaben" stroke={window.globalTS.ICON_COLOR} fillOpacity={0.5} fill={window.globalTS.ICON_COLOR} />
-                    </AreaChart >
-                </Infobox>
-                <Infobox headline={LETZTE_100_KAEUFE} >
-                    <BarChart width={window.innerWidth / 3} height={200} data={getDiagramData()}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <YAxis dataKey="Anzahl Transaktionen" />
-                        <XAxis dataKey="date" />
-                        <Tooltip contentStyle={{ color: "black" }} />
-                        <Legend />
-                        <Bar dataKey="Anzahl Transaktionen" fill={window.globalTS.ICON_COLOR} />
-                    </BarChart >
-                </Infobox>
-            </div>
-            <div className={style.overview}>
-                <Button
-                    size="large"
-                    className={style.button}
-                    variant='contained'
-                    onClick={() => navigate("drinks")}
-                >
-                    <SportsBarIcon sx={buttonSize} />
-                    <Spacer horizontal={10} />
-                    <Typography variant={headingType}>{GETRAENKE}</Typography>
+        <main className={style.container}>
+            <header className={style.header}>
+                <div>
+                    <Typography variant="overline" color="text.secondary">Administration</Typography>
+                    <Typography variant="h4">Übersicht</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Die wichtigsten Zahlen und Bereiche deiner Drinklist
+                    </Typography>
+                </div>
+                <Paper className={style.activitySummary} variant="outlined">
+                    <ReceiptLong color="action" />
+                    <div>
+                        <Typography variant="caption" color="text.secondary">Letzte 100 Transaktionen</Typography>
+                        <Typography variant="body2" fontWeight={600}>
+                            {sales.length} Käufe · {recentRevenue.toFixed(2)} € Umsatz
+                        </Typography>
+                    </div>
+                </Paper>
+            </header>
 
-                </Button>
-                <Button
-                    size="large"
-                    className={style.button}
-                    variant='contained'
-                    onClick={() => navigate("members")}
-                >
-                    <PersonIcon sx={buttonSize} />
-                    <Spacer horizontal={10} />
-                    <Typography variant={headingType}>{MITGLIEDER}</Typography>
-                </Button>
-                <Button
-                    size="large"
-                    className={style.button}
-                    variant='contained'
-                    onClick={() => navigate("transactions")}
-                >
-                    <ReceiptLongIcon sx={buttonSize} />
-                    <Spacer horizontal={10} />
-                    <Typography variant={headingType}>{TRANSAKTIONEN}</Typography>
-                </Button>
-                <Button
-                    size="large"
-                    className={style.button}
-                    variant='contained'
-                    onClick={() => navigate("settings")}
-                >
-                    <Settings sx={buttonSize} />
-                    <Spacer horizontal={10} />
-                    <Typography variant={headingType}>{EINSTELLUNGEN}</Typography>
-                </Button>
-            </div>
-        </>
+            <section className={style.section}>
+                <Typography variant="h5">Auf einen Blick</Typography>
+                <div className={style.metricGrid}>
+                    <MetricCard label="Gesamtguthaben" value={`${totalBalance.toFixed(2)} €`} icon={<Money />} />
+                    <MetricCard label="Mitglieder" value={`${common.members?.length ?? 0}`} icon={<Person />} />
+                    <MetricCard label="Versteckte Nutzer" value={`${hiddenUsers}`} icon={<VisibilityOff />} />
+                    <MetricCard
+                        label="Niedrigstes Guthaben"
+                        value={lowestBalanceMember ? `${lowestBalanceMember.balance.toFixed(2)} €` : '–'}
+                        helper={lowestBalanceMember?.name}
+                        icon={<AccountBalance />}
+                        accent={window.globalTS.ICON_COLOR_SECONDARY}
+                    />
+                </div>
+            </section>
+
+            <section className={style.section}>
+                <div>
+                    <Typography variant="h5">Schnellzugriff</Typography>
+                    <Typography variant="body2" color="text.secondary">Direkt zum gewünschten Verwaltungsbereich</Typography>
+                </div>
+                <div className={style.navigationGrid}>
+                    {navigationItems.map((item) => (
+                        <ButtonBase
+                            key={item.path}
+                            className={style.navigationButton}
+                            onClick={() => navigate(item.path)}
+                            focusRipple
+                        >
+                            <Paper className={style.navigationCard} elevation={1}>
+                                <Avatar className={style.navigationIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
+                                    {item.icon}
+                                </Avatar>
+                                <div className={style.navigationText}>
+                                    <Typography variant="h6">{item.title}</Typography>
+                                    <Typography variant="body2" color="text.secondary">{item.description}</Typography>
+                                </div>
+                                <ArrowForward className={style.navigationArrow} color="action" />
+                            </Paper>
+                        </ButtonBase>
+                    ))}
+                </div>
+            </section>
+
+            <section className={style.section}>
+                <div>
+                    <Typography variant="h5">Aktuelle Entwicklung</Typography>
+                    <Typography variant="body2" color="text.secondary">Ein kompakter Blick auf Guthaben und die letzten Käufe</Typography>
+                </div>
+                <div className={style.chartGrid}>
+                    <Paper className={style.chartCard} elevation={1}>
+                        <div>
+                            <Typography variant="h6">Guthabenverteilung</Typography>
+                            <Typography variant="body2" color="text.secondary">Vom niedrigsten zum höchsten Guthaben</Typography>
+                        </div>
+                        <div className={style.chart}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={balanceData} margin={chartMargin}>
+                                    <defs>
+                                        <linearGradient id="adminBalanceGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={window.globalTS.ICON_COLOR} stopOpacity={0.48} />
+                                            <stop offset="95%" stopColor={window.globalTS.ICON_COLOR} stopOpacity={0.04} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="member" hide />
+                                    <YAxis unit=" €" />
+                                    <Tooltip labelFormatter={() => 'Guthaben'} contentStyle={{ color: 'black' }} />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="Guthaben"
+                                        stroke={window.globalTS.ICON_COLOR}
+                                        strokeWidth={2}
+                                        fill="url(#adminBalanceGradient)"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </Paper>
+
+                    <Paper className={style.chartCard} elevation={1}>
+                        <div>
+                            <Typography variant="h6">Letzte Käufe</Typography>
+                            <Typography variant="body2" color="text.secondary">Verkaufte Getränke pro Tag</Typography>
+                        </div>
+                        <div className={style.chart}>
+                            {purchasesByDate.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={purchasesByDate} margin={chartMargin}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="date" minTickGap={isMobile ? 36 : 18} />
+                                        <YAxis allowDecimals={false} />
+                                        <Tooltip contentStyle={{ color: 'black' }} />
+                                        <Bar dataKey="Käufe" fill={window.globalTS.ICON_COLOR_SECONDARY} radius={[6, 6, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className={style.chartEmpty}>
+                                    <Typography color="text.secondary">Noch keine Käufe vorhanden</Typography>
+                                </div>
+                            )}
+                        </div>
+                    </Paper>
+                </div>
+            </section>
+        </main>
     )
 }
 

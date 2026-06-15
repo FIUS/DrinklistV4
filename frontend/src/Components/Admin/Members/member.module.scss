@@ -1,54 +1,302 @@
 @use "../../Common/variables.module.scss";
 
-.table {
-    padding: variables.$padding;
-}
-
-.newMemberContainer{
-    margin-left: variables.$padding !important;
-    margin-right: variables.$padding !important;
-    max-width: none;
-    width: 100%;
+.container {
     box-sizing: border-box;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: clamp(16px, 3vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    overflow-x: hidden;
 }
 
-.firstRowAlign {
+.header {
     display: flex;
-    align-items: flex-end;
-    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.resultSummary {
+    min-width: 240px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.metricGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.metricCard {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 126px;
+    padding: 18px;
+    border-top: 3px solid;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.metricValue {
+    margin: 3px 0 2px !important;
+    overflow-wrap: anywhere;
+}
+
+.createGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.createCard {
+    min-width: 0;
+    border-radius: 4px !important;
+    overflow: hidden;
+}
+
+.accordionHeading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.createDetails {
+    padding: 8px 20px 20px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.scanPrompt {
+    min-height: 180px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.directoryCard {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.filterBar {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid;
+    border-color: rgb(128 128 128 / 25%);
+}
+
+.nameFilter {
+    width: min(100%, 360px);
+}
+
+.idFilter {
+    width: 120px;
+}
+
+.sortButton {
+    min-width: 0 !important;
+    padding: 4px 0 !important;
+    color: inherit !important;
+    text-transform: none !important;
+    gap: 6px;
+}
+
+.tableIdentity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.identityText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.smallAvatar {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.9rem !important;
+}
+
+.memberAvatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto;
+    padding: 0 !important;
+    line-height: 1 !important;
+    text-align: center;
+    letter-spacing: 0;
+}
+
+.memberNameButton {
+    min-width: 0 !important;
+    padding: 0 !important;
+    color: inherit !important;
+    text-transform: none !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    overflow-wrap: anywhere;
+}
+
+.memberActions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
     flex-wrap: wrap;
+}
+
+.memberActions > button {
+    min-width: 36px;
+    padding: 6px;
 }
 
 .hidden {
-    background-color: rgba(0, 0, 0, 0.103);
+    background-color: rgb(128 128 128 / 11%);
 }
 
-.statisticBoxes {
+.memberList {
+    padding: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+.memberCard {
+    padding: 16px;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: variables.$flex-gap;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.searchID {
-    width: 80px;
-}
-
-.searchName {
-    width: 200px;
-}
-
-.newUserBoxInputs {
+.memberCardHeader {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: variables.$flex-gap;
-    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.memberIdentity {
+    display: flex;
     align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
 
-    & > * {
-        flex: 1 1 240px;
-        min-width: 200px;
+.memberBalance {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.memberCard .memberActions {
+    padding-top: 10px;
+    border-top: 1px solid rgb(128 128 128 / 20%);
+    justify-content: flex-start;
+}
+
+.emptyState {
+    min-height: 220px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+}
+
+@media (max-width: 1100px) {
+    .createGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: variables.$COMPACT_SIZE_THRESHOLD) {
+    .header {
+        flex-direction: column;
+    }
+
+    .resultSummary {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .metricGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .container {
+        padding: 14px;
+        gap: 24px;
+    }
+
+    .formGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .filterBar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .nameFilter,
+    .idFilter {
+        width: 100%;
+    }
+
+    .filterBar button {
+        align-self: flex-start;
+    }
+
+    .memberCardHeader {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: variables.$PHONE_SIZE_THRESHOLD) {
+    .metricGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .metricCard {
+        min-height: 112px;
     }
 }

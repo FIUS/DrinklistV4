@@ -22,12 +22,23 @@ export const stringToColor = (string: String) => {
     return color;
 }
 
-export const calculateAvatarText = (text: String) => {
-    const emojiFilterd = text.match(/\p{Emoji}+/gu)
-    const emoji = emojiFilterd ? emojiFilterd[0] : "?"
-    const short = text.substring(0, 2)
+const avatarEmojiPattern = /(?:\p{Regional_Indicator}{2}|\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?)*)/u
 
-    return emoji !== "?" ? emoji : short
+export const calculateAvatarText = (text: String, fallbackText: String = "") => {
+    const primary = text.toString()
+    const fallback = fallbackText.toString()
+    const emoji = primary.match(avatarEmojiPattern)?.[0] ?? fallback.match(avatarEmojiPattern)?.[0]
+
+    if (emoji) {
+        return emoji
+    }
+
+    const source = primary.trim() || fallback.trim()
+    const letters = source.match(/\p{L}/gu)
+    const initials = letters?.slice(0, 2).join("") ||
+        Array.from(source.replace(/\s+/g, "")).slice(0, 2).join("")
+
+    return initials.toLocaleUpperCase() || "?"
 }
 
 export const convertToLocalDate = (date: string) => {
