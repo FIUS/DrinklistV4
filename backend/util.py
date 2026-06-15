@@ -212,7 +212,7 @@ def get_event_secret_candidates():
     yesterday = today - datetime.timedelta(days=1)
     return [
         get_event_secret_for_date(today),
-        get_event_secret_for_date(yesterday)
+        #get_event_secret_for_date(yesterday)
     ]
 
 
