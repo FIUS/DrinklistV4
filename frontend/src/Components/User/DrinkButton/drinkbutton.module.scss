@@ -1,64 +1,64 @@
-@use "../../Common/variables.module.scss";
+.badge {
+    width: 100%;
+}
 
-.container {
+.card {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 86px;
     display: flex;
-    align-items: center;
-    gap: variables.$flex-gap;
+    align-items: stretch;
+    overflow: hidden;
+    transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-.button {
-    min-width: 300px;
-    min-height: 70px;
-    padding: 0px !important;
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 12%);
 }
 
-.innerbutton {
+.purchaseButton {
+    min-width: 0;
+    flex: 1;
+    padding: 14px 16px !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+}
+
+.drinkInfo {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
-    min-width: 250px;
-    min-height: 60px;
-    padding-top: calc(variables.$padding/2);
-    padding-left: calc(variables.$padding);
-    padding-bottom: calc(variables.$padding/2);
+    gap: 8px;
 }
 
-.innerbuttonContainer {
+.drinkInfo h6 {
+    overflow-wrap: anywhere;
+}
+
+.facts {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    position: relative;
-    min-width: 130px;
-    min-height: 30px;
+    gap: 14px;
+    flex-wrap: wrap;
 }
 
-.tag {
-    position: absolute;
+.facts span {
     display: flex;
-    flex-direction: row;
     align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    opacity: 0.82;
 }
 
-.pricetag {
-    @extend .tag;
-    left: 0px;
+.favoriteButton {
+    width: 52px;
+    border-radius: 0 !important;
+    border-left: 1px solid rgb(128 128 128 / 20%) !important;
 }
 
-.stockTag {
-    @extend .tag;
-    left: 80px;
-}
-
-.rating {
-    width: 50px !important;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
-
-.favouriteIcon {
-    width: 90% !important;
-    height: 90% !important;
+.generatedIcon {
+    width: 16px !important;
+    height: 16px !important;
 }

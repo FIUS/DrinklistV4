@@ -1,33 +1,79 @@
 .container {
-    padding: 24px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: clamp(16px, 3vw, 36px);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    max-width: 520px;
+    gap: 28px;
 }
 
 .headerRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
+.titleBlock {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.heroIcon {
+    width: 60px !important;
+    height: 60px !important;
+    flex: 0 0 auto;
+}
+
 .section {
-    padding: 16px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: clamp(18px, 3vw, 28px);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
 
 .balanceCard {
-    padding: 16px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: clamp(20px, 4vw, 36px);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    border-left: 5px solid var(--event-accent, #ecb365);
 }
 
 .actions {
     flex-wrap: wrap;
+}
+
+.actions button {
+    min-width: 140px;
+}
+
+@media (max-width: 600px) {
+    .headerRow {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .titleBlock {
+        align-items: flex-start;
+    }
+
+    .heroIcon {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    .headerRow > button,
+    .section button,
+    .actions,
+    .actions button {
+        width: 100%;
+    }
 }

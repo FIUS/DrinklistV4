@@ -18,7 +18,7 @@ import {
     ReceiptLong,
     VisibilityOff
 } from '@mui/icons-material'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     Area,
@@ -144,16 +144,16 @@ const Statistics = () => {
         return () => window.clearInterval(interval)
     }, [isRunning])
 
-    const percentToIndex = (percent: number) => {
+    const percentToIndex = useCallback((percent: number) => {
         if (transactions.length <= 1) {
             return 0
         }
         return Math.round((percent / 100) * (transactions.length - 1))
-    }
+    }, [transactions.length])
 
     const rangeIndices = useMemo<[number, number]>(() => {
         return [percentToIndex(dateRange[0]), percentToIndex(dateRange[1])]
-    }, [dateRange, transactions.length])
+    }, [dateRange, percentToIndex])
 
     const selectedTransactions = useMemo(() => {
         if (transactions.length === 0) {

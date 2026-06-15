@@ -44,14 +44,14 @@ const BalanceBox = (props: Props) => {
                     {showAdditionalDrink ? <DrinkButton
                         drink={generatedFavorite !== undefined ? generatedFavorite : common.drinks![0]}
                         memberID={props.memberID}
-                        key={props.memberID}
+                        key={`generated-${generatedFavorite?.id ?? props.memberID}`}
                         isGeneratedFavorite={true}
                         onPurchased={props.onPurchased}
                     /> : <></>}
-                    {props.favorites?.sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).map((value) => {
+                    {props.favorites?.slice().sort((drink1, drink2) => drink1.name.localeCompare(drink2.name)).map((value) => {
                         return <DrinkButton drink={value}
                             memberID={props.memberID}
-                            key={props.memberID}
+                            key={value.id}
                             isGeneratedFavorite={favorite?.drinkID === value.id}
                             onPurchased={props.onPurchased}
                         />

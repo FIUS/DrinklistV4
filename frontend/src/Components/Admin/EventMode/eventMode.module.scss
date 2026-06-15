@@ -1,21 +1,64 @@
 .container {
-    padding: 24px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: clamp(16px, 3vw, 36px);
     display: flex;
     flex-direction: column;
+    gap: 28px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.titleBlock,
+.cardHeader {
+    display: flex;
+    align-items: center;
     gap: 16px;
+    min-width: 0;
+}
+
+.heroIcon {
+    width: 64px !important;
+    height: 64px !important;
+    flex: 0 0 auto;
+}
+
+.heroIcon svg {
+    font-size: 2rem;
 }
 
 .cardRow {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
 }
 
 .card {
-    padding: 16px;
+    box-sizing: border-box;
+    min-height: 230px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 24px;
+    border: 1px solid rgba(127, 127, 127, 0.18);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+}
+
+.cardIcon {
+    width: 52px !important;
+    height: 52px !important;
+    flex: 0 0 auto;
 }
 
 .cardActions {
@@ -24,7 +67,36 @@
     flex-wrap: wrap;
 }
 
-.url {
-    word-break: break-all;
-    color: #555;
+.cardActions button {
+    flex: 1 1 150px;
+}
+
+@media (max-width: 1000px) {
+    .cardRow {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .titleBlock {
+        align-items: flex-start;
+    }
+
+    .heroIcon {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    .card {
+        padding: 18px;
+    }
 }

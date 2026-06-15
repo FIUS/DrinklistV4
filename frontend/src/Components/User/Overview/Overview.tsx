@@ -1,182 +1,205 @@
-import { Box, Fab, FormControl, Grow, Slide, TextField, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { History, PersonSearch, Search } from '@mui/icons-material'
+import { InputAdornment, Paper, TextField, Typography } from '@mui/material'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction'
+import { CommonReducerType } from '../../../Reducer/CommonReducer'
+import { RootState } from '../../../Reducer/reducerCombiner'
+import { Transaction } from '../../../types/ResponseTypes'
+import { WER_BIST_DU } from '../../Common/Internationalization/i18n'
+import { datetimeToString, doGetRequest } from '../../Common/StaticFunctions'
 import UserButton from '../UserButton/UserButton'
 import style from './overview.module.scss'
-import { useDispatch, useSelector } from 'react-redux';
-import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { datetimeToString, doGetRequest } from '../../Common/StaticFunctions';
-import { setDrinkCategories, setDrinks, setMembers } from '../../../Actions/CommonAction';
-import { RootState } from '../../../Reducer/reducerCombiner';
-import { NAME, WER_BIST_DU } from '../../Common/Internationalization/i18n';
-import { Member, Transaction } from '../../../types/ResponseTypes';
-import HistoryIcon from '@mui/icons-material/History';
-import Spacer from '../../Common/Spacer';
-import { useNavigate } from 'react-router-dom';
 
-type Props = {}
-
-const Overview = (props: Props) => {
+const Overview = () => {
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootState) => state.common);
-    const [searchfield, setsearchfield] = useState("")
-    const anchor = React.useRef(null);
-    const [history, sethistory] = useState<Array<Transaction> | null>(null)
     const navigate = useNavigate()
-
-    const memberHistoryName = () => {
-        const member = common.members?.find((member) => historyItemToDisplay?.memberID === member.id)
-        if (member?.alias !== "") {
-            return member?.alias
-        }
-        else return member.name
-    }
-
-    const [historyState, sethistoryState] = useState(0)
-    const historyItemToDisplay = history?.at(Math.floor(historyState / 3))
+    const common: CommonReducerType = useSelector((state: RootState) => state.common)
+    const [searchField, setSearchField] = useState('')
+    const [history, setHistory] = useState<Array<Transaction>>([])
 
     useEffect(() => {
-
-        setTimeout(() => {
-            sethistoryState((historyState + 1) % 9)
-        }, (historyState % 3 === 1) ? 10000 : 200);
-
-    }, [historyState])
-
-    useEffect(() => {
-        doGetRequest("transactions/limit/10").then((value) => {
-            if (value.code === 200) {
-                const transactions: Array<Transaction> = value.content;
-                const filteredTransactions = transactions.filter((transaction) => {
-                    let nameMatches = false;
-                    common.drinks?.forEach((drink) => {
-                        if (transaction.description.toLocaleLowerCase().includes(drink.name.toLocaleLowerCase())) {
-                            nameMatches = true;
-                        }
-                    })
-                    return nameMatches;
-                })
-                sethistory(filteredTransactions)
-            }
-        })
-    }, [common.drinks])
-
-
-    useEffect(() => {
-        if (common.drinks === null || common.members === null || common.drinkCategories === null) {
-            doGetRequest("drinks").then((value) => {
+        if (common.drinks === null) {
+            doGetRequest('drinks').then((value) => {
                 if (value.code === 200) {
                     dispatch(setDrinks(value.content))
                 }
             })
-            doGetRequest("drinks/categories").then((value) => {
+        }
+        if (common.drinkCategories === null) {
+            doGetRequest('drinks/categories').then((value) => {
                 if (value.code === 200) {
                     dispatch(setDrinkCategories(value.content))
                 }
             })
-            doGetRequest("users").then((value) => {
+        }
+        if (common.members === null) {
+            doGetRequest('users').then((value) => {
                 if (value.code === 200) {
                     dispatch(setMembers(value.content))
                 }
             })
         }
-    }, [common.drinks, common.members, common.drinkCategories, dispatch])
+    }, [common.drinkCategories, common.drinks, common.members, dispatch])
 
-    const userVisible = (member: Member) => {
-        return (searchfield === "" ||
-            member.name.toLowerCase().includes(searchfield.toLowerCase()) ||
-            member.alias.toLowerCase().includes(searchfield.toLowerCase())) && !member.hidden
-    }
-
-    const exactSearchMatch = (member: Member) => {
-        return (member.name.toLowerCase() === (searchfield.toLowerCase()) ||
-            member.alias.toLowerCase() === (searchfield.toLowerCase())) && searchfield !== ""
-    }
-
-    const historyBox = () => {
-        if (history !== null && window.innerWidth > window.globalTS.MOBILE_THRESHOLD && history.length > 2) {
-            return <Box sx={{ position: 'fixed', bottom: '10px', left: '10px' }}>
-                <Fab variant="extended"
-                    size="medium"
-                    color="default"
-                    ref={anchor}
-                    className={style.historyContainer}
-                >
-                    <HistoryIcon />
-                    <Spacer horizontal={10} />
-
-                    <Slide in={(historyState % 3) === 1}
-                        container={anchor.current}
-                        direction={(historyState % 3) < 2 ? "down" : "up"}
-                        timeout={200}>
-                        <Typography>
-                            {memberHistoryName() + " - " + historyItemToDisplay?.description + " - " + datetimeToString(historyItemToDisplay?.date)}
-                        </Typography>
-                    </Slide>
-                </Fab>
-
-
-            </Box>
-        } else {
-            return <></>
+    useEffect(() => {
+        if (!common.drinks) {
+            return
         }
+
+        doGetRequest('transactions/limit/10').then((value) => {
+            if (value.code !== 200) {
+                return
+            }
+
+            const drinkNames = common.drinks.map((drink) => drink.name.toLocaleLowerCase())
+            const purchases = (value.content as Array<Transaction>).filter((transaction) => {
+                const description = transaction.description.toLocaleLowerCase()
+                return drinkNames.some((drinkName) => description.includes(drinkName))
+            })
+            setHistory(purchases)
+        })
+    }, [common.drinks])
+
+    const normalizedSearch = searchField.trim().toLocaleLowerCase()
+
+    const visibleMembers = useMemo(() => {
+        return (common.members ?? [])
+            .filter((member) => {
+                const matchesSearch = normalizedSearch === '' ||
+                    member.name.toLocaleLowerCase().includes(normalizedSearch) ||
+                    member.alias.toLocaleLowerCase().includes(normalizedSearch)
+                const exactSearchMatch = normalizedSearch !== '' &&
+                    (member.name.toLocaleLowerCase() === normalizedSearch ||
+                        member.alias.toLocaleLowerCase() === normalizedSearch)
+                return (!member.hidden && matchesSearch) || exactSearchMatch
+            })
+            .slice()
+            .sort((left, right) => {
+                const leftName = left.alias || left.name
+                const rightName = right.alias || right.name
+                return leftName.localeCompare(rightName)
+            })
+    }, [common.members, normalizedSearch])
+
+    const memberName = (memberID: number) => {
+        const member = common.members?.find((item) => item.id === memberID)
+        return member?.alias || member?.name || `Mitglied #${memberID}`
     }
 
     const redirectToUser = () => {
-        const visibleUsers = common.members?.filter(value => {
-            if ((!value.hidden || (exactSearchMatch(value))) && (userVisible(value) || exactSearchMatch(value))) {
-                return true
-            }
-            return false
-        })
-        if (visibleUsers?.length === 1) {
-            navigate("/user/" + visibleUsers[0].id)
+        if (visibleMembers.length === 1) {
+            navigate(`/user/${visibleMembers[0].id}`)
         }
     }
 
     return (
-        <>
-            <div className={style.outterContainer}>
-                <div className={style.headline}>
-                    <Typography variant='h4'>{WER_BIST_DU}</Typography>
+        <main className={style.container}>
+            <header className={style.hero}>
+                <div className={style.heroIcon} style={{ backgroundColor: window.globalTS.ICON_COLOR }}>
+                    <PersonSearch />
                 </div>
-                <form className={style.textfieldForm} noValidate autoComplete="off" onSubmit={(event) => { event.preventDefault(); redirectToUser() }}>
-                    <FormControl className={style.form}>
-                        <TextField
-                            className={style.input}
-                            placeholder={NAME}
-                            type="search"
-                            value={searchfield}
-                            autoFocus
-                            fullWidth
-                            onChange={
-                                (value) => { setsearchfield(value.target.value) }
-                            }
-                        />
-                    </FormControl>
-                </form>
-                <div className={style.buttonArea}>
-                    {common.members?.sort((value1, value2) => {
-                        const name1 = value1.alias !== "" ? value1.alias : value1.name
-                        const name2 = value2.alias !== "" ? value2.alias : value2.name
-                        return name1.localeCompare(name2)
-                    }
-                    )?.map(value => {
-                        if (!value.hidden || (exactSearchMatch(value))) {
-                            return <Grow in={userVisible(value) || exactSearchMatch(value)} key={value.id} unmountOnExit>
-                                <div style={{ width: "100%" }}>
-                                    <UserButton key={value.id} name={value.alias === "" ? value.name : value.alias} id={value.id} />
-                                </div>
-                            </Grow>
-                        }
-                        return <></>
-                    })}
+                <div>
+                    <Typography variant="overline" color="text.secondary">Drinklist</Typography>
+                    <Typography variant="h3">{WER_BIST_DU}</Typography>
+                    <Typography variant="body1" color="text.secondary">
+                        Suche deinen Namen und öffne dein persönliches Getränkekonto.
+                    </Typography>
                 </div>
+            </header>
 
-            </div >
-            {historyBox()}
-        </>
+            <form
+                className={style.searchForm}
+                noValidate
+                autoComplete="off"
+                onSubmit={(event) => {
+                    event.preventDefault()
+                    redirectToUser()
+                }}
+            >
+                <TextField
+                    label="Name oder Alias"
+                    type="search"
+                    value={searchField}
+                    autoFocus
+                    fullWidth
+                    onChange={(event) => setSearchField(event.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Search />
+                            </InputAdornment>
+                        )
+                    }}
+                />
+            </form>
+
+            <div className={style.contentGrid}>
+                <section className={style.memberSection}>
+                    <div className={style.sectionHeading}>
+                        <div>
+                            <Typography variant="h5">Mitglieder</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {visibleMembers.length} Treffer
+                            </Typography>
+                        </div>
+                    </div>
+
+                    {visibleMembers.length > 0 ? (
+                        <div className={style.memberGrid}>
+                            {visibleMembers.map((member) => (
+                                <UserButton key={member.id} member={member} />
+                            ))}
+                        </div>
+                    ) : (
+                        <Paper className={style.emptyState} variant="outlined">
+                            <Search color="disabled" fontSize="large" />
+                            <Typography variant="h6">Niemand gefunden</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Prüfe den Namen oder Alias.
+                            </Typography>
+                        </Paper>
+                    )}
+                </section>
+
+                <aside className={style.activitySection}>
+                    <div className={style.sectionHeading}>
+                        <div>
+                            <Typography variant="h5">Letzte Käufe</Typography>
+                            <Typography variant="body2" color="text.secondary">Was zuletzt abgestrichen wurde</Typography>
+                        </div>
+                        <History color="action" />
+                    </div>
+                    <Paper className={style.activityCard} elevation={1}>
+                        {history.slice(0, 5).map((transaction) => (
+                            <div className={style.activityItem} key={transaction.id}>
+                                <div>
+                                    <Typography variant="body2" fontWeight={600}>
+                                        {transaction.description}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {memberName(transaction.memberID)}
+                                    </Typography>
+                                </div>
+                                <Typography variant="caption" color="text.secondary">
+                                    {datetimeToString(transaction.date)}
+                                </Typography>
+                            </div>
+                        ))}
+                        {history.length === 0 ? (
+                            <div className={style.activityEmpty}>
+                                <History color="disabled" />
+                                <Typography variant="body2" color="text.secondary">
+                                    Noch keine Käufe vorhanden
+                                </Typography>
+                            </div>
+                        ) : null}
+                    </Paper>
+                </aside>
+            </div>
+        </main>
     )
 }
 
 export default Overview
-//

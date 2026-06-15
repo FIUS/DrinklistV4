@@ -1,0 +1,52 @@
+.dialog {
+    border-radius: 18px !important;
+    overflow: hidden;
+}
+
+.title {
+    padding: 22px 24px 12px !important;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 10px !important;
+}
+
+.scanner {
+    width: 100%;
+    min-height: 260px;
+    overflow: hidden;
+    border: 1px solid rgba(127, 127, 127, 0.24);
+    border-radius: 14px;
+    background: #111;
+}
+
+.scanner > div {
+    width: 100%;
+}
+
+.scanner :global(video) {
+    border-radius: 12px;
+}
+
+.error {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgb(211 47 47 / 10%);
+}
+
+.actions {
+    padding: 12px 24px 22px !important;
+}
+
+@media (max-width: 600px) {
+    .scanner {
+        min-height: 220px;
+    }
+
+    .actions button {
+        flex: 1;
+    }
+}

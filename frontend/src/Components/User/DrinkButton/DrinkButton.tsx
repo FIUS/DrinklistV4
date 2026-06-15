@@ -1,19 +1,26 @@
-import { Badge, Box, Button, Typography } from '@mui/material'
+import {
+    Favorite,
+    Inventory2Outlined,
+    SellOutlined
+} from '@mui/icons-material'
+import { Badge, ButtonBase, IconButton, Paper, Tooltip, Typography } from '@mui/material'
 import React from 'react'
-import style from './drinkbutton.module.scss'
-import Rating from '@mui/material/Rating';
-import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import Spacer from '../../Common/Spacer';
-import { Drink } from '../../../types/ResponseTypes';
-import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions';
-import { openErrorToast, openToast, setDrinks, setFavorites, setHistory, setMembers } from '../../../Actions/CommonAction';
-import { useDispatch, useSelector } from 'react-redux';
-import { CommonReducerType } from '../../../Reducer/CommonReducer';
-import { RootState } from '../../../Reducer/reducerCombiner';
-import { format } from 'react-string-format';
-import { ABGESTRICHEN } from '../../Common/Internationalization/i18n';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useDispatch, useSelector } from 'react-redux'
+import { format } from 'react-string-format'
+import {
+    openErrorToast,
+    openToast,
+    setDrinks,
+    setFavorites,
+    setHistory,
+    setMembers
+} from '../../../Actions/CommonAction'
+import { CommonReducerType } from '../../../Reducer/CommonReducer'
+import { RootState } from '../../../Reducer/reducerCombiner'
+import { Drink } from '../../../types/ResponseTypes'
+import { ABGESTRICHEN } from '../../Common/Internationalization/i18n'
+import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions'
+import style from './drinkButton.module.scss'
 
 type Props = {
     drink: Drink,
@@ -22,103 +29,89 @@ type Props = {
     onPurchased?: () => void,
 }
 
-const DrinkButton = (props: Props) => {
+const DrinkButton = ({ drink, memberID, isGeneratedFavorite, onPurchased }: Props) => {
     const dispatch = useDispatch()
-    const common: CommonReducerType = useSelector((state: RootState) => state.common);
+    const common: CommonReducerType = useSelector((state: RootState) => state.common)
+    const isFavorite = common.favorites?.includes(drink.id) ?? false
+
+    const purchase = () => {
+        doPostRequest('drinks/buy', {
+            drinkID: drink.id,
+            memberID
+        }).then((value) => {
+            if (value.code !== 200) {
+                dispatch(openErrorToast())
+                return
+            }
+
+            dispatch(openToast({ message: format(ABGESTRICHEN, drink.name) }))
+            doGetRequest('drinks').then((response) => {
+                if (response.code === 200) {
+                    dispatch(setDrinks(response.content))
+                }
+            })
+            doGetRequest(`users/${memberID}/history`).then((response) => {
+                if (response.code === 200) {
+                    dispatch(setHistory(response.content))
+                }
+            })
+            doGetRequest('users').then((response) => {
+                if (response.code === 200) {
+                    dispatch(setMembers(response.content))
+                }
+            })
+            onPurchased?.()
+        })
+    }
+
+    const toggleFavorite = () => {
+        const action = isFavorite ? 'remove' : 'add'
+        const method = isFavorite ? 'DELETE' : 'PUT'
+
+        doRequest(method, `users/${memberID}/favorites/${action}/${drink.id}`, '').then((value) => {
+            if (value.code === 200) {
+                doGetRequest(`users/${memberID}/favorites`).then((response) => {
+                    if (response.code === 200) {
+                        dispatch(setFavorites(response.content))
+                    }
+                })
+            }
+        })
+    }
 
     return (
-        <Badge color="error"
-            badgeContent={<FavoriteIcon className={style.favouriteIcon} />}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            sx={{
-                '& .MuiBadge-badge': {
-                    width: 29,
-                },
-            }}
-            invisible={!props.isGeneratedFavorite}
+        <Badge
+            className={style.badge}
+            color="error"
+            badgeContent={<Favorite className={style.generatedIcon} />}
+            invisible={!isGeneratedFavorite}
         >
-            <Box className={style.container} >
-
-                <Button className={style.button} variant='contained'>
-                    <div className={style.innerbutton} onClick={() => {
-                        doPostRequest("drinks/buy",
-                            {
-                                drinkID: props.drink.id,
-                                memberID: props.memberID
-                            }).then(value => {
-                                if (value.code === 200) {
-                                    dispatch(openToast({ message: format(ABGESTRICHEN, props.drink.name) }))
-                                    doGetRequest("drinks").then((value) => {
-                                        if (value.code === 200) {
-                                            dispatch(setDrinks(value.content))
-                                        }
-                                    })
-                                    doGetRequest("users/" + props.memberID + "/history").then((value) => {
-                                        if (value.code === 200) {
-                                            dispatch(setHistory(value.content))
-                                        }
-                                    })
-                                    doGetRequest("users").then((value) => {
-                                        if (value.code === 200) {
-                                            dispatch(setMembers(value.content))
-                                        }
-                                    })
-                                    if (props.onPurchased) {
-                                        props.onPurchased()
-                                    }
-                                } else {
-                                    dispatch(openErrorToast())
-                                }
-                            })
-                    }}>
-                        <Typography variant='h6'>
-                            {props.drink.name}
-                        </Typography>
-                        <div className={style.innerbuttonContainer}>
-                            <div className={style.pricetag} >
-                                <SellOutlinedIcon />
-                                <Spacer horizontal={5} />
-                                {props.drink.price.toFixed(2)}€
-                            </div>
-                            <div className={style.stockTag}>
-                                <Inventory2OutlinedIcon />
-                                <Spacer horizontal={5} />
-                                {props.drink.stock}
-                            </div>
+            <Paper className={style.card} elevation={1}>
+                <ButtonBase className={style.purchaseButton} onClick={purchase} focusRipple>
+                    <div className={style.drinkInfo}>
+                        <Typography variant="h6">{drink.name}</Typography>
+                        <div className={style.facts}>
+                            <span>
+                                <SellOutlined fontSize="small" />
+                                {drink.price.toFixed(2)} €
+                            </span>
+                            <span>
+                                <Inventory2Outlined fontSize="small" />
+                                Bestand {drink.stock}
+                            </span>
                         </div>
                     </div>
-
-                    <Rating
-
-                        className={style.rating}
-                        value={common.favorites?.includes(props.drink.id) ? 1 : 0}
-                        max={1}
-                        onChange={
-                            () => {
-                                let url = "add"
-                                let method = "PUT"
-                                if (common.favorites?.includes(props.drink.id)) {
-                                    url = "remove"
-                                    method = "DELETE"
-                                }
-                                doRequest(method, "users/" + props.memberID + "/favorites/" + url + "/" + props.drink.id, "").then(value => {
-                                    if (value.code === 200) {
-                                        doGetRequest("users/" + props.memberID + "/favorites").then((value) => {
-                                            if (value.code === 200) {
-                                                dispatch(setFavorites(value.content))
-                                            }
-                                        })
-                                    }
-                                })
-
-                            }
-                        } />
-                </Button>
-
-            </Box>
+                </ButtonBase>
+                <Tooltip title={isFavorite ? 'Favorit entfernen' : 'Als Favorit markieren'}>
+                    <IconButton
+                        className={style.favoriteButton}
+                        color={isFavorite ? 'error' : 'default'}
+                        onClick={toggleFavorite}
+                    >
+                        <Favorite />
+                    </IconButton>
+                </Tooltip>
+            </Paper>
         </Badge>
     )
 }

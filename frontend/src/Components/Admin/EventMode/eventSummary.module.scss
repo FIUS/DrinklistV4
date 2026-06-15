@@ -1,10 +1,10 @@
 .container {
-    padding: 24px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: clamp(16px, 3vw, 36px);
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    background: white;
-    color: black;
+    gap: 24px;
 }
 
 .header {
@@ -19,17 +19,25 @@
     flex-wrap: wrap;
 }
 
+.metricGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 0.7fr)) minmax(280px, 1.3fr);
+    gap: 18px;
+}
+
 .statBox {
-    padding: 16px;
-    min-width: 180px;
+    padding: 22px;
+    min-width: 0;
+    border-top: 4px solid var(--event-accent, #ecb365);
 }
 
 .closeBox {
-    padding: 16px;
-    min-width: 240px;
+    padding: 22px;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    border-top: 4px solid #d32f2f;
 }
 
 .printView {
@@ -41,18 +49,19 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
 }
 
 .hourGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 20px;
 }
 
 .card {
-    padding: 16px;
+    min-width: 0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -60,12 +69,58 @@
 }
 
 .chartCard {
-    padding: 16px;
+    min-width: 0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     min-height: 380px;
     break-inside: avoid;
+}
+
+@media (max-width: 980px) {
+    .metricGrid,
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+    }
+
+    .actions,
+    .actions button {
+        width: 100%;
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .actions > * {
+        margin-left: 0 !important;
+    }
+
+    .statBox,
+    .closeBox,
+    .card,
+    .chartCard {
+        padding: 16px;
+    }
+
+    .chartCard {
+        min-height: 340px;
+    }
+}
+
+@media (max-width: 420px) {
+    .actions {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media print {

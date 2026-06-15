@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
 import { Html5Qrcode } from 'html5-qrcode'
 import { ABBRECHEN, ERROR_MESSAGE, EVENT_MANUELL, EVENT_QR_CODE_UNGUELTIG, EVENT_QR_VERSION_FALSCH, OK } from '../Common/Internationalization/i18n'
+import style from './eventScanDialog.module.scss'
 
 type Props = {
     open: boolean,
@@ -185,11 +186,20 @@ const EventScanDialog = (props: Props) => {
     }
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth keepMounted>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogContent>
-                <div id={regionId} style={{ width: '100%' }} />
-                {error ? <Typography color="error" variant="body2">{error}</Typography> : <></>}
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+            keepMounted
+            PaperProps={{ className: style.dialog }}
+        >
+            <DialogTitle className={style.title}>{title}</DialogTitle>
+            <DialogContent className={style.content}>
+                <div className={style.scanner}>
+                    <div id={regionId} />
+                </div>
+                {error ? <Typography className={style.error} color="error" variant="body2">{error}</Typography> : null}
                 <TextField
                     label={EVENT_MANUELL}
                     value={manualCode}
@@ -201,7 +211,7 @@ const EventScanDialog = (props: Props) => {
                     autoFocus={false}
                 />
             </DialogContent>
-            <DialogActions>
+            <DialogActions className={style.actions}>
                 <Button onClick={onClose}>{ABBRECHEN}</Button>
                 <Button variant="contained" onClick={submitManual}>{OK}</Button>
             </DialogActions>
