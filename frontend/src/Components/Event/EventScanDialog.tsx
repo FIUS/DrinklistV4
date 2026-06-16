@@ -185,6 +185,11 @@ const EventScanDialog = (props: Props) => {
         }
     }
 
+    const submitManualForm = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        submitManual()
+    }
+
     return (
         <Dialog
             open={open}
@@ -195,26 +200,28 @@ const EventScanDialog = (props: Props) => {
             PaperProps={{ className: style.dialog }}
         >
             <DialogTitle className={style.title}>{title}</DialogTitle>
-            <DialogContent className={style.content}>
-                <div className={style.scanner}>
-                    <div id={regionId} />
-                </div>
-                {error ? <Typography className={style.error} color="error" variant="body2">{error}</Typography> : null}
-                <TextField
-                    label={EVENT_MANUELL}
-                    value={manualCode}
-                    onChange={(event) => setManualCode(event.target.value)}
-                    inputRef={(el: HTMLInputElement) => { manualRef.current = el }}
-                    fullWidth
-                    margin="dense"
-                    autoComplete="off"
-                    autoFocus={false}
-                />
-            </DialogContent>
-            <DialogActions className={style.actions}>
-                <Button onClick={onClose}>{ABBRECHEN}</Button>
-                <Button variant="contained" onClick={submitManual}>{OK}</Button>
-            </DialogActions>
+            <form className={style.form} noValidate autoComplete="off" onSubmit={submitManualForm}>
+                <DialogContent className={style.content}>
+                    <div className={style.scanner}>
+                        <div id={regionId} />
+                    </div>
+                    {error ? <Typography className={style.error} color="error" variant="body2">{error}</Typography> : null}
+                    <TextField
+                        label={EVENT_MANUELL}
+                        value={manualCode}
+                        onChange={(event) => setManualCode(event.target.value)}
+                        inputRef={(el: HTMLInputElement) => { manualRef.current = el }}
+                        fullWidth
+                        margin="dense"
+                        autoComplete="off"
+                        autoFocus={false}
+                    />
+                </DialogContent>
+                <DialogActions className={style.actions}>
+                    <Button type="button" onClick={onClose}>{ABBRECHEN}</Button>
+                    <Button variant="contained" type="submit">{OK}</Button>
+                </DialogActions>
+            </form>
         </Dialog>
     )
 }
