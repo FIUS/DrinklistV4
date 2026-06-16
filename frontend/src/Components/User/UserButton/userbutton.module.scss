@@ -8,11 +8,11 @@
 .card {
     box-sizing: border-box;
     width: 100%;
-    min-height: 92px;
-    padding: 16px;
+    min-height: 78px;
+    padding: 12px;
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 10px;
     transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
@@ -23,6 +23,8 @@
 }
 
 .avatar {
+    width: 36px !important;
+    height: 36px !important;
     flex: 0 0 auto;
     display: inline-flex !important;
     align-items: center !important;
@@ -42,4 +44,13 @@
 .identity span {
     max-width: 100%;
     overflow-wrap: anywhere;
+}
+
+.identity h6 {
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.card > svg {
+    font-size: 1.2rem;
 }
