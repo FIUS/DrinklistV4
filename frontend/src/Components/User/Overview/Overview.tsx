@@ -96,44 +96,48 @@ const Overview = () => {
 
     return (
         <main className={style.container}>
-            <header className={style.hero}>
-                <div className={style.heroIcon} style={{ backgroundColor: window.globalTS.ICON_COLOR }}>
-                    <PersonSearch />
-                </div>
-                <div>
-                    <Typography variant="overline" color="text.secondary">Drinklist</Typography>
-                    <Typography variant="h3">{WER_BIST_DU}</Typography>
-                    <Typography variant="body1" color="text.secondary">
-                        Suche deinen Namen und öffne dein persönliches Getränkekonto.
-                    </Typography>
-                </div>
-            </header>
+            <div className={style.heroRow}>
+                <div className={style.heroMain}>
+                    <header className={style.hero}>
+                        <div className={style.heroIcon} style={{ backgroundColor: window.globalTS.ICON_COLOR }}>
+                            <PersonSearch />
+                        </div>
+                        <div>
+                            <Typography variant="overline" color="text.secondary">Drinklist</Typography>
+                            <Typography variant="h3">{WER_BIST_DU}</Typography>
+                            <Typography variant="body1" color="text.secondary">
+                                Suche deinen Namen und öffne dein persönliches Getränkekonto.
+                            </Typography>
+                        </div>
+                    </header>
 
-            <form
-                className={style.searchForm}
-                noValidate
-                autoComplete="off"
-                onSubmit={(event) => {
-                    event.preventDefault()
-                    redirectToUser()
-                }}
-            >
-                <TextField
-                    label="Name oder Alias"
-                    type="search"
-                    value={searchField}
-                    autoFocus
-                    fullWidth
-                    onChange={(event) => setSearchField(event.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search />
-                            </InputAdornment>
-                        )
-                    }}
-                />
-            </form>
+                    <form
+                        className={style.searchForm}
+                        noValidate
+                        autoComplete="off"
+                        onSubmit={(event) => {
+                            event.preventDefault()
+                            redirectToUser()
+                        }}
+                    >
+                        <TextField
+                            label="Name oder Alias"
+                            type="search"
+                            value={searchField}
+                            autoFocus
+                            fullWidth
+                            onChange={(event) => setSearchField(event.target.value)}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    </form>
+                </div>
+            </div>
 
             <div className={style.contentGrid}>
                 <section className={style.memberSection}>
