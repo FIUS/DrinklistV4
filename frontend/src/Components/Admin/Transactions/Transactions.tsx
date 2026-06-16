@@ -70,6 +70,18 @@ const MetricCard = ({ label, value, helper, icon, accent = window.globalTS.ICON_
     </Paper>
 )
 
+const memberLabel = (transaction: Transaction) => {
+    if (transaction.memberName) {
+        return transaction.memberName
+    }
+
+    if (transaction.memberID !== null && transaction.memberID !== undefined) {
+        return `Mitglied #${transaction.memberID}`
+    }
+
+    return 'Unbekanntes Mitglied'
+}
+
 const Transactions = () => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -102,7 +114,7 @@ const Transactions = () => {
         const dateFilter = searchDate.trim().toLocaleLowerCase()
 
         return transactions.filter((transaction) => {
-            const member = transaction.memberName ?? transaction.memberID.toString()
+            const member = memberLabel(transaction)
             const date = datetimeToString(convertToLocalDate(transaction.date))
 
             return (!descriptionFilter || transaction.description.toLocaleLowerCase().includes(descriptionFilter)) &&
@@ -141,10 +153,6 @@ const Transactions = () => {
             return 'Teil einer Abrechnung'
         }
         return RUECKGAENGIG
-    }
-
-    const memberLabel = (transaction: Transaction) => {
-        return transaction.memberName ?? `Mitglied #${transaction.memberID}`
     }
 
     const amountClass = (amount: number) => amount >= 0 ? style.positiveAmount : style.negativeAmount
