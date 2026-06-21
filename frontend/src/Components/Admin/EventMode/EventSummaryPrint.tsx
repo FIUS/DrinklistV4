@@ -8,6 +8,7 @@ import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
 import style from './eventSummary.module.scss'
 import Spacer from '../../Common/Spacer'
+import { formatMoney } from '../../Common/StaticFunctionsTyped'
 
 const ignoredDescriptions = ['Checkout', 'Deposit', 'Transfer', 'Barzahlung', 'Auszahlung', 'Event payout', 'Payout']
 
@@ -91,7 +92,7 @@ const EventSummaryPrint = () => {
         })
     }, [transactions])
 
-    const totalRevenue = useMemo(() => Math.round(transactionSales.reduce((sum, t) => sum + Math.abs(t.amount), 0) * 100) / 100, [transactionSales])
+    const totalRevenue = useMemo(() => transactionSales.reduce((sum, t) => sum + Math.abs(t.amount), 0), [transactionSales])
     const totalSoldItems = transactionSales.length
 
     const itemRows = useMemo(() => {
@@ -101,24 +102,24 @@ const EventSummaryPrint = () => {
             const amount = Math.abs(transaction.amount)
             if (current) {
                 current.sold += 1
-                current.revenue = Math.round((current.revenue + amount) * 100) / 100
+                current.revenue += amount
                 return
             }
-            rows.set(transaction.description, { name: transaction.description, sold: 1, revenue: Math.round(amount * 100) / 100 })
+            rows.set(transaction.description, { name: transaction.description, sold: 1, revenue: amount })
         })
         return Array.from(rows.values()).sort((l, r) => r.sold - l.sold || r.revenue - l.revenue)
     }, [transactionSales])
 
     const itemLinesWithTotals = useMemo(() => {
         return itemRows.map(r => {
-            const unitPrice = drinkPriceByName.get(r.name) ?? (r.revenue / r.sold)
-            const lineTotal = Math.round(unitPrice * r.sold * 100) / 100
+            const unitPrice = drinkPriceByName.get(r.name) ?? Math.round(r.revenue / r.sold)
+            const lineTotal = Math.round(unitPrice * r.sold)
             return { ...r, unitPrice, lineTotal }
         })
     }, [itemRows, drinkPriceByName])
 
     const sumOfItems = useMemo(() => {
-        return itemLinesWithTotals.reduce((s, r) => Math.round((s + r.lineTotal) * 100) / 100, 0)
+        return itemLinesWithTotals.reduce((s, r) => s + r.lineTotal, 0)
     }, [itemLinesWithTotals])
 
     const categoryRows = useMemo(() => {
@@ -129,10 +130,10 @@ const EventSummaryPrint = () => {
             const amount = Math.abs(transaction.amount)
             if (current) {
                 current.sold += 1
-                current.revenue = Math.round((current.revenue + amount) * 100) / 100
+                current.revenue += amount
                 return
             }
-            rows.set(category, { name: category, sold: 1, revenue: Math.round(amount * 100) / 100 })
+            rows.set(category, { name: category, sold: 1, revenue: amount })
         })
         return Array.from(rows.values()).sort((l, r) => r.sold - l.sold || r.revenue - l.revenue)
     }, [transactionSales, drinkCategoryByName])
@@ -173,13 +174,13 @@ const EventSummaryPrint = () => {
             <Typography variant="h4">Endabrechnung</Typography>
             <Typography variant="body2">{chartDate}</Typography>
 
-            <Typography variant="h6" sx={{ mt: 2 }}>Umsatz: {totalRevenue.toFixed(2)} EUR</Typography>
+            <Typography variant="h6" sx={{ mt: 2 }}>Umsatz: {formatMoney(totalRevenue)} EUR</Typography>
             <Typography variant="h6">Verkauft: {totalSoldItems}</Typography>
 
             <Typography variant="h6" sx={{ mt: 2 }}>Artikel</Typography>
             <pre>
                 {(() => {
-                    const lines = itemLinesWithTotals.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.unitPrice.toFixed(2).padStart(6)} = ${r.lineTotal.toFixed(2).padStart(8)} EUR`)
+                    const lines = itemLinesWithTotals.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${formatMoney(r.unitPrice).padStart(6)} = ${formatMoney(r.lineTotal).padStart(8)} EUR`)
                     const sumLabel = 'Summe'
                     const nameAreaLength = 40 + 1 // name padded to 40 + one space in template
                     const partBeforeLineTotal = 1 + 4 + 3 + 6 + 3 // spaces+qty+' x '+unitPrice+' = '
@@ -187,7 +188,7 @@ const EventSummaryPrint = () => {
                     const totalLineLength = lines.length > 0 ? lines[0].length : estimatedTotalLength
                     const separator = ' '.repeat(nameAreaLength) + '-'.repeat(Math.max(0, totalLineLength - nameAreaLength))
                     const padForSumLabel = nameAreaLength + partBeforeLineTotal
-                    const sumAmount = sumOfItems.toFixed(2).padStart(8)
+                    const sumAmount = formatMoney(sumOfItems).padStart(8)
                     lines.push(separator)
                     lines.push(sumLabel.padEnd(padForSumLabel) + sumAmount + ' EUR')
                     return lines.join('\n')
@@ -196,7 +197,7 @@ const EventSummaryPrint = () => {
 
             <Typography variant="h6" sx={{ mt: 2 }}>Pro Kategorie</Typography>
             <pre>
-                {categoryRows.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${r.revenue.toFixed(2).padStart(8)} EUR`).join('\n')}
+                {categoryRows.map(r => `${r.name.padEnd(40)} ${r.sold.toString().padStart(4)} x ${formatMoney(r.revenue).padStart(8)} EUR`).join('\n')}
             </pre>
             <Spacer vertical={25} />
             <Stack flexDirection="row" gap={2}>

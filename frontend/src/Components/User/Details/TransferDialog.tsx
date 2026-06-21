@@ -21,7 +21,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Picker from '@emoji-mart/react'
 
 import style from './details.module.scss'
-import { safeMemberName } from '../../Common/StaticFunctionsTyped';
+import { parseMoneyInputToCents, safeMemberName } from '../../Common/StaticFunctionsTyped';
 import UserBox from './UserBox';
 import TransferSummary from './TransferSummary';
 
@@ -38,6 +38,7 @@ const TransferDialog = (props: Props) => {
     const [search, setsearch] = useState("")
     const [reason, setreason] = useState<string | null>(null)
     const [amount, setamount] = useState(0)
+    const [amountInput, setAmountInput] = useState("")
     const [chosenEmoji, setChosenEmoji] = useState<string>("💸");
     const [transferButtonDisabled, settransferButtonDisabled] = useState(false)
     const dispatch = useDispatch();
@@ -46,6 +47,7 @@ const TransferDialog = (props: Props) => {
         setselectedUser({ "name": "", "id": -1 })
         setChosenEmoji("💸")
         setamount(0)
+        setAmountInput("")
         setreason(null)
         settransferButtonDisabled(false)
     }
@@ -120,7 +122,11 @@ const TransferDialog = (props: Props) => {
                     label={BETRAG}
                     variant='outlined'
                     type='number'
-                    onChange={(value) => { setamount(parseFloat(value.target.value)) }}
+                    value={amountInput}
+                    onChange={(value) => {
+                        setAmountInput(value.target.value)
+                        setamount(parseMoneyInputToCents(value.target.value))
+                    }}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">€</InputAdornment>,
                     }}

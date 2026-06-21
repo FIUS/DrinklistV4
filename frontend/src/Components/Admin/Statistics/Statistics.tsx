@@ -36,7 +36,7 @@ import { CommonReducerType } from '../../../Reducer/CommonReducer'
 import { RootState } from '../../../Reducer/reducerCombiner'
 import { Transaction } from '../../../types/ResponseTypes'
 import { dateToString, doGetRequest } from '../../Common/StaticFunctions'
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import { centsToEuroNumber, convertToLocalDate, formatMoney } from '../../Common/StaticFunctionsTyped'
 import { MITGLIEDER, UMSATZ } from '../../Common/Internationalization/i18n'
 import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
@@ -67,8 +67,6 @@ const ignoredDescriptions = [
     'event payout',
     'payout'
 ]
-
-const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
 const MetricCard = ({ label, value, helper, icon, accent = window.globalTS.ICON_COLOR }: MetricCardProps) => (
     <Paper className={style.metricCard} elevation={1} sx={{ borderTopColor: accent }}>
@@ -171,7 +169,7 @@ const Statistics = () => {
     }, [selectedTransactions])
 
     const totalBalance = useMemo(() => {
-        return roundCurrency(common.members?.reduce((sum, member) => sum + member.balance, 0) ?? 0)
+        return common.members?.reduce((sum, member) => sum + member.balance, 0) ?? 0
     }, [common.members])
 
     const hiddenUsers = useMemo(() => {
@@ -186,10 +184,10 @@ const Statistics = () => {
     }, [common.members])
 
     const totalRevenue = useMemo(() => {
-        return roundCurrency(sales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0))
+        return sales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0)
     }, [sales])
 
-    const averagePurchase = sales.length > 0 ? roundCurrency(totalRevenue / sales.length) : 0
+    const averagePurchase = sales.length > 0 ? Math.round(totalRevenue / sales.length) : 0
     const activeBuyers = useMemo(() => new Set(sales.map((transaction) => transaction.memberID)).size, [sales])
 
     const purchasesByDate = useMemo(() => {
@@ -227,8 +225,7 @@ const Statistics = () => {
         })
 
         output.forEach((entry) => {
-            entry.revenue = roundCurrency(entry.revenue)
-            entry.average = entry.purchases > 0 ? roundCurrency(entry.revenue / entry.purchases) : 0
+            entry.average = entry.purchases > 0 ? Math.round(entry.revenue / entry.purchases) : 0
         })
 
         return [output[1], output[2], output[3], output[4], output[5], output[6], output[0]]
@@ -245,7 +242,7 @@ const Statistics = () => {
             output.set(transaction.description, {
                 name: transaction.description,
                 purchases: (current?.purchases ?? 0) + 1,
-                revenue: roundCurrency((current?.revenue ?? 0) + Math.abs(transaction.amount))
+                revenue: (current?.revenue ?? 0) + Math.abs(transaction.amount)
             })
         })
 
@@ -261,9 +258,17 @@ const Statistics = () => {
             .sort((left, right) => left.balance - right.balance)
             .map((member, index) => ({
                 member: index + 1,
-                Guthaben: roundCurrency(member.balance)
+                Guthaben: centsToEuroNumber(member.balance)
             }))
     }, [common.members])
+
+    const weekdayChartData = useMemo(() => {
+        return weekdayData.map((entry) => ({
+            ...entry,
+            revenue: centsToEuroNumber(entry.revenue),
+            average: centsToEuroNumber(entry.average)
+        }))
+    }, [weekdayData])
 
     const formatRangeDate = (percent: number) => {
         if (transactions.length === 0) {
@@ -311,12 +316,12 @@ const Statistics = () => {
             <section className={style.section}>
                 <Typography variant="h5">{MITGLIEDER}</Typography>
                 <div className={style.metricGrid}>
-                    <MetricCard label="Gesamtguthaben" value={`${totalBalance.toFixed(2)} €`} icon={<Money />} />
+                    <MetricCard label="Gesamtguthaben" value={`${formatMoney(totalBalance)} €`} icon={<Money />} />
                     <MetricCard label="Mitglieder" value={`${common.members?.length ?? 0}`} icon={<Person />} />
                     <MetricCard label="Versteckte Nutzer" value={`${hiddenUsers}`} icon={<VisibilityOff />} />
                     <MetricCard
                         label="Niedrigstes Guthaben"
-                        value={topDebtor ? `${topDebtor.balance.toFixed(2)} €` : '–'}
+                        value={topDebtor ? `${formatMoney(topDebtor.balance)} €` : '–'}
                         helper={topDebtor?.name}
                         icon={<LocalFireDepartment />}
                     />
@@ -362,9 +367,9 @@ const Statistics = () => {
                 </Paper>
 
                 <div className={style.metricGrid}>
-                    <MetricCard label="Getränkeumsatz" value={`${totalRevenue.toFixed(2)} €`} icon={<Euro />} />
+                    <MetricCard label="Getränkeumsatz" value={`${formatMoney(totalRevenue)} €`} icon={<Euro />} />
                     <MetricCard label="Verkaufte Getränke" value={`${sales.length}`} icon={<ReceiptLong />} />
-                    <MetricCard label="Ø pro Kauf" value={`${averagePurchase.toFixed(2)} €`} icon={<LocalBar />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
+                    <MetricCard label="Ø pro Kauf" value={`${formatMoney(averagePurchase)} €`} icon={<LocalBar />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
                     <MetricCard label="Aktive Mitglieder" value={`${activeBuyers}`} helper="mit mindestens einem Kauf" icon={<Groups />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
                 </div>
 
@@ -375,7 +380,7 @@ const Statistics = () => {
                             <Typography variant="caption" color="text.secondary">Stärkster Wochentag</Typography>
                             <Typography variant="h6">{strongestWeekday?.revenue > 0 ? strongestWeekday.day : '–'}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {strongestWeekday?.revenue > 0 ? `${strongestWeekday.revenue.toFixed(2)} € Umsatz` : 'Noch keine Verkäufe'}
+                                {strongestWeekday?.revenue > 0 ? `${formatMoney(strongestWeekday.revenue)} € Umsatz` : 'Noch keine Verkäufe'}
                             </Typography>
                         </div>
                     </Paper>
@@ -438,7 +443,7 @@ const Statistics = () => {
                             </div>
                             <div className={style.chart}>
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={weekdayData} margin={chartMargin}>
+                                    <BarChart data={weekdayChartData} margin={chartMargin}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                         <XAxis dataKey={isMobile ? 'shortDay' : 'day'} />
                                         <YAxis unit=" €" />

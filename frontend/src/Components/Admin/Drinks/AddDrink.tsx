@@ -17,12 +17,14 @@ import {
     PREIS_IN_EURO
 } from '../../Common/Internationalization/i18n'
 import { doGetRequest, doRequest } from '../../Common/StaticFunctions'
+import { parseMoneyInputToCents } from '../../Common/StaticFunctionsTyped'
 import style from './drinks.module.scss'
 
 const AddDrink = () => {
     const [drinkName, setDrinkName] = useState('')
     const [categoryName, setCategoryName] = useState('')
     const [price, setPrice] = useState(0)
+    const [priceInput, setPriceInput] = useState('')
     const [stock, setStock] = useState(0)
     const [categoryAutofill, setCategoryAutofill] = useState<Array<string>>([])
     const dispatch = useDispatch()
@@ -57,6 +59,7 @@ const AddDrink = () => {
                         setDrinkName('')
                         setCategoryName('')
                         setPrice(0)
+                        setPriceInput('')
                         setStock(0)
                     }
                 })
@@ -115,10 +118,13 @@ const AddDrink = () => {
                 <TextField
                     label={PREIS_IN_EURO}
                     type="number"
-                    value={price}
-                    onChange={(event) => setPrice(Number(event.target.value))}
+                    value={priceInput}
+                    onChange={(event) => {
+                        setPriceInput(event.target.value)
+                        setPrice(parseMoneyInputToCents(event.target.value))
+                    }}
                     size="small"
-                    inputProps={{ min: 0, step: 0.01 }}
+                    inputProps={{ step: 0.01 }}
                     InputProps={{ startAdornment: <SellOutlined className={style.fieldIcon} fontSize="small" /> }}
                 />
                 <TextField

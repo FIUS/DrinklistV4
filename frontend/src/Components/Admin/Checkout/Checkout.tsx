@@ -15,6 +15,7 @@ import { openErrorToast, openToast, setMembers } from '../../../Actions/CommonAc
 import { RootState } from '../../../Reducer/reducerCombiner';
 import { ABRECHNUNG_ABSCHLIESSEN, ABRECHNUNG_HINZUGEFUEGT, DIFFERENZ, ENTFERNEN, HINZUFUEGEN, KASSE_GEZAEHLT, KASSE_NACH_ABRECHNUNG, NAME, NEUER_KASSENSTAND, NEUE_ABRECHNUNG, RECHNUNGEN, RECHNUNGS_NAME, VALUE } from '../../Common/Internationalization/i18n';
 import NavigationButton from '../../Common/NavigationButton/NavigationButton';
+import { formatMoney, parseMoneyInputToCents } from '../../Common/StaticFunctionsTyped';
 
 type Props = {}
 
@@ -27,9 +28,12 @@ const Checkout = (props: Props) => {
     const [invoices, setinvoices] = useState<Array<{ name: string, amount: number, id: number }>>([])
     const [invoiceName, setinvoiceName] = useState("")
     const [invoiceAmount, setinvoiceAmount] = useState(0)
+    const [invoiceAmountInput, setInvoiceAmountInput] = useState("")
     const [countedCash, setcountedCash] = useState(0)
+    const [countedCashInput, setCountedCashInput] = useState("")
     const [cashCheckboxChecked, setcashCheckboxChecked] = useState(false)
     const [tempValue, settempValue] = useState(0)
+    const [tempValueInput, setTempValueInput] = useState("")
     const [buttonDisabled, setbuttonDisabled] = useState(false)
     const [reloadCheckouts, setreloadCheckouts] = useState(false)
     const [noMembersAvailable, setnoMembersAvailable] = useState(false)
@@ -62,9 +66,13 @@ const Checkout = (props: Props) => {
         setselectedUser("")
         settoCheckout([])
         setinvoiceAmount(0)
+        setInvoiceAmountInput("")
         setinvoiceName("")
         setinvoices([])
+        setCountedCashInput("")
         setcashCheckboxChecked(false)
+        settempValue(0)
+        setTempValueInput("")
         setisAddOpen(false)
     }
 
@@ -90,7 +98,7 @@ const Checkout = (props: Props) => {
         if (isAddOpen) {
             return <>
                 <Typography variant="h5">
-                    Kasse vor Abrechnung: {checkouts.length > 0 ? checkouts[checkouts.length - 1].currentCash.toFixed(2) : 0}€
+                    Kasse vor Abrechnung: {checkouts.length > 0 ? formatMoney(checkouts[checkouts.length - 1].currentCash) : formatMoney(0)}€
                 </Typography>
                 <Typography variant='overline'> Einzahlungen</Typography>
                 <TableContainer component={Paper}>
@@ -127,9 +135,10 @@ const Checkout = (props: Props) => {
                                     <TextField
                                         label={VALUE}
                                         type="number"
-                                        value={tempValue}
+                                        value={tempValueInput}
                                         onChange={(textValue) => {
-                                            settempValue(parseFloat(textValue.target.value))
+                                            setTempValueInput(textValue.target.value)
+                                            settempValue(parseMoneyInputToCents(textValue.target.value))
                                         }
                                         }
                                         className={style.textfield} />
@@ -146,6 +155,7 @@ const Checkout = (props: Props) => {
                                                     settoCheckout([...toCheckout, { member: toAdd, amount: tempValue }].sort((a, b) => a.member.id - b.member.id))
                                                     setselectedUser("")
                                                     settempValue(0)
+                                                    setTempValueInput("")
                                                 }
                                             }
                                         }
@@ -161,17 +171,17 @@ const Checkout = (props: Props) => {
                                         {value.member.name}
                                     </TableCell>
                                     <TableCell>
-                                        {value.member.balance.toFixed(2)}€
+                                        {formatMoney(value.member.balance)}€
                                     </TableCell>
                                     <TableCell>
                                         <TextField
                                             label={VALUE}
                                             type="number"
-                                            value={toCheckout.find((member) => member.member.id === value.member.id)?.amount}
+                                            value={formatMoney(toCheckout.find((member) => member.member.id === value.member.id)?.amount)}
                                             onChange={(textValue) => {
                                                 const newValue = textValue.target.value
                                                 const others = toCheckout.filter(checkout => checkout.member.id !== value.member.id)
-                                                settoCheckout([...others, { member: value.member, amount: parseFloat(newValue) }].sort((a, b) => a.member.id - b.member.id))
+                                                settoCheckout([...others, { member: value.member, amount: parseMoneyInputToCents(newValue) }].sort((a, b) => a.member.id - b.member.id))
                                             }
                                             }
                                             className={style.textfield} />
@@ -217,8 +227,11 @@ const Checkout = (props: Props) => {
                                         label={VALUE}
                                         variant='standard'
                                         type='number'
-                                        value={invoiceAmount}
-                                        onChange={(value) => { setinvoiceAmount(parseFloat(value.target.value)) }}
+                                        value={invoiceAmountInput}
+                                        onChange={(value) => {
+                                            setInvoiceAmountInput(value.target.value)
+                                            setinvoiceAmount(parseMoneyInputToCents(value.target.value))
+                                        }}
                                         className={style.textfield}
                                     />
                                 </TableCell>
@@ -228,6 +241,7 @@ const Checkout = (props: Props) => {
                                             setinvoices([...invoices, { name: invoiceName, amount: invoiceAmount, id: secureRandomNumber() }]);
                                             setinvoiceName("");
                                             setinvoiceAmount(0);
+                                            setInvoiceAmountInput("");
                                         }
                                         }
                                     >
@@ -241,7 +255,7 @@ const Checkout = (props: Props) => {
                                         {value.name}
                                     </TableCell>
                                     <TableCell>
-                                        {value.amount.toFixed(2)}€
+                                        {formatMoney(value.amount)}€
                                     </TableCell>
                                     <TableCell>
                                         <Button
@@ -259,7 +273,7 @@ const Checkout = (props: Props) => {
                     </Table>
                 </TableContainer>
                 <Typography variant="h5">
-                    {KASSE_NACH_ABRECHNUNG}: {getNewCash().toFixed(2)}€
+                    {KASSE_NACH_ABRECHNUNG}: {formatMoney(getNewCash())}€
                 </Typography>
                 <FormGroup>
                     <FormControlLabel control={
@@ -276,21 +290,16 @@ const Checkout = (props: Props) => {
                                 label={NEUER_KASSENSTAND}
                                 variant='outlined'
                                 type='text'
-                                value={countedCash}
+                                value={countedCashInput}
                                 onChange={(value) => {
-                                    if (value.target.value === "-") {
-                                        setcountedCash(-1)
-                                    } else if (Number.isNaN(parseFloat(value.target.value))) {
-                                        setcountedCash(0)
-                                    } else {
-                                        setcountedCash(parseFloat(parseFloat(value.target.value).toFixed(2)))
-                                    }
+                                    setCountedCashInput(value.target.value)
+                                    setcountedCash(parseMoneyInputToCents(value.target.value))
 
                                 }}
                                 className={style.textfield}
                             />
                             <Typography variant="h5">
-                                {DIFFERENZ}: {(countedCash - getNewCash()).toFixed(2)}€
+                                {DIFFERENZ}: {formatMoney(countedCash - getNewCash())}€
                             </Typography>
                         </div>
                     </> : <></>

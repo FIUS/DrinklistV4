@@ -3,6 +3,7 @@ import React from 'react'
 import { Member } from '../../../../types/ResponseTypes'
 import StatisticBox from '../../../Common/InfoBox/StatisticBox'
 import { MEISTE_SCHULDEN, NO_USERS } from '../../../Common/Internationalization/i18n'
+import { formatMoney } from '../../../Common/StaticFunctionsTyped'
 
 type Props = {
     members: Array<Member> | null
@@ -22,7 +23,7 @@ const TopDepter = (props: Props) => {
                 username = member.name
             }
         })
-        return `${username} (${balance.toFixed(2)}€)`
+        return `${username} (${formatMoney(balance)}€)`
     }
 
     return (

@@ -9,6 +9,7 @@ import { EventGuestResponse, EventModeStatus, Member } from '../../types/Respons
 import { BETRAG, EVENT_EINZAHLEN, EVENT_EINZAHLUNG_ERFOLG, EVENT_GAST_GELADEN, EVENT_KASSE, EVENT_MARKE_KAUFEN, EVENT_MODE_DISABLED, EVENT_SCANNEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseAction.module.scss'
+import { formatMoney, parseMoneyInputToCents } from '../Common/StaticFunctionsTyped'
 
 const EventKasseDeposit = () => {
     const dispatch = useDispatch()
@@ -67,8 +68,8 @@ const EventKasseDeposit = () => {
         if (!activeGuestCode) {
             return
         }
-        const amount = parseFloat(depositAmount)
-        if (isNaN(amount) || amount <= 0) {
+        const amount = parseMoneyInputToCents(depositAmount)
+        if (amount <= 0) {
             return
         }
         setDepositLoading(true)
@@ -128,7 +129,7 @@ const EventKasseDeposit = () => {
                     <Paper className={style.balanceCard} elevation={2}>
                         <Typography variant="h6">{guestName}</Typography>
                         <Typography variant="h2" sx={{ color: balanceColor }}>
-                            {balance.toFixed(2)} EUR
+                            {formatMoney(balance)} EUR
                         </Typography>
                     </Paper>
                     <Paper className={style.section} elevation={2}>

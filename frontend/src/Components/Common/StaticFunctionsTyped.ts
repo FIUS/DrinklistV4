@@ -68,3 +68,41 @@ export const compareCategoriesBySortingIndex = (
 
     return category1.localeCompare(category2)
 }
+
+export const formatMoney = (cents: number | null | undefined) => {
+    const safeCents = Math.trunc(cents ?? 0)
+    const sign = safeCents < 0 ? "-" : ""
+    const absolute = Math.abs(safeCents)
+    const euros = Math.floor(absolute / 100)
+    const remainder = (absolute % 100).toString().padStart(2, "0")
+
+    return `${sign}${euros}.${remainder}`
+}
+
+export const centsToEuroNumber = (cents: number | null | undefined) => {
+    return Math.trunc(cents ?? 0) / 100
+}
+
+export const parseMoneyInputToCents = (value: string | number | null | undefined) => {
+    if (value === null || value === undefined) {
+        return 0
+    }
+
+    const rawValue = value.toString().trim().replace(",", ".")
+    if (rawValue === "" || rawValue === "-") {
+        return 0
+    }
+
+    const match = rawValue.match(/^(-)?(\d*)(?:\.(\d*))?$/)
+    if (!match) {
+        return 0
+    }
+
+    const [, negative, wholePartRaw, fractionalPartRaw = ""] = match
+    const wholePart = parseInt(wholePartRaw || "0", 10)
+    const centsPart = parseInt((fractionalPartRaw + "00").slice(0, 2), 10)
+    const shouldRoundUp = (fractionalPartRaw[2] ?? "0") >= "5"
+    const absoluteCents = wholePart * 100 + centsPart + (shouldRoundUp ? 1 : 0)
+
+    return negative ? -absoluteCents : absoluteCents
+}
