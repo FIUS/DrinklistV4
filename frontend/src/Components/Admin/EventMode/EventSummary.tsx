@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux'
 import { openErrorToast } from '../../../Actions/CommonAction'
 import { Drink, Transaction } from '../../../types/ResponseTypes'
 import { datetimeToString } from '../../Common/StaticFunctions'
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import { convertToLocalDate, formatMoney } from '../../Common/StaticFunctionsTyped'
 import { EVENT_DRUCKEN, EVENT_MODE, EVENT_ZUSAMMENFASSUNG, KATEGORIE, UMSATZ, VERKAUFT, ZURUECK } from '../../Common/Internationalization/i18n'
 import style from './eventSummary.module.scss'
 
@@ -94,7 +94,7 @@ const EventSummary = () => {
     }, [transactions])
 
     const totalRevenue = useMemo(() => {
-        return Math.round(transactionSales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0) * 100) / 100
+        return transactionSales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0)
     }, [transactionSales])
 
     const totalSoldItems = transactionSales.length
@@ -106,14 +106,14 @@ const EventSummary = () => {
             const amount = Math.abs(transaction.amount)
             if (current) {
                 current.sold += 1
-                current.revenue = Math.round((current.revenue + amount) * 100) / 100
+                current.revenue += amount
                 return
             }
 
             rows.set(transaction.description, {
                 name: transaction.description,
                 sold: 1,
-                revenue: Math.round(amount * 100) / 100
+                revenue: amount
             })
         })
 
@@ -128,14 +128,14 @@ const EventSummary = () => {
             const amount = Math.abs(transaction.amount)
             if (current) {
                 current.sold += 1
-                current.revenue = Math.round((current.revenue + amount) * 100) / 100
+                current.revenue += amount
                 return
             }
 
             rows.set(category, {
                 name: category,
                 sold: 1,
-                revenue: Math.round(amount * 100) / 100
+                revenue: amount
             })
         })
 
@@ -210,7 +210,7 @@ const EventSummary = () => {
             <div className={style.metricGrid}>
                 <Paper className={style.statBox} elevation={2}>
                     <Typography variant="overline">{UMSATZ}</Typography>
-                    <Typography variant="h4">{totalRevenue.toFixed(2)} EUR</Typography>
+                    <Typography variant="h4">{formatMoney(totalRevenue)} EUR</Typography>
                 </Paper>
                 <Paper className={style.statBox} elevation={2}>
                     <Typography variant="overline">{VERKAUFT}</Typography>
@@ -251,7 +251,7 @@ const EventSummary = () => {
                                     <TableRow key={row.name}>
                                         <TableCell>{row.name}</TableCell>
                                         <TableCell align="right">{row.sold}</TableCell>
-                                        <TableCell align="right">{row.revenue.toFixed(2)} EUR</TableCell>
+                                        <TableCell align="right">{formatMoney(row.revenue)} EUR</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -275,7 +275,7 @@ const EventSummary = () => {
                                     <TableRow key={row.name}>
                                         <TableCell>{row.name}</TableCell>
                                         <TableCell align="right">{row.sold}</TableCell>
-                                        <TableCell align="right">{row.revenue.toFixed(2)} EUR</TableCell>
+                                        <TableCell align="right">{formatMoney(row.revenue)} EUR</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

@@ -9,6 +9,7 @@ import { EventGuestResponse, EventModeStatus, Member } from '../../types/Respons
 import { EVENT_AUSZAHLEN, EVENT_AUSZAHLUNG_ERFOLG, EVENT_GAST_GELADEN, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTGELD_AUSZAHLEN, EVENT_SCANNEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseAction.module.scss'
+import { formatMoney } from '../Common/StaticFunctionsTyped'
 
 const EventKassePayout = () => {
     const dispatch = useDispatch()
@@ -124,7 +125,7 @@ const EventKassePayout = () => {
                 <Paper className={style.balanceCard} elevation={2}>
                     <Typography variant="h6">{guestName}</Typography>
                     <Typography variant="h2" sx={{ color: balanceColor }}>
-                        {balance.toFixed(2)} EUR
+                        {formatMoney(balance)} EUR
                     </Typography>
                     <Stack direction="row" spacing={2} className={style.actions}>
                         <Button variant="contained" onClick={confirmPayout} disabled={payoutLoading}>{EVENT_AUSZAHLEN}</Button>

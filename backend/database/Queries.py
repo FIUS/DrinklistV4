@@ -18,7 +18,6 @@ from sqlalchemy import extract
 from difflib import SequenceMatcher
 from sqlalchemy import inspect, text
 import database.Migrations
-import math
 from contextlib import contextmanager
 import threading
 
@@ -141,6 +140,7 @@ class Queries:
 
     def add_user(self, name, money, password, alias="", hidden=False):
         with self.get_session() as session:
+            money = util.parse_cents(money)
             pw_hash, salt = TokenManager.hashPassword(password)
             new_member = Member(name=name.lower(), balance=money,
                                 password=pw_hash, salt=salt, alias=alias, hidden=hidden)
@@ -166,6 +166,7 @@ class Queries:
 
     def change_drink_price(self, drink_id, price):
         with self.get_session() as session:
+            price = util.parse_cents(price)
             drink: Drink = session.query(
                 Drink).filter_by(id=drink_id).first()
             drink.price = price
@@ -213,6 +214,7 @@ class Queries:
 
     def add_drink(self, name, price, stock, category=None):
         with self.get_session() as session:
+            price = util.parse_cents(price)
             effective_category = category if category is not None else util.default_drink_category
             sorting_index = self._get_category_sorting_index(
                 session, effective_category)
@@ -313,6 +315,7 @@ class Queries:
 
     def deposit_user(self, member_id, amount):
         with self.get_session() as session:
+            amount = util.parse_cents(amount)
             member: Member = session.query(
                 Member).filter_by(id=member_id).first()
             member.balance += amount
@@ -322,7 +325,8 @@ class Queries:
             if len(checkouts) > 0:
                 most_recent_checkout = session.query(
                     Checkout).filter_by(id=checkouts[-1]["id"]).first()
-                most_recent_checkout.current_cash += amount
+                most_recent_checkout.current_cash = (
+                    most_recent_checkout.current_cash or 0) + amount
                 connected_checkout = most_recent_checkout.id
 
             deposit_transaction = Transaction(description=f"Deposit",
@@ -337,6 +341,7 @@ class Queries:
     def event_deposit_user(self, member_id, amount, description="Barzahlung"):
         with self.write_lock:
             with self.get_session() as session:
+                amount = util.parse_cents(amount)
                 member: Member = session.query(
                     Member).filter_by(id=member_id).first()
                 if member is None:
@@ -346,7 +351,8 @@ class Queries:
                 connected_checkout = self._get_latest_checkout(session)
                 checkout_id = None
                 if connected_checkout is not None:
-                    connected_checkout.current_cash += amount
+                    connected_checkout.current_cash = (
+                        connected_checkout.current_cash or 0) + amount
                     checkout_id = connected_checkout.id
 
                 session.add(Transaction(
@@ -366,7 +372,7 @@ class Queries:
                 if member is None:
                     return None
 
-                payout_amount = float(member.balance)
+                payout_amount = member.balance or 0
                 if payout_amount <= 0:
                     return {
                         "member": member.to_dict(),
@@ -377,7 +383,8 @@ class Queries:
                 connected_checkout = self._get_latest_checkout(session)
                 checkout_id = None
                 if connected_checkout is not None:
-                    connected_checkout.current_cash -= payout_amount
+                    connected_checkout.current_cash = (
+                        connected_checkout.current_cash or 0) - payout_amount
                     checkout_id = connected_checkout.id
 
                 session.add(Transaction(
@@ -419,7 +426,7 @@ class Queries:
                 if len(prepared_items) == 0:
                     return {"error": "EmptyCart"}
 
-                balance = float(member.balance)
+                balance = member.balance or 0
                 payment_mode = str(payment_mode).lower()
 
                 if payment_mode == "balance":
@@ -437,7 +444,8 @@ class Queries:
                     connected_checkout = self._get_latest_checkout(session)
                     checkout_id = None
                     if connected_checkout is not None:
-                        connected_checkout.current_cash += cash_amount
+                        connected_checkout.current_cash = (
+                            connected_checkout.current_cash or 0) + cash_amount
                         checkout_id = connected_checkout.id
 
                     member.balance += cash_amount
@@ -460,7 +468,7 @@ class Queries:
 
                 session.commit()
                 return {
-                    "balance": float(member.balance),
+                    "balance": member.balance,
                     "total": total_amount,
                     "cash": cash_amount
                 }
@@ -492,7 +500,8 @@ class Queries:
                 connected_checkout = self._get_latest_checkout(session)
                 checkout_id = None
                 if connected_checkout is not None:
-                    connected_checkout.current_cash += cash_amount
+                    connected_checkout.current_cash = (
+                        connected_checkout.current_cash or 0) + cash_amount
                     checkout_id = connected_checkout.id
 
                 if cash_amount > 0:
@@ -560,30 +569,27 @@ class Queries:
             checkout = None
             if checkouts['newCash'] is not None:
                 checkout: Checkout = Checkout(
-                    current_cash=checkouts['newCash'])
+                    current_cash=util.parse_cents(checkouts['newCash']))
             else:
                 db_checkouts: Checkout = session.query(Checkout).order_by(
                     asc(Checkout.id)).all()
 
                 last_db_checkout_cash = None
                 if len(db_checkouts) > 0:
-                    last_db_checkout_cash = db_checkouts[-1].current_cash
+                    last_db_checkout_cash = db_checkouts[-1].current_cash or 0
                 else:
                     last_db_checkout_cash = 0
 
                 sum_members = 0
                 for c in checkouts['members']:
-                    sum_members += c['amount']
+                    sum_members += util.parse_cents(c['amount'])
 
                 sum_invoice = 0
                 for c in checkouts['invoices']:
-                    sum_invoice += c['amount']
+                    sum_invoice += util.parse_cents(c['amount'])
 
                 last_db_checkout_cash += sum_members
                 last_db_checkout_cash -= sum_invoice
-
-                last_db_checkout_cash = math.floor(
-                    last_db_checkout_cash*100)/100
 
                 checkout: Checkout = Checkout(
                     current_cash=last_db_checkout_cash)
@@ -592,7 +598,7 @@ class Queries:
 
             for c in checkouts['members']:
                 member_id = c["memberID"]
-                amount = c["amount"]
+                amount = util.parse_cents(c["amount"])
 
                 member: Member = session.query(
                     Member).filter_by(id=member_id).first()
@@ -602,7 +608,7 @@ class Queries:
                     description="Checkout", member_id=member_id, amount=amount, checkout_id=checkout.id))
 
             for c in checkouts['invoices']:
-                amount = c["amount"]
+                amount = util.parse_cents(c["amount"])
                 name = "Rechnung: "+c["name"]
                 session.add(Transaction(
                     description=name, member_id=1, amount=amount, checkout_id=checkout.id))
@@ -644,7 +650,7 @@ class Queries:
                         else:
                             # paid
                             paid_transactions.append(
-                                [str(t_dict["description"]).replace("&", "\&"), t.date.strftime('%d.%m.%Y'), float(t_dict["amount"])*-1])
+                                [str(t_dict["description"]).replace("&", "\&"), t.date.strftime('%d.%m.%Y'), -t_dict["amount"]])
                     temp_dict["income"] = income_transactions
                     temp_dict["paid"] = paid_transactions
 
@@ -914,6 +920,7 @@ class Queries:
 
     def transfer(self, member_id_from, member_id_to, amount, message=None):
         with self.get_session() as session:
+            amount = util.parse_cents(amount)
             member_from: Member = session.query(
                 Member).filter_by(id=member_id_from).first()
             member_to: Member = session.query(
@@ -1153,16 +1160,19 @@ class Queries:
 
     def get_config_state(self):
         with self.get_session() as session:
-            admin: Member = session.query(Member).filter_by(
-                name=util.admin_username).first()
+            config_state: KeyValue = session.query(
+                KeyValue).filter_by(key="config_state").first()
 
-            return admin.balance
+            return int(config_state.value) if config_state is not None else 0
 
     def set_config_state(self, state):
         with self.get_session() as session:
-            admin: Member = session.query(Member).filter_by(
-                name=util.admin_username).first()
-            admin.balance = state
+            config_state: KeyValue = session.query(
+                KeyValue).filter_by(key="config_state").first()
+            if config_state is None:
+                session.add(KeyValue(key="config_state", value=str(int(state))))
+            else:
+                config_state.value = str(int(state))
             session.commit()
 
     def restore_database(self, imported_data):
@@ -1348,7 +1358,7 @@ class Queries:
                                     headers={"x-auth-token": util.token}, timeout=10)
 
                 for user in resp.json():
-                    self.add_user(user["name"], user["balance"]/100,
+                    self.add_user(user["name"], user["balance"],
                                   util.standard_user_password, hidden=True if user["hidden"] == 1 else False)
                     print("User", user["name"], "imported")
 
@@ -1361,7 +1371,7 @@ class Queries:
 
                 for drink in resp.json():
                     self.add_drink(
-                        drink["name"], drink["price"]/100, drink["stock"])
+                        drink["name"], drink["price"], drink["stock"])
                     print("Drink", drink["name"], "imported")
 
                 print("-->", len(resp.json()), "drinks imported")
@@ -1381,7 +1391,7 @@ class Queries:
                             {
                                 "description": transaction["reason"],
                                 "member_id": user["id"],
-                                "amount": transaction["amount"]/100,
+                                "amount": transaction["amount"],
                                 "date": date
                             })
 

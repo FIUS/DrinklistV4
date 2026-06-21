@@ -16,6 +16,7 @@ import { setMembers } from '../../../Actions/CommonAction';
 import { useDispatch } from 'react-redux';
 import { ABBRECHEN, AKTUALISIEREN, AKTUELL, GUTHABEN_HINZUFUEGEN, MENGE_EINZUZAHLENDES_GELD, NEU } from '../../Common/Internationalization/i18n';
 import { format } from 'react-string-format';
+import { formatMoney, parseMoneyInputToCents } from '../../Common/StaticFunctionsTyped';
 
 type Props = {
     isOpen: boolean,
@@ -25,6 +26,7 @@ type Props = {
 
 const ExchangeDialog = (props: Props) => {
     const [amount, setamount] = useState(0)
+    const [amountInput, setAmountInput] = useState("")
     const dispatch = useDispatch()
 
     return (
@@ -38,13 +40,13 @@ const ExchangeDialog = (props: Props) => {
                 <div className={style.outter}>
                     <div className={style.inner}>
                         <Typography variant='h4'>{AKTUELL}</Typography>
-                        <Typography variant='h3'>{props.member.balance.toFixed(2)}€</Typography>
+                        <Typography variant='h3'>{formatMoney(props.member.balance)}€</Typography>
                     </div>
                     <div className={style.inner}>
                         <TextField
                             fullWidth
                             autoFocus
-                            defaultValue={amount}
+                            value={amountInput}
                             margin="dense"
                             variant='standard'
                             type='number'
@@ -53,9 +55,8 @@ const ExchangeDialog = (props: Props) => {
                                 endAdornment: <InputAdornment position="end">€</InputAdornment>,
                             }}
                             onChange={(value) => {
-                                if (parseFloat(value.target.value)) {
-                                    setamount(parseFloat(value.target.value))
-                                }
+                                setAmountInput(value.target.value)
+                                setamount(parseMoneyInputToCents(value.target.value))
                             }
                             }
                         />
@@ -63,7 +64,7 @@ const ExchangeDialog = (props: Props) => {
                     </div>
                     <div className={style.inner}>
                         <Typography variant='h4'>{NEU}</Typography>
-                        <Typography variant='h3'>{(props.member.balance + amount).toFixed(2)}€</Typography>
+                        <Typography variant='h3'>{formatMoney(props.member.balance + amount)}€</Typography>
                     </div>
                 </div>
 
@@ -78,13 +79,14 @@ const ExchangeDialog = (props: Props) => {
                     }
 
                     doPostRequest("users/" + props.member.id + "/deposit", { amount: amount }).then(value => {
-                        if (value.code === 200) {
-                            doGetRequest("users").then((value) => {
                                 if (value.code === 200) {
-                                    dispatch(setMembers(value.content))
-                                }
-                                setamount(0)
-                            })
+                                    doGetRequest("users").then((value) => {
+                                        if (value.code === 200) {
+                                            dispatch(setMembers(value.content))
+                                        }
+                                        setamount(0)
+                                        setAmountInput("")
+                                    })
                             props.close()
                         }
                     })

@@ -9,6 +9,7 @@ import { ENTFERNEN, EVENT_KASSE, EVENT_MARKE_KAUFEN, EVENT_MODE_DISABLED, EVENT_
 import { useDispatch } from 'react-redux'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import style from './eventKasse.module.scss'
+import { formatMoney } from '../Common/StaticFunctionsTyped'
 
 const EventKasse = () => {
     const dispatch = useDispatch()
@@ -187,7 +188,7 @@ const EventKasse = () => {
                                                 >
                                                     <ListItemText
                                                         primary={transaction.description}
-                                                        secondary={`${transaction.amount.toFixed(2)} EUR`}
+                                                        secondary={`${formatMoney(transaction.amount)} EUR`}
                                                     />
                                                 </ListItem>
                                             ))}

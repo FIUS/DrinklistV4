@@ -1,6 +1,7 @@
 export type Member = {
     id: number,
     name: string,
+    /** Signed integer cents. */
     balance: number,
     hidden: boolean,
     alias: string,
@@ -11,6 +12,7 @@ export type Drink = {
     id: number,
     name: string,
     stock: number,
+    /** Integer cents. */
     price: number,
     category: string,
     sortingIndex?: number
@@ -21,6 +23,7 @@ export type Transaction = {
     description: string,
     memberID: number,
     memberName?: string,
+    /** Signed integer cents. */
     amount: number,
     date: string,
     revertable: boolean,
@@ -30,6 +33,7 @@ export type Transaction = {
 export type Checkout = {
     id: number,
     date: string,
+    /** Integer cents. */
     currentCash: number,
     transactions?: Array<Transaction>
 }
@@ -41,6 +45,7 @@ export type Message = {
     emoji: string,
     request?: {
         to: number,
+        /** Integer cents. */
         amount: number
     }
 }
@@ -52,8 +57,11 @@ export type LowBalanceQrCode = {
 
 export type LowBalanceWarningResponse = {
     showWarning: boolean,
+    /** Signed integer cents. */
     balance: number,
+    /** Integer cents. */
     threshold: number | null,
+    /** Integer cents. */
     depositAmount: number,
     qrCodes: Array<LowBalanceQrCode>
 }
@@ -78,7 +86,10 @@ export type EventGuestLoginResponse = {
 }
 
 export type EventPurchaseResponse = {
+    /** Signed integer cents. */
     balance: number,
+    /** Integer cents. */
     total: number,
+    /** Integer cents. */
     cash: number
 }

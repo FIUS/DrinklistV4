@@ -37,7 +37,7 @@ import {
     TRANSAKTIONEN
 } from '../../Common/Internationalization/i18n'
 import { dateToString, doGetRequest } from '../../Common/StaticFunctions'
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import { centsToEuroNumber, convertToLocalDate, formatMoney } from '../../Common/StaticFunctionsTyped'
 import style from './overview.module.scss'
 
 type MetricCardProps = {
@@ -170,7 +170,7 @@ const Overview = () => {
             .sort((left, right) => left.balance - right.balance)
             .map((member, index) => ({
                 member: index + 1,
-                Guthaben: Math.round(member.balance * 100) / 100
+                Guthaben: centsToEuroNumber(member.balance)
             }))
     }, [common.members])
 
@@ -232,7 +232,7 @@ const Overview = () => {
                     <div>
                         <Typography variant="caption" color="text.secondary">Letzte 100 Transaktionen</Typography>
                         <Typography variant="body2" fontWeight={600}>
-                            {sales.length} Käufe · {recentRevenue.toFixed(2)} € Umsatz
+                            {sales.length} Käufe · {formatMoney(recentRevenue)} € Umsatz
                         </Typography>
                     </div>
                 </Paper>
@@ -241,12 +241,12 @@ const Overview = () => {
             <section className={style.section}>
                 <Typography variant="h5">Auf einen Blick</Typography>
                 <div className={style.metricGrid}>
-                    <MetricCard label="Gesamtguthaben" value={`${totalBalance.toFixed(2)} €`} icon={<Money />} />
+                    <MetricCard label="Gesamtguthaben" value={`${formatMoney(totalBalance)} €`} icon={<Money />} />
                     <MetricCard label="Mitglieder" value={`${common.members?.length ?? 0}`} icon={<Person />} />
                     <MetricCard label="Versteckte Nutzer" value={`${hiddenUsers}`} icon={<VisibilityOff />} />
                     <MetricCard
                         label="Niedrigstes Guthaben"
-                        value={lowestBalanceMember ? `${lowestBalanceMember.balance.toFixed(2)} €` : '–'}
+                        value={lowestBalanceMember ? `${formatMoney(lowestBalanceMember.balance)} €` : '–'}
                         helper={lowestBalanceMember?.name}
                         icon={<AccountBalance />}
                         accent={window.globalTS.ICON_COLOR_SECONDARY}

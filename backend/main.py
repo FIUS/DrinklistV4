@@ -124,7 +124,7 @@ def get_member_id_from_code(code):
 
 
 model_amount = api.model('Amount', {
-    'amount': fields.Float(required=True)
+    'amount': fields.Integer(required=True)
 })
 
 
@@ -182,14 +182,14 @@ class get_low_balance_warning(Resource):
         if member is None:
             return util.build_response("User not found", code=404)
 
-        balance = float(member["balance"])
+        balance = member["balance"] or 0
         threshold = util.low_balance_threshold
         show_warning = threshold is not None and balance <= threshold
         deposit_amount = 0
         qr_codes = []
 
         if show_warning:
-            deposit_amount = abs(balance) + 20
+            deposit_amount = abs(balance) + 2000
             epc_text = util.build_low_balance_epc_qr_text(
                 deposit_amount, member["name"], member["id"])
             if epc_text is not None:
@@ -270,7 +270,10 @@ class transfer_money(Resource):
         Transfer money from one member to another
         """
 
-        amount = float(request.json['amount'])
+        try:
+            amount = util.parse_cents(request.json['amount'])
+        except ValueError:
+            return util.build_response("Amount has to be integer cents", code=406)
 
         if amount < 0:
             return util.build_response("Amount has to be positive", code=412)
@@ -288,7 +291,7 @@ class transfer_money(Resource):
 
             db.add_message(
                 member_id_to,
-                f"Du hast {'{:.2f}'.format(amount)}€ von {from_name} erhalten{f' mit folgender Nachricht: {message}' if message is not None else ''}",
+                f"Du hast {util.format_cents(amount)}€ von {from_name} erhalten{f' mit folgender Nachricht: {message}' if message is not None else ''}",
                 from_name,
                 request.json['emoji'] if 'emoji' in request.json else None
             )
@@ -300,19 +303,19 @@ class transfer_money(Resource):
                                      from_alias,
                                      to_name,
                                      to_alias,
-                                     f"Du hast {'{:.2f}'.format(amount)}€ an {to_alias if to_alias != '' else to_name}{to_message}gesendet",
-                                     f"Du hast {'{:.2f}'.format(amount)}€ von {from_alias if from_alias != '' else from_name}{from_message}erhalten")
+                                     f"Du hast {util.format_cents(amount)}€ an {to_alias if to_alias != '' else to_name}{to_message}gesendet",
+                                     f"Du hast {util.format_cents(amount)}€ von {from_alias if from_alias != '' else from_name}{from_message}erhalten")
 
         else:
             return util.build_response("Your are not allowed to transfer money from this account", code=403)
 
-        return util.build_response(f"{amount}€ transfered")
+        return util.build_response(f"{util.format_cents(amount)}€ transfered")
 
 
 model_requestTransfer = api.model('Transfer request', {
     'fromUser': fields.List(fields.Integer),
     'toUser': fields.Integer(required=True),
-    'amount': fields.Float(description="Amount per user"),
+    'amount': fields.Integer(description="Amount per user in cents"),
     'description': fields.String()
 })
 
@@ -328,18 +331,22 @@ class request_transfer(Resource):
 
         fromUser = request.json['fromUser']
         toUser = request.json['toUser']
-        amount = request.json['amount']
+        try:
+            amount = util.parse_cents(request.json['amount'])
+        except ValueError:
+            return util.build_response("Amount has to be integer cents", code=406)
         description = request.json['description']
 
         safeNameTo = db.get_safe_name(toUser)
 
-        outputDescription = f"Es wurden {amount:.2f}€ von dir angefordert" if description is None else f"Es wurden {amount:.2f}€ von dir angefordert, wegen {description}"
+        formatted_amount = util.format_cents(amount)
+        outputDescription = f"Es wurden {formatted_amount}€ von dir angefordert" if description is None else f"Es wurden {formatted_amount}€ von dir angefordert, wegen {description}"
 
         for user in fromUser:
             username, alias = db.get_username_alias(user)
             safeNameFrom = db.get_safe_name(user)
             mail_body = util.money_request_mail_test.format(
-                name=safeNameFrom, requester=safeNameTo, money=f"{amount:.2f}", url=util.domain)
+                name=safeNameFrom, requester=safeNameTo, money=formatted_amount, url=util.domain)
             mail.send_mail("Überweisungsanfrage",
                            mail.mail_from_username(username), mail_body)
             db.add_message(user, outputDescription, f"von {safeNameTo}", request=json.dumps({
@@ -367,7 +374,11 @@ class user_deposit(Resource):
         """
         Deposit money for a user
         """
-        db.deposit_user(member_id, float(request.json["amount"]))
+        try:
+            amount = util.parse_cents(request.json["amount"])
+        except ValueError:
+            return util.build_response("Amount has to be integer cents", code=406)
+        db.deposit_user(member_id, amount)
         return util.build_response("Money added")
 
 
@@ -457,7 +468,7 @@ class user_messages(Resource):
 model = api.model('Add User', {
     'name': fields.String(description='Name of the new user', required=True),
     'alias': fields.String(description='Alias of the user', required=False),
-    'money': fields.Float(description='Initial balance of the user', required=True),
+    'money': fields.Integer(description='Initial balance of the user in cents', required=True),
     'password': fields.String(description='Initial password of user', required=True),
 })
 
@@ -470,12 +481,17 @@ class add_user(Resource):
         """
         Add a user
         """
+        try:
+            money = util.parse_cents(request.json["money"])
+        except ValueError:
+            return util.build_response("Initial balance has to be integer cents", code=406)
+
         if 'alias' in request.json:
             db.add_user(request.json["name"],
-                        request.json["money"], request.json["password"], alias=request.json["alias"])
+                        money, request.json["password"], alias=request.json["alias"])
         else:
             db.add_user(request.json["name"],
-                        request.json["money"], request.json["password"])
+                        money, request.json["password"])
 
         mail.send_welcome_mail(request.json["name"])
 
@@ -525,12 +541,12 @@ event_code_model = api.model('Event-Code', {
 
 event_register_model = api.model('Event-Register', {
     'code': fields.String(description='QR code content', required=True),
-    'initialBalance': fields.Float(description='Initial balance', required=False)
+    'initialBalance': fields.Integer(description='Initial balance in cents', required=False)
 })
 
 event_deposit_model = api.model('Event-Deposit', {
     'code': fields.String(description='QR code content', required=True),
-    'amount': fields.Float(description='Cash amount', required=True)
+    'amount': fields.Integer(description='Cash amount in cents', required=True)
 })
 
 event_purchase_item_model = api.model('Event-Purchase-Item', {
@@ -576,7 +592,10 @@ class event_guest_register(Resource):
 
         initial_balance = 0
         if request.json is not None and "initialBalance" in request.json and request.json["initialBalance"] is not None:
-            initial_balance = float(request.json["initialBalance"])
+            try:
+                initial_balance = util.parse_cents(request.json["initialBalance"])
+            except ValueError:
+                return util.build_response("Initial balance has to be integer cents", code=406)
 
         new_member = db.add_user(code, initial_balance, code)
         return util.build_response({"member": new_member})
@@ -634,8 +653,8 @@ class event_guest_deposit(Resource):
             return util.build_response("Missing amount", code=406)
 
         try:
-            amount = float(amount)
-        except (TypeError, ValueError):
+            amount = util.parse_cents(amount)
+        except ValueError:
             return util.build_response("Invalid amount", code=406)
 
         if amount <= 0:
@@ -860,7 +879,11 @@ class set_drink_price(Resource):
         if request.json["amount"] is None:
             return util.build_response("Price cannot be empty", code=406)
 
-        db.change_drink_price(drink_id, request.json["amount"])
+        try:
+            price = util.parse_cents(request.json["amount"])
+        except ValueError:
+            return util.build_response("Price has to be integer cents", code=406)
+        db.change_drink_price(drink_id, price)
         return util.build_response("Price changed")
 
 
@@ -971,7 +994,7 @@ class delete_drink(Resource):
 
 model = api.model('Add-Drink', {
     'name': fields.String(description='What the drink should be named', required=True),
-    'price': fields.Float(description='The price in euro', required=True),
+    'price': fields.Integer(description='The price in cents', required=True),
     'stock': fields.Integer(description='The current stock', required=True),
     'category': fields.String(description='The category that the drink should be sorted into', required=False),
 })
@@ -985,8 +1008,13 @@ class add_drink(Resource):
         """
         Add a drink
         """
+        try:
+            price = util.parse_cents(request.json["price"])
+        except ValueError:
+            return util.build_response("Price has to be integer cents", code=406)
+
         db.add_drink(request.json["name"],
-                     request.json["price"], request.json["stock"], request.json["category"] if "category" in request.json else None)
+                     price, request.json["stock"], request.json["category"] if "category" in request.json else None)
         return util.build_response("Drink added")
 
 
@@ -1058,16 +1086,16 @@ class undo_transaction(Resource):
 
 member_model = api.model('Member-Checkout', {
     'memberID': fields.Integer,
-    'amount': fields.Float
+    'amount': fields.Integer
 })
 
 invoice_model = api.model('Invoice-Checkout', {
     'name': fields.Integer,
-    'amount': fields.Float
+    'amount': fields.Integer
 })
 
 model = api.model('Do-Checkout', {
-    'newCash': fields.Float(description='The value that what was counted after the checkout', required=False),
+    'newCash': fields.Integer(description='The counted cash balance in cents after checkout', required=False),
     'members': fields.Nested(member_model, as_list=True),
     'invoices': fields.Nested(invoice_model, as_list=True)
 })
@@ -1081,7 +1109,10 @@ class do_checkout(Resource):
         """
         Create a checkout
         """
-        db.do_checkout(request.json)
+        try:
+            db.do_checkout(request.json)
+        except ValueError:
+            return util.build_response("Checkout amounts have to be integer cents", code=406)
         memberids = [m["memberID"] for m in request.json['members']]
         mail_infos = db.get_checkout_mail(memberids)
 

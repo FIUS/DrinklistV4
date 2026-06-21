@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography';
 
 
 import style from './details.module.scss'
-import { safeMemberName } from '../../Common/StaticFunctionsTyped';
+import { parseMoneyInputToCents, safeMemberName } from '../../Common/StaticFunctionsTyped';
 import UserBox from './UserBox';
 import RequestUserItem from './RequestUserItem';
 import Cookies from 'js-cookie';
@@ -38,6 +38,7 @@ const RequestDialog = (props: Props) => {
     const [search, setsearch] = useState("")
     const [reason, setreason] = useState<string | null>(null)
     const [amount, setamount] = useState(0)
+    const [amountInput, setAmountInput] = useState("")
     const [includeUser, setincludeUser] = useState(false)
 
 
@@ -52,6 +53,7 @@ const RequestDialog = (props: Props) => {
         setselectedUser({ "name": "", "id": -1 })
         setselectedUsers([])
         setamount(0)
+        setAmountInput("")
         setreason(null)
     }
 
@@ -61,6 +63,7 @@ const RequestDialog = (props: Props) => {
     }
 
     const userAmountDivide = (!includeUser ? selectedUsers.length : selectedUsers.length + 1)
+    const amountPerUser = userAmountDivide > 0 ? Math.round(amount / userAmountDivide) : 0
 
     const filterTransactions = () => {
         const transactions = common.history?.filter(transaction => transaction.memberID === props.member.id).filter(t => {
@@ -134,7 +137,11 @@ const RequestDialog = (props: Props) => {
                     label={BETRAG}
                     variant='outlined'
                     type='number'
-                    onChange={(value) => { setamount(parseFloat(value.target.value)) }}
+                    value={amountInput}
+                    onChange={(value) => {
+                        setAmountInput(value.target.value)
+                        setamount(parseMoneyInputToCents(value.target.value))
+                    }}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">€</InputAdornment>,
                     }}
@@ -152,7 +159,7 @@ const RequestDialog = (props: Props) => {
                     {selectedUsers.map(user => {
                         return <RequestUserItem
                             name={user.name}
-                            amount={amount / userAmountDivide}
+                            amount={amountPerUser}
                             removeUser={() => {
                                 const notRemovedUsers = selectedUsers.filter(userIterator => userIterator.id !== user.id);
                                 setselectedUsers([...notRemovedUsers])
@@ -176,7 +183,7 @@ const RequestDialog = (props: Props) => {
                         doPostRequest("users/request/transfer", {
                             'fromUser': fromUser,
                             'toUser': toUser,
-                            'amount': amount / userAmountDivide,
+                            'amount': amountPerUser,
                             'description': reason
                         })
                     }}>

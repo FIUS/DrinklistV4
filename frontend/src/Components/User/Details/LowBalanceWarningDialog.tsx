@@ -5,6 +5,7 @@ import QRCode from 'react-qr-code'
 import { LOW_BALANCE_MESSAGE, LOW_BALANCE_NO_QR, LOW_BALANCE_QR_BANK, LOW_BALANCE_QR_PAYPAL, LOW_BALANCE_TITLE, OK, WARNUNG } from '../../Common/Internationalization/i18n'
 import { LowBalanceWarningResponse } from '../../../types/ResponseTypes'
 import style from './lowBalanceWarningDialog.module.scss'
+import { formatMoney } from '../../Common/StaticFunctionsTyped'
 
 type Props = {
     isOpen: boolean,
@@ -27,7 +28,7 @@ const LowBalanceWarningDialog = (props: Props) => {
         return "QR"
     }
 
-    const depositText = props.warning.depositAmount.toFixed(2)
+    const depositText = formatMoney(props.warning.depositAmount)
     const hasQrCodes = props.warning.qrCodes.length > 0
 
     return (

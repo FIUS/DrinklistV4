@@ -20,6 +20,7 @@ import { RootState } from '../../../Reducer/reducerCombiner'
 import { Drink } from '../../../types/ResponseTypes'
 import { ABGESTRICHEN } from '../../Common/Internationalization/i18n'
 import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions'
+import { formatMoney } from '../../Common/StaticFunctionsTyped'
 import style from './availableDrinkBox.module.scss'
 
 type Props = {
@@ -102,7 +103,7 @@ const AvailableDrinkCard = ({ category, drinks = [], memberID, onPurchased }: Pr
                                 </div>
                                 <span className={style.price}>
                                     <SellOutlined fontSize="small" />
-                                    {drink.price.toFixed(2)} €
+                                    {formatMoney(drink.price)} €
                                 </span>
                             </ButtonBase>
                             <Tooltip title={isFavorite ? 'Favorit entfernen' : 'Als Favorit markieren'}>

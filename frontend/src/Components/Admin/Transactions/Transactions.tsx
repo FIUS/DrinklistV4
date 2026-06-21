@@ -47,7 +47,7 @@ import {
     doPostRequest,
     timeToString
 } from '../../Common/StaticFunctions'
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped'
+import { convertToLocalDate, formatMoney } from '../../Common/StaticFunctionsTyped'
 import WarningPopup from '../../Common/WarningPopup/WarningPopup'
 import style from './transactions.module.scss'
 
@@ -190,12 +190,12 @@ const Transactions = () => {
                     />
                     <MetricCard
                         label="Positive Buchungen"
-                        value={`${incomingTotal.toFixed(2)} €`}
+                        value={`${formatMoney(incomingTotal)} €`}
                         icon={<TrendingUp />}
                     />
                     <MetricCard
                         label="Negative Buchungen"
-                        value={`${outgoingTotal.toFixed(2)} €`}
+                        value={`${formatMoney(outgoingTotal)} €`}
                         icon={<TrendingDown />}
                         accent={window.globalTS.ICON_COLOR_SECONDARY}
                     />
@@ -285,7 +285,7 @@ const Transactions = () => {
                                             <Typography variant="caption" color="text.secondary">#{transaction.id}</Typography>
                                         </div>
                                         <Typography variant="h6" className={amountClass(transaction.amount)}>
-                                            {transaction.amount.toFixed(2)} €
+                                            {formatMoney(transaction.amount)} €
                                         </Typography>
                                     </div>
                                     <div className={style.transactionMeta}>
@@ -358,7 +358,7 @@ const Transactions = () => {
                                             <TableCell>{memberLabel(transaction)}</TableCell>
                                             <TableCell>
                                                 <Typography fontWeight={600} className={amountClass(transaction.amount)}>
-                                                    {transaction.amount.toFixed(2)} €
+                                                    {formatMoney(transaction.amount)} €
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>{datetimeToString(convertToLocalDate(transaction.date))}</TableCell>

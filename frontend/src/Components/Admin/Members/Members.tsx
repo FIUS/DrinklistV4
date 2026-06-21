@@ -56,7 +56,7 @@ import {
     SICHTBARKEIT_AENDERN
 } from '../../Common/Internationalization/i18n'
 import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions'
-import { calculateAvatarText } from '../../Common/StaticFunctionsTyped'
+import { calculateAvatarText, formatMoney, parseMoneyInputToCents } from '../../Common/StaticFunctionsTyped'
 import WarningPopup from '../../Common/WarningPopup/WarningPopup'
 import DialogManager from './DialogManager'
 import MemberNameEditDialog from './MemberNameEditDialog'
@@ -111,12 +111,14 @@ const Members = () => {
 
     const [name, setName] = useState('')
     const [balance, setBalance] = useState(0)
+    const [balanceInput, setBalanceInput] = useState('')
     const [password, setPassword] = useState('')
     const [alias, setAlias] = useState('')
     const [qrScanOpen, setQrScanOpen] = useState(false)
     const [qrScannedCode, setQrScannedCode] = useState<string | null>(null)
     const [qrAlias, setQrAlias] = useState('')
     const [qrBalance, setQrBalance] = useState(0)
+    const [qrBalanceInput, setQrBalanceInput] = useState('')
     const [searchName, setSearchName] = useState('')
     const [searchID, setSearchID] = useState('')
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -236,6 +238,7 @@ const Members = () => {
             if (value.code === 200) {
                 setName('')
                 setBalance(0)
+                setBalanceInput('')
                 setPassword('')
                 setAlias('')
                 refreshMembers()
@@ -258,6 +261,7 @@ const Members = () => {
                 setQrScannedCode(null)
                 setQrAlias('')
                 setQrBalance(0)
+                setQrBalanceInput('')
                 refreshMembers()
             }
         })
@@ -308,12 +312,12 @@ const Members = () => {
             <section className={style.section}>
                 <Typography variant="h5">Auf einen Blick</Typography>
                 <div className={style.metricGrid}>
-                    <MetricCard label="Gesamtguthaben" value={`${totalBalance.toFixed(2)} €`} icon={<Money />} />
+                    <MetricCard label="Gesamtguthaben" value={`${formatMoney(totalBalance)} €`} icon={<Money />} />
                     <MetricCard label="Mitglieder" value={`${common.members?.length ?? 0}`} icon={<Person />} />
                     <MetricCard label="Versteckte Nutzer" value={`${hiddenUsers}`} icon={<VisibilityOff />} />
                     <MetricCard
                         label="Niedrigstes Guthaben"
-                        value={lowestBalanceMember ? `${lowestBalanceMember.balance.toFixed(2)} €` : '–'}
+                        value={lowestBalanceMember ? `${formatMoney(lowestBalanceMember.balance)} €` : '–'}
                         helper={lowestBalanceMember?.alias || lowestBalanceMember?.name}
                         icon={<Money />}
                         accent={window.globalTS.ICON_COLOR_SECONDARY}
@@ -356,8 +360,11 @@ const Members = () => {
                                 <TextField
                                     label="Guthaben"
                                     type="number"
-                                    value={balance}
-                                    onChange={(event) => setBalance(Number(event.target.value))}
+                                    value={balanceInput}
+                                    onChange={(event) => {
+                                        setBalanceInput(event.target.value)
+                                        setBalance(parseMoneyInputToCents(event.target.value))
+                                    }}
                                     size="small"
                                 />
                                 <TextField
@@ -413,8 +420,11 @@ const Members = () => {
                                         <TextField
                                             label="Guthaben"
                                             type="number"
-                                            value={qrBalance}
-                                            onChange={(event) => setQrBalance(Number(event.target.value))}
+                                            value={qrBalanceInput}
+                                            onChange={(event) => {
+                                                setQrBalanceInput(event.target.value)
+                                                setQrBalance(parseMoneyInputToCents(event.target.value))
+                                            }}
                                             size="small"
                                         />
                                     </div>
@@ -503,7 +513,7 @@ const Members = () => {
                                     </div>
                                     <div className={style.memberBalance}>
                                         <Typography variant="caption" color="text.secondary">{KONTO}</Typography>
-                                        <Typography variant="h6">{member.balance.toFixed(2)} €</Typography>
+                                        <Typography variant="h6">{formatMoney(member.balance)} €</Typography>
                                     </div>
                                     {memberActions(member)}
                                 </Paper>
@@ -551,7 +561,7 @@ const Members = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Typography fontWeight={600}>{member.balance.toFixed(2)} €</Typography>
+                                                <Typography fontWeight={600}>{formatMoney(member.balance)} €</Typography>
                                             </TableCell>
                                             <TableCell align="right">{memberActions(member)}</TableCell>
                                         </TableRow>

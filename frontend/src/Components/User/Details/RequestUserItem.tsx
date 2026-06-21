@@ -2,6 +2,7 @@ import { Button, Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
 import style from './details.module.scss'
 import CloseIcon from '@mui/icons-material/Close';
+import { formatMoney } from '../../Common/StaticFunctionsTyped';
 
 type Props = {
     name: String,
@@ -19,7 +20,7 @@ const RequestUserItem = (props: Props) => {
                 </div>
                 <Stack direction="row" alignItems="center" gap={"15px"}>
                     <Typography variant='h6'>
-                        {props.amount > 0 ? props.amount.toFixed(2) : "__,__"}€
+                        {props.amount > 0 ? formatMoney(props.amount) : "__,__"}€
                     </Typography>
                     <Button color='error' variant='contained' size='small' onClick={() => { props.removeUser()}}>
                         <CloseIcon />

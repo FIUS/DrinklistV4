@@ -55,7 +55,7 @@ def compile_latex(name):
 
 
 def format_float(input):
-    return '{0:.2f}'.format(input).replace(".", ",")
+    return util.format_cents(input, decimal_separator=",")
 
 
 def send_mail(subject, to_address, body):

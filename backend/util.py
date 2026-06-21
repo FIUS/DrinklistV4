@@ -1,11 +1,56 @@
 from flask import Response
 import base64
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import hashlib
 import json
 import os
 import datetime
 import time
 import requests
+
+
+def euro_to_cents(value):
+    if value is None:
+        return None
+    try:
+        amount = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        raise ValueError("Invalid euro amount")
+    return int((amount * Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
+def parse_cents(value):
+    if value is None or isinstance(value, bool):
+        raise ValueError("Invalid cent amount")
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        if value.is_integer():
+            return int(value)
+        raise ValueError("Cent amount must be an integer")
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped == "":
+            raise ValueError("Cent amount must not be empty")
+        try:
+            decimal_value = Decimal(stripped)
+        except InvalidOperation:
+            raise ValueError("Invalid cent amount")
+        if decimal_value != decimal_value.to_integral_value():
+            raise ValueError("Cent amount must be an integer")
+        return int(decimal_value)
+    raise ValueError("Invalid cent amount")
+
+
+def cents_to_euros(cents):
+    if cents is None:
+        return None
+    return Decimal(int(cents)) / Decimal("100")
+
+
+def format_cents(cents, decimal_separator="."):
+    formatted = f"{cents_to_euros(cents):.2f}"
+    return formatted.replace(".", decimal_separator)
 
 cookie_expire = int(os.environ.get("COOKIE_EXPIRE_TIME")) * \
     60*60 if os.environ.get("COOKIE_EXPIRE_TIME") else 60**3
@@ -79,7 +124,7 @@ OIDC_USER_INFO = os.environ.get(
 OIDC_USER_NEEDS_VERIFICATION = os.environ.get(
     "OIDC_USER_NEEDS_VERIFICATION") == "true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
 
-CURRENT_VERSION = 2
+CURRENT_VERSION = 3
 
 pretix_url = os.environ.get("PRETIX_URL") if os.environ.get(
     "PRETIX_URL") else None
@@ -92,7 +137,7 @@ pretix_event = os.environ.get("PRETIX_EVENT") if os.environ.get(
 pretix_api_token = os.environ.get("PRETIX_API_TOKEN") if os.environ.get(
     "PRETIX_API_TOKEN") else None
 
-low_balance_threshold = float(os.environ.get(
+low_balance_threshold = euro_to_cents(os.environ.get(
     "LOW_BALANCE_THRESHOLD")) if os.environ.get("LOW_BALANCE_THRESHOLD") else None
 low_balance_transfer_name = os.environ.get(
     "LOW_BALANCE_TRANSFER_NAME") if os.environ.get("LOW_BALANCE_TRANSFER_NAME") else None
@@ -158,12 +203,12 @@ def get_user_info(access_token, resource_url):
     return response.json()
 
 
-def build_low_balance_epc_qr_text(amount_eur: float, member_name: str, member_id: int):
+def build_low_balance_epc_qr_text(amount_cents: int, member_name: str, member_id: int):
     if low_balance_transfer_name is None or low_balance_transfer_iban is None or low_balance_transfer_bic is None:
         return None
 
     remittance = f"Drinklist {member_name} - {member_id}"
-    amount_str = f"{amount_eur:.2f}"
+    amount_str = format_cents(amount_cents)
     lines = [
         "BCD",
         "001",
@@ -180,7 +225,7 @@ def build_low_balance_epc_qr_text(amount_eur: float, member_name: str, member_id
     return "\n".join(lines)
 
 
-def build_low_balance_paypal_qr_text(amount_eur: float):
+def build_low_balance_paypal_qr_text(amount_cents: int):
     if low_balance_paypal_me is None:
         return None
 
@@ -191,7 +236,7 @@ def build_low_balance_paypal_qr_text(amount_eur: float):
     if "paypal.me" in username:
         username = username.rstrip("/").split("/")[-1]
 
-    amount_str = f"{amount_eur:.2f}".replace(".", ",")
+    amount_str = format_cents(amount_cents, decimal_separator=",")
     return f"https://paypal.me/{username}/{amount_str}"
 
 

@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import { doGetRequest, doGetRequestWithEventSecret, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
-import { compareCategoriesBySortingIndex } from '../Common/StaticFunctionsTyped'
+import { compareCategoriesBySortingIndex, formatMoney } from '../Common/StaticFunctionsTyped'
 import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
 import { ABBRECHEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
@@ -104,15 +104,14 @@ const EventKasseCheckout = () => {
 
     const totalAmount = cart.reduce((sum, item) => sum + item.drink.price * item.quantity, 0)
     const balance = activeGuest?.balance ?? 0
-    const balanceInCents = Math.round(balance * 100)
     const shortage = Math.max(0, totalAmount - balance)
-    const showSplit = shortage > 0 && balanceInCents > 0
-    const showCashOnly = shortage > 0 && balanceInCents <= 0
+    const showSplit = shortage > 0 && balance > 0
+    const showCashOnly = shortage > 0 && balance <= 0
     const canCheckout = activeGuest !== null && cart.length > 0
     const canCashCheckout = cart.length > 0
-    const hasPositiveBalance = balanceInCents > 0
+    const hasPositiveBalance = balance > 0
     // require positive balance to be considered able to cover via balance
-    const canCover = balanceInCents > 0 && balance >= totalAmount
+    const canCover = balance > 0 && balance >= totalAmount
     const balanceColor = balance >= 0 ? 'limegreen' : 'darkred'
 
     const handleLookup = (code: string) => {
@@ -262,7 +261,7 @@ const EventKasseCheckout = () => {
                     <Typography variant="overline" color="text.secondary">Guthabenkarte</Typography>
                     <Typography variant="h6">{guestName}</Typography>
                     <Typography variant="h2" sx={{ color: balanceColor }}>
-                        {balance.toFixed(2)} EUR
+                        {formatMoney(balance)} EUR
                     </Typography>
                 </Paper>
             ) : (
@@ -295,7 +294,7 @@ const EventKasseCheckout = () => {
                                         {item.drink.name}
                                     </Typography>
                                     <Typography variant="body2">
-                                        {item.drink.price.toFixed(2)} EUR x {item.quantity}
+                                        {formatMoney(item.drink.price)} EUR x {item.quantity}
                                     </Typography>
                                 </div>
                                 <div className={style.cartActions}>
@@ -308,14 +307,14 @@ const EventKasseCheckout = () => {
                 )}
                 <div className={style.cartTotals}>
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                        {EVENT_GESAMT}: {totalAmount.toFixed(2)} EUR
+                        {EVENT_GESAMT}: {formatMoney(totalAmount)} EUR
                     </Typography>
-                    {activeGuest ? <Typography variant="body2">{GUTHABEN}: {balance.toFixed(2)} EUR</Typography> : <></>}
-                    {showSplit ? <Typography variant="body2">{EVENT_RESTBETRAG_BAR}: {shortage.toFixed(2)} EUR</Typography> : <></>}
-                    {showCashOnly ? <Typography variant="body2">{EVENT_BEZAHLEN_BAR}: {totalAmount.toFixed(2)} EUR</Typography> : <></>}
+                    {activeGuest ? <Typography variant="body2">{GUTHABEN}: {formatMoney(balance)} EUR</Typography> : <></>}
+                    {showSplit ? <Typography variant="body2">{EVENT_RESTBETRAG_BAR}: {formatMoney(shortage)} EUR</Typography> : <></>}
+                    {showCashOnly ? <Typography variant="body2">{EVENT_BEZAHLEN_BAR}: {formatMoney(totalAmount)} EUR</Typography> : <></>}
                     {activeGuest && shortage > 0 ? (
                         <Alert severity="warning">
-                            {format(EVENT_GUTHABEN_NICHT_AUSREICHEND, shortage.toFixed(2))}
+                            {format(EVENT_GUTHABEN_NICHT_AUSREICHEND, formatMoney(shortage))}
                         </Alert>
                     ) : null}
                 </div>
@@ -383,7 +382,7 @@ const EventKasseCheckout = () => {
                                         <Stack className={style.drinkStack} spacing={1} justifyContent="space-between">
                                             <Stack>
                                                 <Typography variant="body1">{drink.name}</Typography>
-                                                <Typography variant="body2">{drink.price.toFixed(2)} EUR</Typography>
+                                                <Typography variant="body2">{formatMoney(drink.price)} EUR</Typography>
                                             </Stack>
                                             <Button
                                                 variant="contained"
@@ -414,9 +413,9 @@ const EventKasseCheckout = () => {
                 <DialogTitle>{EVENT_ZAHLUNG_BESTAETIGEN}</DialogTitle>
                 <DialogContent>
                     <Stack spacing={1}>
-                        <Typography variant="body1">{EVENT_GESAMT}: {totalAmount.toFixed(2)} EUR</Typography>
-                        <Typography variant="body2">{EVENT_ZAHLUNG_GUTHABEN}: {breakdown.balanceUsed.toFixed(2)} EUR</Typography>
-                        <Typography variant="body2">{EVENT_ZAHLUNG_BAR}: {breakdown.cashUsed.toFixed(2)} EUR</Typography>
+                        <Typography variant="body1">{EVENT_GESAMT}: {formatMoney(totalAmount)} EUR</Typography>
+                        <Typography variant="body2">{EVENT_ZAHLUNG_GUTHABEN}: {formatMoney(breakdown.balanceUsed)} EUR</Typography>
+                        <Typography variant="body2">{EVENT_ZAHLUNG_BAR}: {formatMoney(breakdown.cashUsed)} EUR</Typography>
                     </Stack>
                 </DialogContent>
                 <DialogActions>

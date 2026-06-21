@@ -12,6 +12,7 @@ import { setDrinkCategories, setDrinks } from '../../../Actions/CommonAction'
 import { Drink as DrinkType } from '../../../types/ResponseTypes'
 import { GETRAENK_LOESCHEN, SICHER_X_LOESCHEN } from '../../Common/Internationalization/i18n'
 import { doGetRequest, doRequest } from '../../Common/StaticFunctions'
+import { formatMoney } from '../../Common/StaticFunctionsTyped'
 import WarningPopup from '../../Common/WarningPopup/WarningPopup'
 import DrinkEditDialog from './DrinkEditDialog'
 import DrinkPriceDialog from './DrinkPriceDialog'
@@ -61,7 +62,7 @@ const Drink = ({ drink }: Props) => {
                     <SellOutlined />
                     <span className={style.factText}>
                         <Typography variant="caption" color="text.secondary">Preis</Typography>
-                        <Typography variant="h6">{drink.price.toFixed(2)} €</Typography>
+                        <Typography variant="h6">{formatMoney(drink.price)} €</Typography>
                     </span>
                 </Button>
                 <Button className={style.factButton} onClick={() => setStockDialogOpen(true)}>

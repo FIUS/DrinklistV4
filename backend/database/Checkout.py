@@ -10,7 +10,7 @@ class Checkout(db.Model):
     transactions = relationship(
         'database.Transaction.Transaction', lazy="joined")
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
-    current_cash = sql.Column(sql.Float, nullable=True)
+    current_cash = sql.Column("current_cash_cents", sql.Integer, nullable=True)
 
     def dict(self):
         return {"id": self.id, "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ'), "currentCash": self.current_cash}

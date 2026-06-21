@@ -4,6 +4,7 @@ import style from './details.module.scss'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { BITTE_EMPFAENGER, KEIN_VERWENDUNGSZWECK } from '../../Common/Internationalization/i18n';
+import { formatMoney } from '../../Common/StaticFunctionsTyped';
 
 type Props = {
     name: String,
@@ -57,7 +58,7 @@ const TransferSummary = (props: Props) => {
                         {nameElement()}
                     </div>
                     <Typography variant='h6'>
-                        {props.amount > 0 ? props.amount.toFixed(2) : "__,__"}€
+                        {props.amount > 0 ? formatMoney(props.amount) : "__,__"}€
                     </Typography>
                 </Stack>
                 <Spacer vertical={15} />

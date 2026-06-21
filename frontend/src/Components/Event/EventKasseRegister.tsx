@@ -9,6 +9,7 @@ import { EventGuestResponse, EventModeStatus } from '../../types/ResponseTypes'
 import { EVENT_GAST_ANGELEGT, EVENT_GAST_EXISTIERT, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NEUER_GAST, EVENT_SCANNEN, EVENT_STARTGUTHABEN, ZURUECK, OK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseAction.module.scss'
+import { parseMoneyInputToCents } from '../Common/StaticFunctionsTyped'
 
 const EventKasseRegister = () => {
     const dispatch = useDispatch()
@@ -68,10 +69,9 @@ const EventKasseRegister = () => {
             setokClicked(false)
             return
         }
-        const amount = parseFloat(initialBalance)
         const payload = {
             code: guestCode,
-            initialBalance: isNaN(amount) ? 0 : amount
+            initialBalance: parseMoneyInputToCents(initialBalance)
         }
         doPostRequestWithEventSecret('event/guest/register', payload, secret).then((value) => {
             if (value.code === 403) {

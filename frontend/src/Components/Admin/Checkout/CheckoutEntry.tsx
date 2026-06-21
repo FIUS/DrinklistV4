@@ -12,7 +12,7 @@ import Spacer from '../../Common/Spacer';
 import { EINNAHMEN, EINZAHLUNGEN, ERFOLGREICH_RUECKGAENIG_GEMACHT, KASSE_DIFFERENZ, KASSE_NACH_ABRECHNUNG, KASSE_VOR_ABRECHNUNG, NAME, RECHNUNGEN, RUECKGAENGIG, VALUE } from '../../Common/Internationalization/i18n';
 import { useDispatch } from 'react-redux';
 import { openErrorToast, openToast } from '../../../Actions/CommonAction';
-import { convertToLocalDate } from '../../Common/StaticFunctionsTyped';
+import { convertToLocalDate, formatMoney } from '../../Common/StaticFunctionsTyped';
 
 type Props = {
     checkout: Checkout,
@@ -77,7 +77,7 @@ const CheckoutEntry = (props: Props) => {
             <AccordionDetails>
                 <div className={style.entryBottomInfo}>
                     <Typography variant="h5">
-                        {KASSE_VOR_ABRECHNUNG}: {props.prevCheckout ? props.prevCheckout?.currentCash.toFixed(2) : (0).toFixed(2)}€
+                        {KASSE_VOR_ABRECHNUNG}: {formatMoney(props.prevCheckout ? props.prevCheckout?.currentCash : 0)}€
                     </Typography>
                 </div>
                 <Typography variant='overline'> {EINZAHLUNGEN}</Typography>
@@ -103,7 +103,7 @@ const CheckoutEntry = (props: Props) => {
                                         {value.memberName}
                                     </TableCell>
                                     <TableCell>
-                                        {value.amount.toFixed(2)}€
+                                        {formatMoney(value.amount)}€
                                     </TableCell>
                                 </TableRow>
                             })}
@@ -116,7 +116,7 @@ const CheckoutEntry = (props: Props) => {
 
                                 </TableCell>
                                 <TableCell className={style.sum}>
-                                    {sumTransactionsNormal().toFixed(2)}€
+                                    {formatMoney(sumTransactionsNormal())}€
                                 </TableCell>
                             </TableRow>
                         </TableBody>
@@ -146,7 +146,7 @@ const CheckoutEntry = (props: Props) => {
                                         {value.description}
                                     </TableCell>
                                     <TableCell>
-                                        {(-value.amount).toFixed(2)}€
+                                        {formatMoney(-value.amount)}€
                                     </TableCell>
                                 </TableRow>
                             })}
@@ -159,7 +159,7 @@ const CheckoutEntry = (props: Props) => {
 
                                 </TableCell>
                                 <TableCell className={style.sum}>
-                                    {(-sumTransactionsInvoices()).toFixed(2)}€
+                                    {formatMoney(-sumTransactionsInvoices())}€
                                 </TableCell>
                             </TableRow>
                         </TableBody>
@@ -169,13 +169,13 @@ const CheckoutEntry = (props: Props) => {
                 <div className={style.entryBottomInfo}>
 
                     <Typography variant="h5">
-                        {KASSE_NACH_ABRECHNUNG}: {props.checkout.currentCash.toFixed(2)}€
+                        {KASSE_NACH_ABRECHNUNG}: {formatMoney(props.checkout.currentCash)}€
                     </Typography>
                     <Typography variant="h5">
-                        {EINNAHMEN}: {(props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0)).toFixed(2)}€
+                        {EINNAHMEN}: {formatMoney(props.checkout.currentCash - (props.prevCheckout ? props.prevCheckout?.currentCash : 0))}€
                     </Typography>
                     <Typography variant="h5">
-                        {KASSE_DIFFERENZ}: {lostMoney().toFixed(2)}€
+                        {KASSE_DIFFERENZ}: {formatMoney(lostMoney())}€
                     </Typography>
                     <Button variant='outlined' color='error' disabled={!props.firstElement || undoInProgress} onClick={() => {
                         setundoInProgress(true)

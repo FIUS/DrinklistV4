@@ -8,7 +8,7 @@ class Drink(db.Model):
     id = sql.Column(sql.Integer, primary_key=True)
     name = sql.Column(sql.String(100), unique=True)
     stock = sql.Column(sql.Integer, default=0)
-    price = sql.Column(sql.Float, default=0)
+    price = sql.Column("price_cents", sql.Integer, default=0)
     category = sql.Column(sql.String(100),
                           default=util.default_drink_category)
     sorting_index = sql.Column(sql.Integer, default=0)

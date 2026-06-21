@@ -57,8 +57,10 @@ import {
 import { dateToString, doGetRequest, doPostRequest, timeToString } from '../../Common/StaticFunctions'
 import {
     calculateAvatarText,
+    centsToEuroNumber,
     compareCategoriesBySortingIndex,
     convertToLocalDate,
+    formatMoney,
     stringToColor
 } from '../../Common/StaticFunctionsTyped'
 import AvailableDrinkCard from './AvailableDrinkCard'
@@ -323,8 +325,8 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
                             </div>
                             <Typography variant="h2" sx={{ color: balanceColor }}>
                                 <CountUp
-                                    start={currentMember.balance - lastAmount}
-                                    end={currentMember.balance}
+                                    start={centsToEuroNumber(currentMember.balance - lastAmount)}
+                                    end={centsToEuroNumber(currentMember.balance)}
                                     decimals={2}
                                     duration={0.5}
                                 /> €
@@ -364,7 +366,7 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
                                                 fontWeight={700}
                                                 className={transaction.amount >= 0 ? style.positiveAmount : style.negativeAmount}
                                             >
-                                                {transaction.amount.toFixed(2)} €
+                                                {formatMoney(transaction.amount)} €
                                             </Typography>
                                             {!readOnly && transaction.revertable ? (
                                                 <Tooltip title="Rückgängig">

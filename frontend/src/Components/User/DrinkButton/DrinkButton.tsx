@@ -20,6 +20,7 @@ import { RootState } from '../../../Reducer/reducerCombiner'
 import { Drink } from '../../../types/ResponseTypes'
 import { ABGESTRICHEN } from '../../Common/Internationalization/i18n'
 import { doGetRequest, doPostRequest, doRequest } from '../../Common/StaticFunctions'
+import { formatMoney } from '../../Common/StaticFunctionsTyped'
 import style from './drinkbutton.module.scss'
 
 type Props = {
@@ -93,7 +94,7 @@ const DrinkButton = ({ drink, memberID, isGeneratedFavorite, onPurchased }: Prop
                         <div className={style.facts}>
                             <span>
                                 <SellOutlined fontSize="small" />
-                                {drink.price.toFixed(2)} €
+                                {formatMoney(drink.price)} €
                             </span>
                             <span>
                                 <Inventory2Outlined fontSize="small" />
