@@ -116,7 +116,7 @@ const AddDrink = () => {
                     label={PREIS_IN_EURO}
                     type="number"
                     value={price}
-                    onChange={(event) => setPrice(Math.max(0, Number(event.target.value)))}
+                    onChange={(event) => setPrice(Number(event.target.value))}
                     size="small"
                     inputProps={{ min: 0, step: 0.01 }}
                     InputProps={{ startAdornment: <SellOutlined className={style.fieldIcon} fontSize="small" /> }}
