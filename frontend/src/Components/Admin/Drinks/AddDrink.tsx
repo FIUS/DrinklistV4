@@ -121,10 +121,10 @@ const AddDrink = () => {
                     value={priceInput}
                     onChange={(event) => {
                         setPriceInput(event.target.value)
-                        setPrice(Math.max(0, parseMoneyInputToCents(event.target.value)))
+                        setPrice(parseMoneyInputToCents(event.target.value))
                     }}
                     size="small"
-                    inputProps={{ min: 0, step: 0.01 }}
+                    inputProps={{ step: 0.01 }}
                     InputProps={{ startAdornment: <SellOutlined className={style.fieldIcon} fontSize="small" /> }}
                 />
                 <TextField
