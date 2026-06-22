@@ -124,7 +124,7 @@ OIDC_USER_INFO = os.environ.get(
 OIDC_USER_NEEDS_VERIFICATION = os.environ.get(
     "OIDC_USER_NEEDS_VERIFICATION") == "true" if os.environ.get("OIDC_USER_NEEDS_VERIFICATION") else True
 
-CURRENT_VERSION = 3
+CURRENT_VERSION = 4
 
 pretix_url = os.environ.get("PRETIX_URL") if os.environ.get(
     "PRETIX_URL") else None

@@ -12,7 +12,7 @@ class Transaction(db.Model):
         'member.id', ondelete='SET NULL'), nullable=True)
     member = relationship(
         'database.Member.Member', lazy="joined")
-    amount = sql.Column("amount_cents", sql.Integer, nullable=True)
+    amount = sql.Column(sql.Integer, nullable=True)
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
     checkout_id = sql.Column(sql.Integer, sql.ForeignKey(
         'checkout.id', ondelete='SET NULL'), nullable=True, default=None)

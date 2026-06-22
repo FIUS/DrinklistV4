@@ -31,6 +31,16 @@ def migrate(db: session):
             "UPDATE \"transaction\" SET amount_cents = CASE WHEN amount IS NULL THEN NULL ELSE CAST(ROUND(amount * 100) AS INTEGER) END;",
             "ALTER TABLE checkout ADD COLUMN current_cash_cents INTEGER;",
             "UPDATE checkout SET current_cash_cents = CASE WHEN current_cash IS NULL THEN NULL ELSE CAST(ROUND(current_cash * 100) AS INTEGER) END;"
+        ],
+        [
+            "ALTER TABLE member DROP COLUMN balance;",
+            "ALTER TABLE member RENAME COLUMN balance_cents TO balance;",
+            "ALTER TABLE drink DROP COLUMN price;",
+            "ALTER TABLE drink RENAME COLUMN price_cents TO price;",
+            "ALTER TABLE \"transaction\" DROP COLUMN amount;",
+            "ALTER TABLE \"transaction\" RENAME COLUMN amount_cents TO amount;",
+            "ALTER TABLE checkout DROP COLUMN current_cash;",
+            "ALTER TABLE checkout RENAME COLUMN current_cash_cents TO current_cash;"
         ]
     ]
 
