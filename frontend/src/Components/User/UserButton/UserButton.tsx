@@ -12,6 +12,7 @@ type Props = {
 
 const UserButton = ({ member }: Props) => {
     const navigate = useNavigate()
+    const showUsername = window.globalTS.DASH_SHOW_USERNAME === true
     const displayName = member.alias || member.name
 
     return (
@@ -29,11 +30,13 @@ const UserButton = ({ member }: Props) => {
                 </Avatar>
                 <div className={style.identity}>
                     <Typography variant="h6">{displayName}</Typography>
-                    {member.alias ? (
-                        <Typography variant="caption" color="text.secondary">{member.name}</Typography>
-                    ) : (
-                        <Typography variant="caption" color="text.secondary">Mitglied #{member.id}</Typography>
-                    )}
+                    {showUsername ? (
+                        member.alias ? (
+                            <Typography variant="caption" color="text.secondary">{member.name}</Typography>
+                        ) : (
+                            <Typography variant="caption" color="text.secondary">Mitglied #{member.id}</Typography>
+                        )
+                    ) : null}
                 </div>
                 <ArrowForward color="action" />
             </Paper>

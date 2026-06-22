@@ -13,6 +13,7 @@ window.globalTS = {
     "WELCOME_TEXT_0_ADMIN": drinklistName + " Admin-Interface",
     "WELCOME_TEXT_1": "Bitte logge dich ein!",
     "HOME_BUTTON": drinklistName,
+    "DASH_SHOW_USERNAME": false,
     "TRANSACTION_LIMIT": 1000,
     "AUTH_COOKIE_PREFIX": "",
     "OIDC_BUTTON_TEXT": null,
