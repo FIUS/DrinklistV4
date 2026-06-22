@@ -197,14 +197,12 @@ const Transactions = () => {
                         label="Negative Buchungen"
                         value={`${formatMoney(outgoingTotal)} €`}
                         icon={<TrendingDown />}
-                        accent={window.globalTS.ICON_COLOR_SECONDARY}
                     />
                     <MetricCard
                         label="Rückgängig möglich"
                         value={`${undoableTransactions}`}
                         helper="nicht Teil einer Abrechnung"
                         icon={<Undo />}
-                        accent={window.globalTS.ICON_COLOR_SECONDARY}
                     />
                 </div>
             </section>

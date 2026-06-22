@@ -249,7 +249,6 @@ const Overview = () => {
                         value={lowestBalanceMember ? `${formatMoney(lowestBalanceMember.balance)} €` : '–'}
                         helper={lowestBalanceMember?.name}
                         icon={<AccountBalance />}
-                        accent={window.globalTS.ICON_COLOR_SECONDARY}
                     />
                 </div>
             </section>

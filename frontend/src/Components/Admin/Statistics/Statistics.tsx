@@ -369,8 +369,8 @@ const Statistics = () => {
                 <div className={style.metricGrid}>
                     <MetricCard label="Getränkeumsatz" value={`${formatMoney(totalRevenue)} €`} icon={<Euro />} />
                     <MetricCard label="Verkaufte Getränke" value={`${sales.length}`} icon={<ReceiptLong />} />
-                    <MetricCard label="Ø pro Kauf" value={`${formatMoney(averagePurchase)} €`} icon={<LocalBar />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
-                    <MetricCard label="Aktive Mitglieder" value={`${activeBuyers}`} helper="mit mindestens einem Kauf" icon={<Groups />} accent={window.globalTS.ICON_COLOR_SECONDARY} />
+                    <MetricCard label="Ø pro Kauf" value={`${formatMoney(averagePurchase)} €`} icon={<LocalBar />} />
+                    <MetricCard label="Aktive Mitglieder" value={`${activeBuyers}`} helper="mit mindestens einem Kauf" icon={<Groups />} />
                 </div>
 
                 <div className={style.insightGrid}>

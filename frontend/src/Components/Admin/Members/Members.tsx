@@ -320,7 +320,6 @@ const Members = () => {
                         value={lowestBalanceMember ? `${formatMoney(lowestBalanceMember.balance)} €` : '–'}
                         helper={lowestBalanceMember?.alias || lowestBalanceMember?.name}
                         icon={<Money />}
-                        accent={window.globalTS.ICON_COLOR_SECONDARY}
                     />
                 </div>
             </section>

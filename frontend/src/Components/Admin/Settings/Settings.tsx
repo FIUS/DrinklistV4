@@ -155,7 +155,7 @@ const Settings = () => {
 
                 <Paper className={style.sectionCard} elevation={1}>
                     <div className={style.sectionHeader}>
-                        <Avatar className={style.sectionIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR_SECONDARY }}>
+                        <Avatar className={style.sectionIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
                             <AdminPanelSettings />
                         </Avatar>
                         <div>

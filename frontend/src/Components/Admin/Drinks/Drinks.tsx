@@ -247,7 +247,6 @@ const Drinks = () => {
                         value={lowestStockDrink ? `${lowestStockDrink.stock}` : '–'}
                         helper={lowestStockDrink?.name}
                         icon={<WarningAmber />}
-                        accent={window.globalTS.ICON_COLOR_SECONDARY}
                     />
                 </div>
             </section>
