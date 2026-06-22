@@ -50,7 +50,7 @@ const PasswordChange = ({ textfielLabel, description, requestPath, icon }: Props
     return (
         <div className={style.passwordRow}>
             <div className={style.passwordInfo}>
-                <Avatar className={style.passwordIcon} sx={{ bgcolor: 'action.hover', color: 'primary.main' }}>
+                <Avatar className={style.passwordIcon} sx={{ bgcolor: window.globalTS.ICON_COLOR }}>
                     {icon}
                 </Avatar>
                 <div>

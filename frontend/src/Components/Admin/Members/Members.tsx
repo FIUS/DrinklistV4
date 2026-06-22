@@ -388,7 +388,7 @@ const Members = () => {
                     <Accordion className={style.createCard} disableGutters>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <div className={style.accordionHeading}>
-                                <Avatar sx={{ bgcolor: window.globalTS.ICON_COLOR_SECONDARY }}><QrCodeScanner /></Avatar>
+                                <Avatar sx={{ bgcolor: window.globalTS.ICON_COLOR }}><QrCodeScanner /></Avatar>
                                 <div>
                                     <Typography variant="h6">Per QR-Code anlegen</Typography>
                                     <Typography variant="body2" color="text.secondary">Code scannen und optional ergänzen</Typography>
