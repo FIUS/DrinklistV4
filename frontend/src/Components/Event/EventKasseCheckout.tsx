@@ -217,6 +217,10 @@ const EventKasseCheckout = () => {
     }
 
     const getBreakdown = (mode: 'balance' | 'cash' | 'split') => {
+        if (activeGuest && totalAmount < 0) {
+            return { balanceUsed: totalAmount, cashUsed: 0 }
+        }
+
         if (mode === 'balance') {
             return { balanceUsed: totalAmount, cashUsed: 0 }
         }
