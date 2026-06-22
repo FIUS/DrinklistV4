@@ -1,4 +1,5 @@
 import {
+    AutoAwesome,
     Favorite,
     Inventory2Outlined,
     SellOutlined
@@ -83,8 +84,7 @@ const DrinkButton = ({ drink, memberID, isGeneratedFavorite, onPurchased }: Prop
     return (
         <Badge
             className={style.badge}
-            color="error"
-            badgeContent={<Favorite className={style.generatedIcon} />}
+            badgeContent={<AutoAwesome className={style.generatedIcon} />}
             invisible={!isGeneratedFavorite}
         >
             <Paper className={style.card} elevation={1}>
