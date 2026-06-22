@@ -197,6 +197,7 @@ export const EVENT_MANUELL = "Code manuell eingeben";
 export const EVENT_STARTGUTHABEN = "Startguthaben";
 export const EVENT_WARENKORB = "Warenkorb";
 export const EVENT_GESAMT = "Gesamt";
+export const EVENT_AUFLADEN = "Aufladen";
 export const EVENT_BEZAHLEN_GUTHABEN = "Aus Guthaben bezahlen";
 export const EVENT_BEZAHLEN_BAR = "Bar bezahlen";
 export const EVENT_BEZAHLEN_SPLIT = "Guthaben + Bar";

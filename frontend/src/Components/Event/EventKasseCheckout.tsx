@@ -7,7 +7,7 @@ import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import { doGetRequest, doGetRequestWithEventSecret, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
 import { compareCategoriesBySortingIndex, formatMoney } from '../Common/StaticFunctionsTyped'
 import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
-import { ABBRECHEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
+import { ABBRECHEN, EVENT_AUFLADEN, EVENT_AUSZAHLEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseCheckout.module.scss'
 import { format } from 'react-string-format'
@@ -112,6 +112,9 @@ const EventKasseCheckout = () => {
     const hasPositiveBalance = balance > 0
     // require positive balance to be considered able to cover via balance
     const canCover = balance > 0 && balance >= totalAmount
+    const cashPaymentLabel = totalAmount < 0
+        ? (activeGuest ? EVENT_AUFLADEN : EVENT_AUSZAHLEN)
+        : EVENT_BEZAHLEN_BAR
     const balanceColor = balance >= 0 ? 'limegreen' : 'darkred'
 
     const handleLookup = (code: string) => {
@@ -311,7 +314,7 @@ const EventKasseCheckout = () => {
                     </Typography>
                     {activeGuest ? <Typography variant="body2">{GUTHABEN}: {formatMoney(balance)} EUR</Typography> : <></>}
                     {showSplit ? <Typography variant="body2">{EVENT_RESTBETRAG_BAR}: {formatMoney(shortage)} EUR</Typography> : <></>}
-                    {showCashOnly ? <Typography variant="body2">{EVENT_BEZAHLEN_BAR}: {formatMoney(totalAmount)} EUR</Typography> : <></>}
+                    {showCashOnly ? <Typography variant="body2">{cashPaymentLabel}: {formatMoney(totalAmount)} EUR</Typography> : <></>}
                     {activeGuest && shortage > 0 ? (
                         <Alert severity="warning">
                             {format(EVENT_GUTHABEN_NICHT_AUSREICHEND, formatMoney(shortage))}
@@ -341,7 +344,7 @@ const EventKasseCheckout = () => {
                                 disabled={!canCashCheckout}
                                 onClick={() => openConfirm('cash')}
                             >
-                                {EVENT_BEZAHLEN_BAR}
+                                {cashPaymentLabel}
                             </Button>
                         </>
                     ) : (
@@ -350,7 +353,7 @@ const EventKasseCheckout = () => {
                             disabled={!canCashCheckout}
                             onClick={() => openConfirm('cash')}
                         >
-                            {EVENT_BEZAHLEN_BAR}
+                            {cashPaymentLabel}
                         </Button>
                     )}
                 </div>
