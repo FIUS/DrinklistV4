@@ -6,8 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { openErrorToast, openToast } from '../../Actions/CommonAction'
 import { doGetRequest, doGetRequestWithEventSecret, doPostRequestWithEventSecret } from '../Common/StaticFunctions'
 import { compareCategoriesBySortingIndex, formatMoney } from '../Common/StaticFunctionsTyped'
-import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, EventPurchaseResponse, Member } from '../../types/ResponseTypes'
-import { ABBRECHEN, EVENT_AUFLADEN, EVENT_AUSZAHLEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
+import { Drink, EventDrinksResponse, EventGuestResponse, EventModeStatus, Member } from '../../types/ResponseTypes'
+import { ABBRECHEN, EVENT_AUFLADEN, EVENT_AUSZAHLEN, EVENT_BEZAHLEN_BAR, EVENT_BEZAHLEN_GUTHABEN, EVENT_BEZAHLEN_SPLIT, EVENT_BESTAETIGEN, EVENT_EINKAUF_ERFOLG, EVENT_GAST_ANGELEGT, EVENT_GAST_GELADEN, EVENT_GESAMT, EVENT_GUTHABEN_NICHT_AUSREICHEND, EVENT_KASSE, EVENT_MODE_DISABLED, EVENT_NO_GUTHABENKARTE, EVENT_RESTBETRAG_BAR, EVENT_SCANNEN, EVENT_WARENKORB, EVENT_WARENKORB_ENTFERNT, EVENT_WARENKORB_HINZUGEFUEGT, EVENT_WARENKORB_LEER, EVENT_ZAHLUNG_BAR, EVENT_ZAHLUNG_BESTAETIGEN, EVENT_ZAHLUNG_GUTHABEN, GUTHABEN, ZURUECK } from '../Common/Internationalization/i18n'
 import EventScanDialog from './EventScanDialog'
 import style from './eventKasseCheckout.module.scss'
 import { format } from 'react-string-format'
@@ -130,7 +130,20 @@ const EventKasseCheckout = () => {
                 dispatch(openToast({ message: EVENT_GAST_GELADEN }))
                 //resetCart()
             } else if (value.code === 404) {
-                dispatch(openToast({ message: EVENT_NO_GUTHABENKARTE, type: 'error' }))
+                return doPostRequestWithEventSecret('event/guest/register', { code, initialBalance: 0 }, secret).then((registerValue) => {
+                    if (registerValue.code === 403) {
+                        dispatch(openErrorToast())
+                        return
+                    }
+                    if (registerValue.code === 200) {
+                        const payload: EventGuestResponse = registerValue.content
+                        setActiveGuest(payload.member)
+                        setActiveGuestCode(code)
+                        dispatch(openToast({ message: EVENT_GAST_ANGELEGT }))
+                    } else {
+                        dispatch(openToast({ message: EVENT_NO_GUTHABENKARTE, type: 'error' }))
+                    }
+                })
             } else {
                 dispatch(openErrorToast())
             }
@@ -153,11 +166,10 @@ const EventKasseCheckout = () => {
                 return
             }
             if (value.code === 200) {
-                const response: EventPurchaseResponse = value.content
-                setActiveGuest((prev) => prev ? { ...prev, balance: response.balance } : prev)
+                setActiveGuest(null)
+                setActiveGuestCode(null)
                 dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
                 resetCart()
-                navigate(`/event/${secret}/kasse`)
             } else {
                 dispatch(openErrorToast())
             }
@@ -177,7 +189,6 @@ const EventKasseCheckout = () => {
             if (value.code === 200) {
                 dispatch(openToast({ message: EVENT_EINKAUF_ERFOLG }))
                 resetCart()
-                navigate(`/event/${secret}/kasse`)
             } else {
                 dispatch(openErrorToast())
             }

@@ -19,6 +19,8 @@ type SummaryRow = {
 
 const ignoredDescriptions = ['Checkout', 'Deposit', 'Transfer', 'Barzahlung', 'Auszahlung', 'Event payout', 'Payout']
 
+const transactionRevenue = (transaction: Transaction) => -transaction.amount
+
 const EventSummary = () => {
     const navigate = useNavigate()
     const [transactions, setTransactions] = useState<Array<Transaction>>([])
@@ -82,19 +84,20 @@ const EventSummary = () => {
         return map
     }, [drinks])
 
+    const drinkNames = useMemo(() => new Set(drinks.map((drink) => drink.name)), [drinks])
+
     const transactionSales = useMemo(() => {
         return transactions.filter((transaction) => {
             const desc = (transaction.description ?? '').toString().toLowerCase()
-            // exclude any explicit cash payments regardless of sign
-            if (transaction.amount >= 0) {
+            if (ignoredDescriptions.some((ignored) => desc.includes(ignored.toLowerCase()))) {
                 return false
             }
-            return !ignoredDescriptions.some((ignored) => desc.includes(ignored.toLowerCase()))
+            return transaction.amount < 0 || drinkNames.has(transaction.description)
         })
-    }, [transactions])
+    }, [drinkNames, transactions])
 
     const totalRevenue = useMemo(() => {
-        return transactionSales.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0)
+        return transactionSales.reduce((sum, transaction) => sum + transactionRevenue(transaction), 0)
     }, [transactionSales])
 
     const totalSoldItems = transactionSales.length
@@ -103,7 +106,7 @@ const EventSummary = () => {
         const rows = new Map<string, SummaryRow>()
         transactionSales.forEach((transaction) => {
             const current = rows.get(transaction.description)
-            const amount = Math.abs(transaction.amount)
+            const amount = transactionRevenue(transaction)
             if (current) {
                 current.sold += 1
                 current.revenue += amount
@@ -125,7 +128,7 @@ const EventSummary = () => {
         transactionSales.forEach((transaction) => {
             const category = drinkCategoryByName.get(transaction.description) ?? 'Unbekannt'
             const current = rows.get(category)
-            const amount = Math.abs(transaction.amount)
+            const amount = transactionRevenue(transaction)
             if (current) {
                 current.sold += 1
                 current.revenue += amount
