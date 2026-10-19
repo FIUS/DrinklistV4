@@ -188,7 +188,7 @@ class get_low_balance_warning(Resource):
         deposit_amount = 0
         qr_codes = []
 
-        if show_warning:
+        if show_warning or request.args.get('includePaymentDetails') == 'true':
             deposit_amount = abs(balance) + 2000
             epc_text = util.build_low_balance_epc_qr_text(
                 deposit_amount, member["name"], member["id"])

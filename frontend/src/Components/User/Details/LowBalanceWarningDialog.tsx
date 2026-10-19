@@ -2,13 +2,14 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typog
 import React from 'react'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import QRCode from 'react-qr-code'
-import { LOW_BALANCE_MESSAGE, LOW_BALANCE_NO_QR, LOW_BALANCE_QR_BANK, LOW_BALANCE_QR_PAYPAL, LOW_BALANCE_TITLE, OK, WARNUNG } from '../../Common/Internationalization/i18n'
+import { LOW_BALANCE_MESSAGE, LOW_BALANCE_NO_QR, LOW_BALANCE_QR_BANK, LOW_BALANCE_QR_PAYPAL, LOW_BALANCE_TITLE, OK, WARNUNG, ZAHLUNGSINFORMATIONEN } from '../../Common/Internationalization/i18n'
 import { LowBalanceWarningResponse } from '../../../types/ResponseTypes'
 import style from './lowBalanceWarningDialog.module.scss'
 import { formatMoney } from '../../Common/StaticFunctionsTyped'
 
 type Props = {
     isOpen: boolean,
+    paymentInfoOnly?: boolean,
     warning: LowBalanceWarningResponse | null,
     onClose: () => void
 }
@@ -33,11 +34,14 @@ const LowBalanceWarningDialog = (props: Props) => {
 
     return (
         <Dialog open={props.isOpen} onClose={props.onClose} maxWidth="sm" fullWidth>
-            <DialogTitle className={style.title} sx={{ color: "warning.light" }}>
-                <WarningAmberIcon sx={{ color: "warning.light" }} /><Typography variant='h5'>{WARNUNG}: {LOW_BALANCE_TITLE}</Typography>
+            <DialogTitle className={style.title} sx={props.paymentInfoOnly ? undefined : { color: "warning.light" }}>
+                {!props.paymentInfoOnly ? <WarningAmberIcon sx={{ color: "warning.light" }} /> : null}
+                <Typography variant='h5'>
+                    {props.paymentInfoOnly ? ZAHLUNGSINFORMATIONEN : <>{WARNUNG}: {LOW_BALANCE_TITLE}</>}
+                </Typography>
             </DialogTitle>
             <DialogContent className={style.content}>
-                <Typography variant='caption'>{LOW_BALANCE_MESSAGE}</Typography>
+                {!props.paymentInfoOnly ? <Typography variant='caption'>{LOW_BALANCE_MESSAGE}</Typography> : null}
 
                 {hasQrCodes ? <div className={style.qrGrid}>
                     {props.warning.qrCodes.map((code, index) => {

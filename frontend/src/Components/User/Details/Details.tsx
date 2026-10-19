@@ -5,6 +5,7 @@ import {
     Delete,
     History,
     Payments,
+    QrCode2,
     RequestQuote,
     Search
 } from '@mui/icons-material'
@@ -43,6 +44,7 @@ import {
     GELD_ANFORDERN,
     GETRAENKE,
     GUTHABEN,
+    GUTHABEN_AUFLADEN,
     HALLO,
     HISTORY,
     KONTOSTAND,
@@ -94,10 +96,12 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
     const [searchField, setSearchField] = useState('')
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
     const [lowBalanceDialogOpen, setLowBalanceDialogOpen] = useState(false)
+    const [paymentInfoOnly, setPaymentInfoOnly] = useState(false)
     const [lowBalanceWarning, setLowBalanceWarning] = useState<LowBalanceWarningResponse | null>(null)
     const [historyExpanded, setHistoryExpanded] = useState(false)
     const cookieMemberID = Number(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + 'memberID') ?? 0)
     const showBackButton = !readOnly && cookieMemberID <= 2
+    const showTopUpButton = !readOnly && common.isLoggedIn && cookieMemberID > 0 && cookieMemberID === memberIDNumber
 
     useEffect(() => {
         if (readOnly) {
@@ -224,18 +228,25 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
         })
     }
 
-    const checkLowBalanceWarning = (id: string) => {
+    const checkLowBalanceWarning = (id: string, forceOpen = false) => {
         if (!id || readOnly) {
             return
         }
 
-        doGetRequest(`users/${id}/low-balance-warning`).then((value) => {
+        doGetRequest(`users/${id}/low-balance-warning${forceOpen ? '?includePaymentDetails=true' : ''}`).then((value) => {
             if (value.code === 200) {
                 const warning: LowBalanceWarningResponse = value.content
-                if (warning.showWarning) {
+                if (forceOpen || warning.showWarning) {
+                    setPaymentInfoOnly(forceOpen)
                     setLowBalanceWarning(warning)
                     setLowBalanceDialogOpen(true)
                 }
+            } else if (forceOpen) {
+                dispatch(openErrorToast())
+            }
+        }).catch(() => {
+            if (forceOpen) {
+                dispatch(openErrorToast())
             }
         })
     }
@@ -262,6 +273,7 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
                     />
                     <LowBalanceWarningDialog
                         isOpen={lowBalanceDialogOpen}
+                        paymentInfoOnly={paymentInfoOnly}
                         warning={lowBalanceWarning}
                         onClose={() => setLowBalanceDialogOpen(false)}
                     />
@@ -322,6 +334,18 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
                                 <Typography variant="overline" color="text.secondary">
                                     {readOnly ? GUTHABEN : KONTOSTAND}
                                 </Typography>
+                                {showTopUpButton ? (
+                                    <Tooltip title={GUTHABEN_AUFLADEN}>
+                                        <IconButton
+                                            size="small"
+                                            aria-label={GUTHABEN_AUFLADEN}
+                                            sx={{ ml: 'auto' }}
+                                            onClick={() => checkLowBalanceWarning(memberId, true)}
+                                        >
+                                            <QrCode2 fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                ) : null}
                             </div>
                             <Typography variant="h2" sx={{ color: balanceColor }}>
                                 <CountUp
