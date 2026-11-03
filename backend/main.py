@@ -1032,8 +1032,16 @@ class buy_drink(Resource):
         """
         Buy a drink
         """
-        status = db.buy_drink(
-            request.json["memberID"], request.json["drinkID"])
+        member_id = request.json["memberID"]
+        if db.get_user_by_id(member_id) is None:
+            return util.build_response("User not found", code=404)
+
+        cookie_member_id = request.cookies.get(
+            f"{util.auth_cookie_memberID}memberID")
+        if str(member_id) != cookie_member_id and cookie_member_id != "2" and not is_admin():
+            return util.build_response("Unauthorized", code=403)
+
+        status = db.buy_drink(member_id, request.json["drinkID"])
         if "name" in status:
             return util.build_response(f"Drink {status['name']} bought")
         else:
