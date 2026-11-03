@@ -209,6 +209,8 @@ class Queries:
         with self.get_session() as session:
             drink: Drink = session.query(
                 Drink).filter_by(id=drink_id).first()
+            session.query(Transaction).filter_by(drink_id=drink_id).update(
+                {Transaction.drink_id: None}, synchronize_session=False)
             session.delete(drink)
             session.commit()
 
@@ -237,7 +239,8 @@ class Queries:
                 member.balance -= drink.price
                 drink.stock -= 1
                 session.add(Transaction(
-                    description=f"{drink.name}", member_id=member.id, amount=(-drink.price)))
+                    description=f"{drink.name}", member_id=member.id,
+                    drink_id=drink.id, amount=(-drink.price)))
 
                 session.commit()
 
@@ -280,7 +283,7 @@ class Queries:
             with self.get_session() as session:
                 transaction: Transaction = session.query(
                     Transaction).filter_by(id=transaction_id).first()
-                if transaction.checkout_id is not None:
+                if transaction is None or transaction.checkout_id is not None:
                     # Cannot delete a transaction that is part of a checkout
                     return False
 
@@ -290,6 +293,12 @@ class Queries:
                         id=transaction.member_id).first()
                     if member is not None:
                         member.balance -= transaction.amount
+
+                if transaction.drink_id is not None:
+                    drink: Drink = session.query(Drink).filter_by(
+                        id=transaction.drink_id).first()
+                    if drink is not None:
+                        drink.stock += 1
 
                 if transaction.connected_transaction_id is not None:
                     transaction_connected: Transaction = session.query(
@@ -463,6 +472,7 @@ class Queries:
                         session.add(Transaction(
                             description=f"{drink.name}",
                             member_id=member_id,
+                            drink_id=drink.id,
                             amount=-drink.price
                         ))
 
@@ -518,6 +528,7 @@ class Queries:
                         session.add(Transaction(
                             description=f"{drink.name}",
                             member_id=None,
+                            drink_id=drink.id,
                             amount=-drink.price,
                             checkout_id=checkout_id
                         ))
@@ -1286,6 +1297,7 @@ class Queries:
                         id=t['id'],
                         description=t['description'],
                         member_id=t['memberID'],
+                        drink_id=t.get('drink_id'),
                         amount=t['amount'],
                         date=datetime.strptime(
                             t['date'], "%Y-%m-%dT%H:%M:%SZ"),
@@ -1303,6 +1315,7 @@ class Queries:
                             id=t['id'],
                             description=t['description'],
                             member_id=t['memberID'],
+                            drink_id=t.get('drink_id'),
                             amount=t['amount'],
                             date=datetime.strptime(
                                 t['date'], "%Y-%m-%dT%H:%M:%SZ"),

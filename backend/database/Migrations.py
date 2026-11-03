@@ -41,6 +41,9 @@ def migrate(db: session):
             "ALTER TABLE \"transaction\" RENAME COLUMN amount_cents TO amount;",
             "ALTER TABLE checkout DROP COLUMN current_cash;",
             "ALTER TABLE checkout RENAME COLUMN current_cash_cents TO current_cash;"
+        ],
+        [
+            'ALTER TABLE "transaction" ADD COLUMN drink_id INTEGER REFERENCES drink(id) ON DELETE SET NULL;'
         ]
     ]
 

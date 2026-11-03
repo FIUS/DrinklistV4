@@ -12,6 +12,8 @@ class Transaction(db.Model):
         'member.id', ondelete='SET NULL'), nullable=True)
     member = relationship(
         'database.Member.Member', lazy="joined")
+    drink_id = sql.Column(sql.Integer, sql.ForeignKey(
+        'drink.id', ondelete='SET NULL'), nullable=True)
     amount = sql.Column(sql.Integer, nullable=True)
     date = sql.Column(sql.DateTime, default=datetime.now, nullable=False)
     checkout_id = sql.Column(sql.Integer, sql.ForeignKey(
@@ -42,6 +44,7 @@ class Transaction(db.Model):
             "id": self.id,
             "description": self.description,
             "memberID": self.member_id,
+            "drink_id": self.drink_id,
             "amount": self.amount,
             "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             "checkout_id": self.checkout_id

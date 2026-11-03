@@ -208,6 +208,11 @@ const Details = ({ readOnly = false, memberIdOverride }: Props) => {
             if (value.code === 200) {
                 dispatch(openToast({ message: format(NICHT_MEHR_ABGESTRICHEN, transaction.description) }))
                 refreshMemberData()
+                doGetRequest('drinks').then((response) => {
+                    if (response.code === 200) {
+                        dispatch(setDrinks(response.content))
+                    }
+                })
             } else if (value.code === 412 && value.content === 'TooLate') {
                 dispatch(openToast({
                     message: WENDE_DICH_AN_ADMIN_RUECKGAENGIG,
