@@ -13,33 +13,40 @@ const LoginChecker = (props: Props) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        let requestString = ""
-        if (location.pathname.startsWith("/admin")) {
-            requestString = "login/admin/check"
-        } else if (location.pathname.startsWith("/event")) {
-            return
-        } else if (location.pathname.startsWith("/message")) {
-            return
-        } else if (location.pathname.startsWith("/config")) {
-            return
-        } else if (!location.pathname.startsWith("/login")) {
-            requestString = "login/check"
-        } else {
+        if (location.pathname.startsWith("/event") ||
+            location.pathname.startsWith("/login/qr") ||
+            location.pathname.startsWith("/message") ||
+            location.pathname.startsWith("/config")) {
             return
         }
-        console.log(Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID"))
-        doGetRequest(requestString).then((value) => {
-            if (value.code !== 200) {
-                doGetRequest("config/status").then((response) => {
-                    if (response.code === 200 && response.content === 0) {
-                        navigate("/config/start" + location.pathname)
-                        dispatch(setLoginState(false))
-                    } else {
-                        navigate("/login?originalPath=" + location.pathname)
-                        dispatch(setLoginState(false))
-                    }
-                })
 
+        let isActive = true
+
+        const checkLogin = async () => {
+            const config = await doGetRequest("config/status")
+            if (!isActive) {
+                return
+            }
+
+            if (config.code === 200 && config.content === 0) {
+                dispatch(setLoginState(false))
+                navigate("/config/start", { replace: true })
+                return
+            }
+
+            if (location.pathname.startsWith("/login")) {
+                return
+            }
+
+            const requestString = location.pathname.startsWith("/admin") ? "login/admin/check" : "login/check"
+            const value = await doGetRequest(requestString)
+            if (!isActive) {
+                return
+            }
+
+            if (value.code !== 200) {
+                navigate("/login?originalPath=" + location.pathname, { replace: true })
+                dispatch(setLoginState(false))
             } else {
                 dispatch(setLoginState(true))
 
@@ -51,7 +58,13 @@ const LoginChecker = (props: Props) => {
                     navigate("/user/" + Cookies.get(window.globalTS.AUTH_COOKIE_PREFIX + "memberID"))
                 }
             }
-        })
+        }
+
+        checkLogin()
+
+        return () => {
+            isActive = false
+        }
 
     }, [location.pathname, navigate, dispatch])
 
